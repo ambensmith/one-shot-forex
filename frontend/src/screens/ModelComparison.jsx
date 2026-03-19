@@ -22,7 +22,7 @@ export default function ModelComparison() {
       </HowItWorks>
 
       {/* Model Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {models.map(model => (
           <div key={model.key} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
             <div className="flex items-center justify-between mb-3">
