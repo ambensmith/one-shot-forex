@@ -110,6 +110,7 @@ export const RISK_PRESETS = {
       'risk.max_open_positions_per_stream': 3,
       'risk.max_daily_loss_per_stream': 0.02,
       'risk.max_correlated_positions': 1,
+      'risk.leverage': 1,
     },
   },
   moderate: {
@@ -121,6 +122,7 @@ export const RISK_PRESETS = {
       'risk.max_open_positions_per_stream': 5,
       'risk.max_daily_loss_per_stream': 0.03,
       'risk.max_correlated_positions': 2,
+      'risk.leverage': 1,
     },
   },
   aggressive: {
@@ -132,6 +134,7 @@ export const RISK_PRESETS = {
       'risk.max_open_positions_per_stream': 8,
       'risk.max_daily_loss_per_stream': 0.05,
       'risk.max_correlated_positions': 3,
+      'risk.leverage': 1,
     },
   },
 }

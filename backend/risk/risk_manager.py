@@ -40,6 +40,7 @@ class RiskManager:
         self.sl_method = risk_cfg.get("stop_loss_method", "atr")
         self.atr_multiplier = risk_cfg.get("atr_multiplier", 1.5)
         self.atr_period = risk_cfg.get("atr_period", 14)
+        self.leverage = risk_cfg.get("leverage", 1)
 
     def check_trade(self, stream_id: str, instrument: str,
                     direction: str, entry_price: float,
@@ -99,6 +100,7 @@ class RiskManager:
         # For forex, 1 standard lot = 100,000 units; pip value ~$10 per lot
         # Simplified: units = risk_amount / stop_distance
         units = risk_amount / stop_distance
+        units *= self.leverage
         return round(units)
 
     def calculate_stop_loss(self, instrument: str, entry_price: float,
