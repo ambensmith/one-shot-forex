@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useDashboard, useHybrids } from '../hooks/useStreamData'
 import { triggerStream, pollWorkflow } from '../lib/api'
 import MetricTile from '../components/MetricTile'
+import HelpTooltip from '../components/HelpTooltip'
+import HowItWorks from '../components/HowItWorks'
 import { formatPnl, STRATEGY_INFO } from '../lib/constants'
 
 const AVAILABLE_MODULES = [
@@ -12,10 +14,10 @@ const AVAILABLE_MODULES = [
 ]
 
 const COMBINER_MODES = [
-  { value: 'weighted', label: 'Weighted Score', desc: 'Sum of weighted signals' },
-  { value: 'all_agree', label: 'All Must Agree', desc: 'Strictest — fewest trades' },
-  { value: 'majority', label: 'Majority Vote', desc: 'More than half agree' },
-  { value: 'any', label: 'Any One Triggers', desc: 'Loosest — most trades' },
+  { value: 'weighted', label: 'Weighted Score', desc: 'Sum of weighted signals — the higher the total weight in one direction, the stronger the signal.', glossaryKey: 'combiner_weighted' },
+  { value: 'all_agree', label: 'All Must Agree', desc: 'Every module must produce the same direction. Strictest mode — fewest trades but highest conviction.', glossaryKey: 'combiner_all_agree' },
+  { value: 'majority', label: 'Majority Vote', desc: 'More than half of modules must agree. A balanced approach.', glossaryKey: 'combiner_majority' },
+  { value: 'any', label: 'Any One Triggers', desc: 'If any single module produces a signal, a trade is placed. Loosest mode — most trades.', glossaryKey: 'combiner_any' },
 ]
 
 const DEFAULT_INSTRUMENTS = ['EUR_USD', 'GBP_USD', 'USD_JPY', 'XAU_USD', 'BCO_USD']
@@ -136,6 +138,13 @@ export default function HybridBuilder() {
         </div>
       </div>
 
+      <HowItWorks>
+        <p>Hybrids let you combine multiple signal sources into a single trading recipe. For example, you could require both the AI news analysis AND the momentum strategy to agree before placing a trade.</p>
+        <p><strong>Modules</strong> are the signal sources (News AI, or any of the 5 strategies). Each module gets a weight and an optional "must participate" flag.</p>
+        <p><strong>Combiner mode</strong> controls how module signals are merged into a final trading decision.</p>
+        <p>This is the most customizable part of the system — experiment with different combinations to find what works best.</p>
+      </HowItWorks>
+
       {/* Status banner */}
       {statusMsg && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
@@ -154,9 +163,9 @@ export default function HybridBuilder() {
             <div key={h.id} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
               <h3 className="font-semibold">{h.name}</h3>
               <div className="grid grid-cols-3 gap-2 mt-2">
-                <MetricTile label="P&L" value={formatPnl(h.total_pnl)} positive={h.total_pnl > 0} />
+                <MetricTile label="P&L" value={formatPnl(h.total_pnl)} positive={h.total_pnl > 0} helpTerm="pnl" />
                 <MetricTile label="Trades" value={h.trade_count} />
-                <MetricTile label="Win %" value={`${(h.win_rate * 100).toFixed(0)}%`} />
+                <MetricTile label="Win %" value={`${(h.win_rate * 100).toFixed(0)}%`} helpTerm="win_rate" />
               </div>
             </div>
           ))}
@@ -181,7 +190,7 @@ export default function HybridBuilder() {
       {dashHybrids.length === 0 && savedHybrids.length === 0 && !editing && (
         <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-8 text-center">
           <p className="text-gray-400 mb-2">No hybrid strategies yet</p>
-          <p className="text-gray-500 text-sm">Create one by combining news signals with mechanical strategies</p>
+          <p className="text-gray-500 text-sm">Create one by combining news signals with mechanical strategies. Click "+ Create New Hybrid" above to get started.</p>
         </div>
       )}
 
@@ -254,7 +263,7 @@ export default function HybridBuilder() {
             <div>
               <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Recipe</h4>
               {selectedModules.length === 0 ? (
-                <p className="text-gray-500 text-sm">Click modules on the left to add them</p>
+                <p className="text-gray-500 text-sm">Click modules on the left to add them to your recipe.</p>
               ) : (
                 <div className="space-y-3">
                   {selectedModules.map((mod) => (
@@ -266,8 +275,9 @@ export default function HybridBuilder() {
                         </button>
                       </div>
                       <div className="flex items-center gap-4">
-                        <label className="text-xs text-gray-500">
-                          Weight:
+                        <label className="text-xs text-gray-500 flex items-center">
+                          Weight
+                          <HelpTooltip term="module_weight" />
                           <input
                             type="number"
                             min="0" max="1" step="0.1"
@@ -284,6 +294,7 @@ export default function HybridBuilder() {
                             className="rounded"
                           />
                           Must participate
+                          <HelpTooltip term="must_participate" />
                         </label>
                       </div>
                     </div>
@@ -292,19 +303,25 @@ export default function HybridBuilder() {
               )}
 
               {/* Combiner Mode */}
-              <h4 className="text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Combiner Mode</h4>
+              <h4 className="text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2 flex items-center">
+                Combiner Mode
+              </h4>
               <div className="space-y-1">
                 {COMBINER_MODES.map(mode => (
-                  <label key={mode.value} className="flex items-center gap-2 p-2 rounded hover:bg-gray-900/50 cursor-pointer">
+                  <label key={mode.value} className="flex items-start gap-2 p-2 rounded hover:bg-gray-900/50 cursor-pointer">
                     <input
                       type="radio"
                       name="combiner"
                       value={mode.value}
                       checked={combinerMode === mode.value}
                       onChange={() => setCombinerMode(mode.value)}
+                      className="mt-0.5"
                     />
                     <div>
-                      <div className="text-sm">{mode.label}</div>
+                      <div className="text-sm flex items-center">
+                        {mode.label}
+                        <HelpTooltip term={mode.glossaryKey} />
+                      </div>
                       <div className="text-xs text-gray-500">{mode.desc}</div>
                     </div>
                   </label>

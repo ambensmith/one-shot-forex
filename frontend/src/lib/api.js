@@ -68,7 +68,29 @@ export async function loadRunReviews() {
   return data?.runs || []
 }
 
+/**
+ * Save config overrides using smart routing:
+ * - Simple config changes (toggles, sliders) → fast direct commit (~5s)
+ * - Falls back to workflow dispatch if direct save fails
+ */
 export async function saveConfig(overrides) {
+  // Try the fast direct save first
+  try {
+    const directResp = await fetch('/api/config-direct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ overrides }),
+    })
+    if (directResp.ok) {
+      const result = await directResp.json()
+      // Return a synthetic result that Settings.jsx can handle
+      return { status: 'ok', message: result.message }
+    }
+  } catch {
+    // Direct save not available, fall through to workflow
+  }
+
+  // Fallback: workflow-based save
   const resp = await fetch('/api/config', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

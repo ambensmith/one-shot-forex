@@ -1,5 +1,7 @@
 import { useModels, useSignals } from '../hooks/useStreamData'
 import MetricTile from '../components/MetricTile'
+import HowItWorks from '../components/HowItWorks'
+import HelpTooltip from '../components/HelpTooltip'
 
 export default function ModelComparison() {
   const { models, loading } = useModels()
@@ -13,6 +15,11 @@ export default function ModelComparison() {
         <h2 className="text-2xl font-bold">Model Comparison</h2>
         <p className="text-sm text-gray-500 mt-1">Compare LLM performance across providers</p>
       </div>
+
+      <HowItWorks>
+        <p>This page compares how different AI models analyze the same news. The primary model (usually Groq/Llama) generates signals that become actual trades. Comparison models are logged but don't trade — they show you what alternative AI models would have done.</p>
+        <p>Data updates each time you fetch news on the <a href="/news" className="text-blue-400 hover:text-blue-300 underline">News Stream</a> page.</p>
+      </HowItWorks>
 
       {/* Model Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -79,7 +86,7 @@ export default function ModelComparison() {
             Signal Agreement Analysis
           </h3>
           <p className="text-xs text-gray-500 mb-4">
-            Showing how different LLMs trade the same news. Data updates when you fetch news on the News Stream page.
+            Showing how different LLMs trade the same news. When models agree on direction, the signal is stronger.
           </p>
           <table className="w-full text-sm">
             <thead>

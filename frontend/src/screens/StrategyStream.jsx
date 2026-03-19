@@ -4,6 +4,8 @@ import { triggerStream, pollWorkflow } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
 import ConfidenceMeter from '../components/ConfidenceMeter'
+import HelpTooltip from '../components/HelpTooltip'
+import HowItWorks from '../components/HowItWorks'
 import { formatPnl, formatPercent, STRATEGY_INFO } from '../lib/constants'
 
 export default function StrategyStream() {
@@ -59,6 +61,12 @@ export default function StrategyStream() {
         </button>
       </div>
 
+      <HowItWorks>
+        <p>Each strategy card below represents a mechanical trading rule backed by academic research. No AI is involved — these are purely mathematical, rule-based strategies.</p>
+        <p>When you click <strong>Run Strategy Stream</strong>, each enabled strategy analyzes recent price data (hourly candles) and generates buy/sell/neutral signals. The system then applies risk management checks before placing any trades.</p>
+        <p>You can enable/disable individual strategies and tune their parameters in <a href="/settings" className="text-blue-400 hover:text-blue-300 underline">Settings</a>.</p>
+      </HowItWorks>
+
       {/* Status banner */}
       {statusMsg && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
@@ -72,11 +80,11 @@ export default function StrategyStream() {
 
       {/* Overall Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <MetricTile label="P&L" value={formatPnl(stream?.total_pnl || 0)} positive={stream?.total_pnl > 0} />
+        <MetricTile label="P&L" value={formatPnl(stream?.total_pnl || 0)} positive={stream?.total_pnl > 0} helpTerm="pnl" />
         <MetricTile label="Trades" value={stream?.trade_count || 0} />
-        <MetricTile label="Win Rate" value={formatPercent(stream?.win_rate || 0)} />
-        <MetricTile label="Sharpe" value={(stream?.sharpe_ratio || 0).toFixed(2)} />
-        <MetricTile label="Max DD" value={formatPercent(stream?.max_drawdown || 0)} />
+        <MetricTile label="Win Rate" value={formatPercent(stream?.win_rate || 0)} helpTerm="win_rate" />
+        <MetricTile label="Sharpe" value={(stream?.sharpe_ratio || 0).toFixed(2)} helpTerm="sharpe_ratio" />
+        <MetricTile label="Max DD" value={formatPercent(stream?.max_drawdown || 0)} helpTerm="max_drawdown" />
       </div>
 
       {/* Strategy Cards */}
@@ -84,19 +92,22 @@ export default function StrategyStream() {
         {Object.entries(STRATEGY_INFO).map(([name, info]) => {
           const stats = breakdown.find(b => b.name === name) || {}
           const stratSignals = signals.filter(s => s.source === name).slice(0, 5)
-          const activePositions = trades.filter(t => t.status === 'open')
 
           return (
             <div key={name} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h3 className="font-semibold text-lg capitalize">
+                  <h3 className="font-semibold text-lg capitalize flex items-center">
                     {name.replace('_', ' ')}
+                    <HelpTooltip term={info.glossaryKey || name} />
                   </h3>
                   <p className="text-xs text-gray-500">{info.desc} ({info.paper})</p>
                 </div>
                 <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">ON</span>
               </div>
+
+              {/* Plain-English explanation */}
+              <p className="text-sm text-gray-400 mb-3">{info.explanation}</p>
 
               <div className="grid grid-cols-4 gap-4 mb-3">
                 <div>
