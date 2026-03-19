@@ -1,0 +1,216 @@
+import { useState } from 'react'
+import { useDashboard } from '../hooks/useStreamData'
+import MetricTile from '../components/MetricTile'
+import { formatPnl, STRATEGY_INFO } from '../lib/constants'
+
+const AVAILABLE_MODULES = [
+  { type: 'news', name: 'News Signals', icon: 'N' },
+  ...Object.keys(STRATEGY_INFO).map(name => ({
+    type: 'strategy', name, icon: 'S',
+  })),
+]
+
+const COMBINER_MODES = [
+  { value: 'weighted', label: 'Weighted Score', desc: 'Sum of weighted signals' },
+  { value: 'all_agree', label: 'All Must Agree', desc: 'Strictest — fewest trades' },
+  { value: 'majority', label: 'Majority Vote', desc: 'More than half agree' },
+  { value: 'any', label: 'Any One Triggers', desc: 'Loosest — most trades' },
+]
+
+export default function HybridBuilder() {
+  const { data: dashboard } = useDashboard()
+  const hybrids = dashboard?.streams?.filter(s => s.id.startsWith('hybrid:')) || []
+
+  const [editing, setEditing] = useState(false)
+  const [hybridName, setHybridName] = useState('')
+  const [selectedModules, setSelectedModules] = useState([])
+  const [combinerMode, setCombinerMode] = useState('weighted')
+  const [minConfidence, setMinConfidence] = useState(0.65)
+
+  const addModule = (mod) => {
+    if (!selectedModules.find(m => m.name === mod.name)) {
+      setSelectedModules([...selectedModules, { ...mod, weight: 0.5, mustParticipate: false }])
+    }
+  }
+
+  const removeModule = (name) => {
+    setSelectedModules(selectedModules.filter(m => m.name !== name))
+  }
+
+  const updateModule = (name, field, value) => {
+    setSelectedModules(selectedModules.map(m =>
+      m.name === name ? { ...m, [field]: value } : m
+    ))
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">Custom Hybrid</h2>
+          <p className="text-sm text-gray-500 mt-1">Combine news + strategies into custom recipes</p>
+        </div>
+        <button
+          onClick={() => setEditing(!editing)}
+          className="px-4 py-2 bg-brand-500 text-white rounded-lg text-sm hover:bg-brand-600 transition-colors"
+        >
+          {editing ? 'Cancel' : '+ Create New Hybrid'}
+        </button>
+      </div>
+
+      {/* Existing Hybrids */}
+      {hybrids.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {hybrids.map(h => (
+            <div key={h.id} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
+              <h3 className="font-semibold">{h.name}</h3>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                <MetricTile label="P&L" value={formatPnl(h.total_pnl)} positive={h.total_pnl > 0} />
+                <MetricTile label="Trades" value={h.trade_count} />
+                <MetricTile label="Win %" value={`${(h.win_rate * 100).toFixed(0)}%`} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hybrids.length === 0 && !editing && (
+        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-8 text-center">
+          <p className="text-gray-400 mb-2">No hybrid strategies yet</p>
+          <p className="text-gray-500 text-sm">Create one by combining news signals with mechanical strategies</p>
+        </div>
+      )}
+
+      {/* Builder */}
+      {editing && (
+        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-6">
+          <h3 className="font-semibold mb-4">Build Recipe</h3>
+
+          <div className="mb-4">
+            <label className="text-xs text-gray-500 block mb-1">Hybrid Name</label>
+            <input
+              type="text"
+              value={hybridName}
+              onChange={e => setHybridName(e.target.value)}
+              placeholder="e.g., Geopolitical Edge"
+              className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm w-full max-w-xs"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Available Modules */}
+            <div>
+              <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Available Modules</h4>
+              <div className="space-y-2">
+                {AVAILABLE_MODULES.map(mod => (
+                  <button
+                    key={mod.name}
+                    onClick={() => addModule(mod)}
+                    disabled={selectedModules.find(m => m.name === mod.name)}
+                    className="w-full flex items-center gap-3 p-3 bg-gray-900/50 rounded border border-gray-700/50
+                               hover:border-brand-500/50 transition-colors text-left disabled:opacity-30"
+                  >
+                    <span className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold ${
+                      mod.type === 'news' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'
+                    }`}>
+                      {mod.icon}
+                    </span>
+                    <div>
+                      <div className="text-sm font-medium capitalize">{mod.name.replace('_', ' ')}</div>
+                      <div className="text-xs text-gray-500">
+                        {mod.type === 'news' ? 'LLM news analysis' : STRATEGY_INFO[mod.name]?.desc}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Selected Modules */}
+            <div>
+              <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Recipe</h4>
+              {selectedModules.length === 0 ? (
+                <p className="text-gray-500 text-sm">Click modules on the left to add them</p>
+              ) : (
+                <div className="space-y-3">
+                  {selectedModules.map((mod, i) => (
+                    <div key={mod.name} className="bg-gray-900/50 rounded border border-gray-700/50 p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium capitalize">{mod.name.replace('_', ' ')}</span>
+                        <button onClick={() => removeModule(mod.name)} className="text-xs text-red-400 hover:text-red-300">
+                          Remove
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <label className="text-xs text-gray-500">
+                          Weight:
+                          <input
+                            type="number"
+                            min="0" max="1" step="0.1"
+                            value={mod.weight}
+                            onChange={e => updateModule(mod.name, 'weight', parseFloat(e.target.value))}
+                            className="ml-2 w-16 bg-gray-800 border border-gray-700 rounded px-2 py-0.5 text-xs"
+                          />
+                        </label>
+                        <label className="text-xs text-gray-500 flex items-center gap-1">
+                          <input
+                            type="checkbox"
+                            checked={mod.mustParticipate}
+                            onChange={e => updateModule(mod.name, 'mustParticipate', e.target.checked)}
+                            className="rounded"
+                          />
+                          Must participate
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Combiner Mode */}
+              <h4 className="text-xs text-gray-500 uppercase tracking-wider mt-4 mb-2">Combiner Mode</h4>
+              <div className="space-y-1">
+                {COMBINER_MODES.map(mode => (
+                  <label key={mode.value} className="flex items-center gap-2 p-2 rounded hover:bg-gray-900/50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="combiner"
+                      value={mode.value}
+                      checked={combinerMode === mode.value}
+                      onChange={() => setCombinerMode(mode.value)}
+                    />
+                    <div>
+                      <div className="text-sm">{mode.label}</div>
+                      <div className="text-xs text-gray-500">{mode.desc}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              {/* Min Confidence */}
+              <div className="mt-4">
+                <label className="text-xs text-gray-500">
+                  Min Confidence:
+                  <input
+                    type="number"
+                    min="0" max="1" step="0.05"
+                    value={minConfidence}
+                    onChange={e => setMinConfidence(parseFloat(e.target.value))}
+                    className="ml-2 w-16 bg-gray-800 border border-gray-700 rounded px-2 py-0.5 text-xs"
+                  />
+                </label>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 mt-4">
+                <button className="px-4 py-2 bg-brand-500 text-white rounded text-sm hover:bg-brand-600 transition-colors">
+                  Save & Activate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

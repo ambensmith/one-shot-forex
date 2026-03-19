@@ -1,0 +1,30 @@
+scheduler:
+  interval: "1h"
+  timezone: "UTC"
+
+risk:
+  max_risk_per_trade: 0.01
+  max_open_positions_per_stream: 5
+  max_daily_loss_per_stream: 0.03
+  max_correlated_positions: 2
+  default_rr_ratio: 1.5
+  stop_loss_method: "atr"
+  atr_multiplier: 1.5
+  atr_period: 14
+
+execution:
+  mode: "practice"
+  oanda_environment: "practice"
+
+data:
+  candle_granularity: "H1"
+  lookback_periods: 200
+  secondary_granularity: "D"
+
+reviews:
+  auto_generate: true
+  schedule: "daily"
+  time: "22:00"
+  review_period_days: 7
+  max_archive_count: 30
+  output_dir: "reviews"

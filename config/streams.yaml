@@ -1,0 +1,77 @@
+news_stream:
+  id: "news"
+  name: "News Stream"
+  enabled: true
+  capital_allocation: 33333
+  instruments:
+    - EUR_USD
+    - GBP_USD
+    - USD_JPY
+    - XAU_USD
+    - BCO_USD
+  news_sources:
+    - type: "rss"
+      url: "https://feeds.bbci.co.uk/news/business/rss.xml"
+      name: "BBC Business"
+    - type: "rss"
+      url: "https://www.reutersagency.com/feed/"
+      name: "Reuters"
+    - type: "gdelt"
+      enabled: true
+    - type: "economic_calendar"
+      url: "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+  news_lookback_hours: 4
+  min_confidence: 0.60
+  llm:
+    primary_model: "groq/llama-3.3-70b"
+    comparison_models:
+      - "mistral/mistral-small"
+      - "openrouter/deepseek-v3"
+    comparison_enabled: false
+
+strategy_stream:
+  id: "strategy"
+  name: "Strategy Stream"
+  enabled: true
+  capital_allocation: 33333
+  instruments:
+    - EUR_USD
+    - GBP_USD
+    - USD_JPY
+    - USD_CHF
+    - AUD_USD
+    - XAU_USD
+  strategies:
+    - name: "momentum"
+      enabled: true
+      params:
+        lookback_months: 12
+        rebalance_frequency: "weekly"
+    - name: "carry"
+      enabled: true
+      params:
+        rate_data: "manual"
+    - name: "breakout"
+      enabled: true
+      params:
+        asian_start: "22:00"
+        asian_end: "06:00"
+        breakout_buffer_pips: 10
+    - name: "mean_reversion"
+      enabled: true
+      params:
+        bb_period: 20
+        bb_std: 2.0
+        rsi_period: 14
+        rsi_oversold: 30
+        rsi_overbought: 70
+    - name: "volatility_breakout"
+      enabled: true
+      params:
+        atr_period: 14
+        atr_contraction_threshold: 0.7
+        breakout_atr_multiplier: 1.0
+
+hybrid_defaults:
+  capital_allocation: 33333
+  min_confidence: 0.60
