@@ -101,20 +101,19 @@ export default function HybridBuilder() {
     try {
       await toggleHybrid(h.id, newActive)
       setStatusMsg({ type: 'ok', text: `${h.name} ${newActive ? 'activated' : 'deactivated'}` })
-      refreshHybrids()
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
     } catch (e) {
       setStatusMsg({ type: 'error', text: e.message })
     }
   }
 
   async function handleDelete(h) {
-    setStatusMsg({ type: 'info', text: `Deleting ${h.name}...` })
     setConfirmDelete(null)
+    setStatusMsg({ type: 'info', text: `Deleting ${h.name}...` })
     try {
       await deleteHybrid(h.id)
       setStatusMsg({ type: 'ok', text: `${h.name} deleted` })
-      refreshHybrids()
-      refreshDashboard()
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
     } catch (e) {
       setStatusMsg({ type: 'error', text: e.message })
     }
@@ -126,7 +125,7 @@ export default function HybridBuilder() {
     try {
       await toggleAllHybrids(newActive)
       setStatusMsg({ type: 'ok', text: `All hybrids ${newActive ? 'enabled' : 'disabled'}` })
-      refreshHybrids()
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
     } catch (e) {
       setStatusMsg({ type: 'error', text: e.message })
     }
