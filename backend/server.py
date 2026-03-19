@@ -7,7 +7,7 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -323,6 +323,71 @@ async def refresh_data():
     finally:
         db.close()
 
+
+
+@app.post("/api/hybrid/{config_id}/toggle")
+async def toggle_hybrid(config_id: int, request: Request):
+    """Toggle a hybrid config's is_active status."""
+    from backend.core.config import load_config
+    from backend.core.database import Database
+
+    config = load_config()
+    db = Database("data/sentinel.db")
+    try:
+        body = await request.json()
+        is_active = int(bool(body.get("is_active", False)))
+        db.update_hybrid_config(config_id, is_active=is_active)
+        _export_json(db, config)
+        logger.info("Toggled hybrid %d → is_active=%d", config_id, is_active)
+        return JSONResponse({"status": "ok", "is_active": bool(is_active)})
+    except Exception as e:
+        logger.exception("Toggle hybrid failed")
+        return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
+    finally:
+        db.close()
+
+
+@app.post("/api/hybrid/toggle-all")
+async def toggle_all_hybrids(request: Request):
+    """Toggle all hybrid configs on or off."""
+    from backend.core.config import load_config
+    from backend.core.database import Database
+
+    config = load_config()
+    db = Database("data/sentinel.db")
+    try:
+        body = await request.json()
+        is_active = int(bool(body.get("is_active", False)))
+        for hybrid in db.get_all_hybrids():
+            db.update_hybrid_config(hybrid["id"], is_active=is_active)
+        _export_json(db, config)
+        logger.info("Toggled all hybrids → is_active=%d", is_active)
+        return JSONResponse({"status": "ok", "is_active": bool(is_active)})
+    except Exception as e:
+        logger.exception("Toggle all hybrids failed")
+        return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
+    finally:
+        db.close()
+
+
+@app.delete("/api/hybrid/{config_id}")
+async def delete_hybrid(config_id: int):
+    """Delete a hybrid config."""
+    from backend.core.config import load_config
+    from backend.core.database import Database
+
+    config = load_config()
+    db = Database("data/sentinel.db")
+    try:
+        db.delete_hybrid_config(config_id)
+        _export_json(db, config)
+        logger.info("Deleted hybrid config %d", config_id)
+        return JSONResponse({"status": "ok", "message": f"Hybrid {config_id} deleted"})
+    except Exception as e:
+        logger.exception("Delete hybrid failed")
+        return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
+    finally:
+        db.close()
 
 
 @app.get("/api/status")

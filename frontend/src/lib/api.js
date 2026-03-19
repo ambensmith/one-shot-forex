@@ -109,6 +109,45 @@ export function saveModelComparison(modelComparison) {
   }
 }
 
+// ── Hybrid Management ────────────────────────────────────
+
+export async function toggleHybrid(configId, isActive) {
+  const resp = await fetch(`/api/hybrid/${configId}/toggle`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ is_active: isActive }),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
+export async function deleteHybrid(configId) {
+  const resp = await fetch(`/api/hybrid/${configId}`, {
+    method: 'DELETE',
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
+export async function toggleAllHybrids(isActive) {
+  const resp = await fetch('/api/hybrid/toggle-all', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ is_active: isActive }),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
 // ── Workflow Trigger Helpers ──────────────────────────────
 
 /**
