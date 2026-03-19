@@ -355,6 +355,37 @@ def run_save_hybrid(hybrid_json: str):
     db.close()
 
 
+def run_toggle_hybrid(hybrid_id: int, is_active: int):
+    """Toggle a hybrid config's is_active status."""
+    from backend.core.database import Database
+
+    db = Database("data/sentinel.db")
+    db.update_hybrid_config(hybrid_id, is_active=is_active)
+    db.close()
+    logger.info(f"Toggled hybrid {hybrid_id} → is_active={is_active}")
+
+
+def run_delete_hybrid(hybrid_id: int):
+    """Delete a hybrid config."""
+    from backend.core.database import Database
+
+    db = Database("data/sentinel.db")
+    db.delete_hybrid_config(hybrid_id)
+    db.close()
+    logger.info(f"Deleted hybrid config {hybrid_id}")
+
+
+def run_toggle_all_hybrids(is_active: int):
+    """Toggle all hybrid configs on or off."""
+    from backend.core.database import Database
+
+    db = Database("data/sentinel.db")
+    for hybrid in db.get_all_hybrids():
+        db.update_hybrid_config(hybrid["id"], is_active=is_active)
+    db.close()
+    logger.info(f"Toggled all hybrids → is_active={is_active}")
+
+
 def run_save_config(config_json: str):
     """Save config overrides from a JSON string."""
     from backend.core.config import save_config_overrides, get_effective_config
@@ -570,7 +601,7 @@ def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "close-all", "close-all-and-reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "sync-broker", "backfill-pnl"],
+        choices=["tick", "backtest", "review", "reset", "close-all", "close-all-and-reset", "save-hybrid", "toggle-hybrid", "delete-hybrid", "toggle-all-hybrids", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "sync-broker", "backfill-pnl"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -589,6 +620,8 @@ def main():
     parser.add_argument("--instrument", help="Instrument for backtest mode")
     parser.add_argument("--period", help="Period for review, e.g. '7d' or '30d'")
     parser.add_argument("--hybrid-json", help="Hybrid config as JSON string (save-hybrid mode)")
+    parser.add_argument("--hybrid-id", type=int, help="Hybrid config ID (toggle-hybrid/delete-hybrid modes)")
+    parser.add_argument("--hybrid-active", type=int, choices=[0, 1], help="Set is_active (toggle-hybrid mode)")
     parser.add_argument("--config-json", help="Config overrides as JSON string (save-config mode)")
     args = parser.parse_args()
 
@@ -607,6 +640,18 @@ def main():
         if not args.hybrid_json:
             parser.error("--hybrid-json is required for save-hybrid mode")
         run_save_hybrid(args.hybrid_json)
+    elif args.mode == "toggle-hybrid":
+        if args.hybrid_id is None or args.hybrid_active is None:
+            parser.error("--hybrid-id and --hybrid-active are required for toggle-hybrid mode")
+        run_toggle_hybrid(args.hybrid_id, args.hybrid_active)
+    elif args.mode == "delete-hybrid":
+        if args.hybrid_id is None:
+            parser.error("--hybrid-id is required for delete-hybrid mode")
+        run_delete_hybrid(args.hybrid_id)
+    elif args.mode == "toggle-all-hybrids":
+        if args.hybrid_active is None:
+            parser.error("--hybrid-active is required for toggle-all-hybrids mode")
+        run_toggle_all_hybrids(args.hybrid_active)
     elif args.mode == "save-config":
         if not args.config_json:
             parser.error("--config-json is required for save-config mode")

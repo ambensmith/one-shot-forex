@@ -111,41 +111,16 @@ export function saveModelComparison(modelComparison) {
 
 // ── Hybrid Management ────────────────────────────────────
 
-export async function toggleHybrid(configId, isActive) {
-  const resp = await fetch(`/api/hybrid/${configId}/toggle`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ is_active: isActive }),
-  })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
-  }
-  return resp.json()
+export function toggleHybrid(configId, isActive) {
+  return triggerStream({ mode: 'toggle-hybrid', hybrid_id: configId, hybrid_active: isActive ? 1 : 0 })
 }
 
-export async function deleteHybrid(configId) {
-  const resp = await fetch(`/api/hybrid/${configId}`, {
-    method: 'DELETE',
-  })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
-  }
-  return resp.json()
+export function deleteHybrid(configId) {
+  return triggerStream({ mode: 'delete-hybrid', hybrid_id: configId })
 }
 
-export async function toggleAllHybrids(isActive) {
-  const resp = await fetch('/api/hybrid/toggle-all', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ is_active: isActive }),
-  })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
-  }
-  return resp.json()
+export function toggleAllHybrids(isActive) {
+  return triggerStream({ mode: 'toggle-all-hybrids', hybrid_active: isActive ? 1 : 0 })
 }
 
 // ── Workflow Trigger Helpers ──────────────────────────────
@@ -155,11 +130,11 @@ export async function toggleAllHybrids(isActive) {
  * @param {Object} params - { mode, stream?, hybrid?, period? }
  * @returns {{ run_id, status, message }}
  */
-export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, period = '7d' }) {
+export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, hybrid_id, hybrid_active, period = '7d' }) {
   const resp = await fetch('/api/trigger-stream', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, stream, hybrid, period }),
+    body: JSON.stringify({ mode, stream, hybrid, hybrid_id, hybrid_active, period }),
   })
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
