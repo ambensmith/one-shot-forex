@@ -204,19 +204,38 @@ function NewsFeedPanel({ data, loading, error, loadingPhase }) {
 }
 
 export default function NewsStream() {
-  const { signals, loading: sigLoading } = useSignals('news')
-  const { trades } = useTrades('news')
-  const { data: dashboard } = useDashboard()
+  const { signals, loading: sigLoading, refresh: refreshSignals } = useSignals('news')
+  const { trades, refresh: refreshTrades } = useTrades('news')
+  const { data: dashboard, refresh: refreshDashboard } = useDashboard()
 
   const [newsData, setNewsData] = useState(null)
   const [newsLoading, setNewsLoading] = useState(false)
   const [newsError, setNewsError] = useState(null)
   const [lastFetched, setLastFetched] = useState(null)
   const [loadingPhase, setLoadingPhase] = useState('')
+  const [tradingRunning, setTradingRunning] = useState(false)
+  const [tradingResult, setTradingResult] = useState(null)
 
   const stream = dashboard?.streams?.find(s => s.id === 'news')
   const openTrades = trades.filter(t => t.status === 'open')
   const latestSignals = signals.filter(s => !s.is_comparison).slice(0, 10)
+
+  async function handleRunTradingCycle() {
+    setTradingRunning(true)
+    setTradingResult(null)
+    try {
+      const resp = await fetch('/api/run-stream/news', { method: 'POST' })
+      const data = await resp.json()
+      setTradingResult(data)
+      refreshSignals()
+      refreshTrades()
+      refreshDashboard()
+    } catch (e) {
+      setTradingResult({ status: 'error', error: e.message })
+    } finally {
+      setTradingRunning(false)
+    }
+  }
 
   async function handleFetchNews() {
     setNewsLoading(true)
@@ -261,13 +280,50 @@ export default function NewsStream() {
           )}
           <button
             onClick={handleFetchNews}
-            disabled={newsLoading}
+            disabled={newsLoading || tradingRunning}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
           >
             {newsLoading ? 'Fetching & Analyzing...' : 'Fetch News & Generate Signals'}
           </button>
+          <button
+            onClick={handleRunTradingCycle}
+            disabled={tradingRunning || newsLoading}
+            className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+          >
+            {tradingRunning ? 'Running Trading Cycle...' : 'Run News Trading Cycle'}
+          </button>
         </div>
       </div>
+
+      {/* Trading cycle result banner */}
+      {tradingResult && (
+        <div className={`rounded-lg p-4 mb-6 text-sm border ${
+          tradingResult.status === 'ok'
+            ? 'bg-green-900/20 border-green-800/50 text-green-300'
+            : 'bg-red-900/20 border-red-800/50 text-red-300'
+        }`}>
+          {tradingResult.status === 'ok' ? (
+            <div>
+              <span className="font-semibold">News trading cycle complete:</span>{' '}
+              {tradingResult.new_signals} signals, {tradingResult.new_trades} trades executed, {tradingResult.open_positions} open
+              {tradingResult.signals_detail?.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {tradingResult.signals_detail.map((s, i) => (
+                    <div key={i} className="text-xs">
+                      <span className={`font-mono ${s.direction === 'long' ? 'text-green-400' : s.direction === 'short' ? 'text-red-400' : 'text-gray-400'}`}>
+                        {s.direction.toUpperCase()}
+                      </span>{' '}
+                      {s.instrument} ({(s.confidence * 100).toFixed(0)}%) — {s.reasoning}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <span>Error: {tradingResult.error}</span>
+          )}
+        </div>
+      )}
 
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDashboard, useTrades, useEquity } from '../hooks/useStreamData'
 import MetricTile from '../components/MetricTile'
 import EquityCurve from '../components/EquityCurve'
@@ -5,9 +6,50 @@ import TradeRow from '../components/TradeRow'
 import { formatPnl, formatPercent } from '../lib/constants'
 
 export default function Dashboard() {
-  const { data: dashboard, loading } = useDashboard()
-  const { trades } = useTrades()
-  const { curves } = useEquity()
+  const { data: dashboard, loading, refresh: refreshDashboard } = useDashboard()
+  const { trades, refresh: refreshTrades } = useTrades()
+  const { curves, refresh: refreshEquity } = useEquity()
+
+  const [running, setRunning] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [result, setResult] = useState(null)
+
+  function refreshAll() {
+    refreshDashboard()
+    refreshTrades()
+    refreshEquity()
+  }
+
+  async function handleRunAll() {
+    setRunning(true)
+    setResult(null)
+    try {
+      const resp = await fetch('/api/run-all', { method: 'POST' })
+      const data = await resp.json()
+      setResult(data)
+      refreshAll()
+    } catch (e) {
+      setResult({ status: 'error', error: e.message })
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  async function handleReset() {
+    if (!confirm('Reset all data? This will clear all signals, trades, and equity history.')) return
+    setResetting(true)
+    setResult(null)
+    try {
+      const resp = await fetch('/api/reset', { method: 'POST' })
+      const data = await resp.json()
+      setResult(data)
+      refreshAll()
+    } catch (e) {
+      setResult({ status: 'error', error: e.message })
+    } finally {
+      setResetting(false)
+    }
+  }
 
   if (loading) return <p className="text-gray-500">Loading dashboard...</p>
   if (!dashboard) return <p className="text-gray-500">No dashboard data available. Run a trading cycle first.</p>
@@ -18,7 +60,55 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleReset}
+            disabled={resetting || running}
+            className="px-4 py-2 bg-red-600/80 hover:bg-red-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+          >
+            {resetting ? 'Resetting...' : 'Reset Data'}
+          </button>
+          <button
+            onClick={handleRunAll}
+            disabled={running || resetting}
+            className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+          >
+            {running ? 'Running All Streams...' : 'Run All Streams'}
+          </button>
+        </div>
+      </div>
+
+      {/* Result banner */}
+      {result && (
+        <div className={`rounded-lg p-4 mb-6 text-sm border ${
+          result.status === 'ok'
+            ? 'bg-green-900/20 border-green-800/50 text-green-300'
+            : 'bg-red-900/20 border-red-800/50 text-red-300'
+        }`}>
+          {result.status === 'ok' ? (
+            result.message ? (
+              <span>{result.message}</span>
+            ) : (
+              <div>
+                <span className="font-semibold">All streams complete. </span>
+                {result.results?.news && (
+                  <span>News: {result.results.news.new_signals}sig/{result.results.news.new_trades}trades. </span>
+                )}
+                {result.results?.strategy && (
+                  <span>Strategy: {result.results.strategy.new_signals}sig/{result.results.strategy.new_trades}trades. </span>
+                )}
+                {result.results?.hybrid?.length > 0 && (
+                  <span>Hybrid: {result.results.hybrid.map(h => `${h.stream}: ${h.new_trades}trades`).join(', ')}. </span>
+                )}
+              </div>
+            )
+          ) : (
+            <span>Error: {result.error}</span>
+          )}
+        </div>
+      )}
 
       {/* Equity Curves */}
       <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
