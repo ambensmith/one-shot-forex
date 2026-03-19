@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { useSignals, useTrades, useDashboard } from '../hooks/useStreamData'
+import { useSignals, useTrades, useDashboard, useConfig } from '../hooks/useStreamData'
 import { saveModelComparison, triggerStream, pollWorkflow } from '../lib/api'
 import StreamCard from '../components/StreamCard'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
+import HelpTooltip from '../components/HelpTooltip'
+import HowItWorks from '../components/HowItWorks'
 import { formatPnl, formatPercent, timeAgo } from '../lib/constants'
 
 const DIRECTION_STYLES = {
@@ -12,10 +14,16 @@ const DIRECTION_STYLES = {
   neutral: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
 }
 
-function SignalCard({ signal }) {
+function SignalCard({ signal, minConfidence }) {
   const dirStyle = DIRECTION_STYLES[signal.direction] || DIRECTION_STYLES.neutral
   const confPct = ((signal.confidence || 0) * 100).toFixed(0)
   const confColor = signal.confidence >= 0.7 ? '#37b24d' : signal.confidence >= 0.5 ? '#f59f00' : '#868e96'
+  const thresholdPct = ((minConfidence || 0.6) * 100)
+
+  // Determine trade outcome
+  const wasBelowThreshold = signal.confidence < (minConfidence || 0.6)
+  const wasTraded = signal.was_traded
+  const rejectionReason = signal.rejection_reason
 
   return (
     <div className={`rounded-lg p-4 border ${dirStyle}`}>
@@ -27,16 +35,37 @@ function SignalCard({ signal }) {
           <span className="font-mono font-semibold">{signal.display_name}</span>
           <span className="text-xs text-gray-500">{signal.instrument}</span>
         </div>
-        <span className="text-xs text-gray-500">{signal.headline_count} headlines</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">{signal.headline_count} headlines</span>
+          {/* Trade outcome badge */}
+          {wasTraded && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-medium">Traded</span>
+          )}
+          {wasBelowThreshold && !wasTraded && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400 font-medium">Below threshold</span>
+          )}
+          {rejectionReason && !wasTraded && !wasBelowThreshold && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-medium" title={rejectionReason}>Risk rejected</span>
+          )}
+        </div>
       </div>
 
-      {/* Confidence bar */}
+      {/* Confidence bar with threshold marker */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs text-gray-400">Confidence:</span>
-        <div className="flex-1 bg-gray-700 rounded-full h-2">
+        <span className="text-xs text-gray-400 flex items-center">
+          Confidence
+          <HelpTooltip term="confidence" />
+        </span>
+        <div className="flex-1 bg-gray-700 rounded-full h-2 relative">
           <div
             className="h-2 rounded-full transition-all"
             style={{ width: `${confPct}%`, backgroundColor: confColor }}
+          />
+          {/* Threshold marker line */}
+          <div
+            className="absolute top-[-2px] bottom-[-2px] w-0.5 bg-white/40"
+            style={{ left: `${thresholdPct}%` }}
+            title={`Min confidence threshold: ${thresholdPct}%`}
           />
         </div>
         <span className="text-xs font-mono">{confPct}%</span>
@@ -65,7 +94,7 @@ function SignalCard({ signal }) {
   )
 }
 
-function NewsFeedPanel({ data, loading, error, loadingPhase }) {
+function NewsFeedPanel({ data, loading, error, loadingPhase, minConfidence }) {
   if (loading) {
     return (
       <div className="flex items-center gap-3 py-12 justify-center text-gray-400">
@@ -94,11 +123,17 @@ function NewsFeedPanel({ data, loading, error, loadingPhase }) {
         </div>
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 text-center">
           <div className="text-lg font-bold">{summary.after_dedup}</div>
-          <div className="text-xs text-gray-500">After Dedup</div>
+          <div className="text-xs text-gray-500 flex items-center justify-center">
+            After Dedup
+            <HelpTooltip term="news_dedup" />
+          </div>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 text-center">
           <div className="text-lg font-bold text-green-400">{summary.mapped_count}</div>
-          <div className="text-xs text-gray-500">Mapped</div>
+          <div className="text-xs text-gray-500 flex items-center justify-center">
+            Mapped
+            <HelpTooltip term="instrument_mapping" />
+          </div>
         </div>
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 text-center">
           <div className="text-lg font-bold text-gray-500">{summary.unmapped_count}</div>
@@ -126,12 +161,15 @@ function NewsFeedPanel({ data, loading, error, loadingPhase }) {
       {/* LLM Signals */}
       {signals && signals.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">LLM Trading Signals</h3>
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+            LLM Trading Signals
+            <HelpTooltip term="confidence" />
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {signals
               .sort((a, b) => b.confidence - a.confidence)
               .map((sig) => (
-                <SignalCard key={sig.instrument} signal={sig} />
+                <SignalCard key={sig.instrument} signal={sig} minConfidence={minConfidence} />
               ))}
           </div>
         </div>
@@ -207,6 +245,7 @@ export default function NewsStream() {
   const { signals, loading: sigLoading, refresh: refreshSignals } = useSignals('news')
   const { trades, refresh: refreshTrades } = useTrades('news')
   const { data: dashboard, refresh: refreshDashboard } = useDashboard()
+  const { config } = useConfig()
 
   const [newsData, setNewsData] = useState(null)
   const [newsLoading, setNewsLoading] = useState(false)
@@ -219,6 +258,9 @@ export default function NewsStream() {
   const stream = dashboard?.streams?.find(s => s.id === 'news')
   const openTrades = trades.filter(t => t.status === 'open')
   const latestSignals = signals.filter(s => !s.is_comparison).slice(0, 10)
+  const minConfidence = config?.streams?.news_stream?.min_confidence || 0.6
+  const capitalAllocation = config?.streams?.news_stream?.capital_allocation || 33333
+  const riskPct = config?.risk?.max_risk_per_trade || 0.01
 
   async function handleRunTradingCycle() {
     setTradingRunning(true)
@@ -251,7 +293,6 @@ export default function NewsStream() {
     setNewsError(null)
     setLoadingPhase('Fetching news from BBC, Reuters, GDELT, Calendar...')
 
-    // Brief delay then update phase message
     const phaseTimer = setTimeout(() => {
       setLoadingPhase('News fetched. Generating signals across all models...')
     }, 5000)
@@ -263,7 +304,6 @@ export default function NewsStream() {
       const data = await resp.json()
       setNewsData(data)
       setLastFetched(new Date().toLocaleTimeString())
-      // Cache model comparison data for the ModelComparison page
       if (data.model_comparison) {
         saveModelComparison(data.model_comparison)
       }
@@ -304,6 +344,15 @@ export default function NewsStream() {
         </div>
       </div>
 
+      <HowItWorks>
+        <p><strong>Step 1:</strong> Headlines are fetched from BBC Business, CNBC, GDELT, and the economic calendar.</p>
+        <p><strong>Step 2:</strong> Duplicate headlines are removed, then each headline is matched to currency pairs using keyword mapping.</p>
+        <p><strong>Step 3:</strong> An AI model analyzes the headlines for each pair and generates a trading signal with a confidence score and reasoning.</p>
+        <p><strong>Step 4:</strong> Signals above your minimum confidence threshold ({(minConfidence * 100).toFixed(0)}%) are checked against risk limits.</p>
+        <p><strong>Step 5:</strong> If approved by risk management, paper trades are placed automatically on the demo account.</p>
+        <p className="text-gray-500 italic">"Fetch News" shows you signals without trading. "Run Trading Cycle" goes further and places trades.</p>
+      </HowItWorks>
+
       {/* Trading cycle result banner */}
       {tradingResult && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
@@ -317,17 +366,17 @@ export default function NewsStream() {
 
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <MetricTile label="P&L" value={formatPnl(stream?.total_pnl || 0)} positive={stream?.total_pnl > 0} />
+        <MetricTile label="P&L" value={formatPnl(stream?.total_pnl || 0)} positive={stream?.total_pnl > 0} helpTerm="pnl" />
         <MetricTile label="Trades" value={stream?.trade_count || 0} />
-        <MetricTile label="Win Rate" value={formatPercent(stream?.win_rate || 0)} />
-        <MetricTile label="Sharpe" value={(stream?.sharpe_ratio || 0).toFixed(2)} />
-        <MetricTile label="Max DD" value={formatPercent(stream?.max_drawdown || 0)} />
+        <MetricTile label="Win Rate" value={formatPercent(stream?.win_rate || 0)} helpTerm="win_rate" />
+        <MetricTile label="Sharpe" value={(stream?.sharpe_ratio || 0).toFixed(2)} helpTerm="sharpe_ratio" />
+        <MetricTile label="Max DD" value={formatPercent(stream?.max_drawdown || 0)} helpTerm="max_drawdown" />
       </div>
 
       {/* Live News Feed + Signals */}
       {(newsData || newsLoading || newsError) && (
         <div className="mb-6">
-          <NewsFeedPanel data={newsData} loading={newsLoading} error={newsError} loadingPhase={loadingPhase} />
+          <NewsFeedPanel data={newsData} loading={newsLoading} error={newsError} loadingPhase={loadingPhase} minConfidence={minConfidence} />
         </div>
       )}
 
@@ -338,7 +387,7 @@ export default function NewsStream() {
           {sigLoading ? (
             <p className="text-gray-500 text-sm">Loading...</p>
           ) : latestSignals.length === 0 ? (
-            <p className="text-gray-500 text-sm">No historical signals yet.</p>
+            <p className="text-gray-500 text-sm">No signals yet. Click "Fetch News" above to generate AI trading signals from live headlines.</p>
           ) : (
             latestSignals.map(sig => (
               <StreamCard key={sig.id} signal={sig} />
@@ -352,20 +401,27 @@ export default function NewsStream() {
           {openTrades.length === 0 ? (
             <p className="text-gray-500 text-sm">No open positions</p>
           ) : (
-            openTrades.map(t => (
-              <div key={t.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-sm">{t.instrument}</span>
-                  <SignalBadge direction={t.direction} size="sm" />
+            openTrades.map(t => {
+              const riskAmount = capitalAllocation * riskPct
+              return (
+                <div key={t.id} className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm">{t.instrument}</span>
+                    <SignalBadge direction={t.direction} size="sm" />
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Entry: {t.entry_price?.toFixed(5)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    SL: {t.stop_loss?.toFixed(5)} | TP: {t.take_profit?.toFixed(5)}
+                  </div>
+                  <div className="text-xs text-amber-400/80 mt-1 flex items-center">
+                    Risking ~£{riskAmount.toFixed(0)} ({(riskPct * 100).toFixed(1)}% of £{capitalAllocation.toLocaleString()})
+                    <HelpTooltip term="max_risk_per_trade" />
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  Entry: {t.entry_price?.toFixed(5)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  SL: {t.stop_loss?.toFixed(5)} | TP: {t.take_profit?.toFixed(5)}
-                </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </div>

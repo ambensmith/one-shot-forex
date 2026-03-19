@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import Guide from './screens/Guide'
 import NewsStream from './screens/NewsStream'
 import StrategyStream from './screens/StrategyStream'
 import HybridBuilder from './screens/HybridBuilder'
@@ -12,7 +13,8 @@ export default function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Navigate to="/news" replace />} />
+        <Route path="/" element={<Navigate to="/guide" replace />} />
+        <Route path="/guide" element={<Guide />} />
         <Route path="/news" element={<NewsStream />} />
         <Route path="/strategies" element={<StrategyStream />} />
         <Route path="/hybrid" element={<HybridBuilder />} />

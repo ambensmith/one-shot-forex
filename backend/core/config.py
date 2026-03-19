@@ -42,7 +42,18 @@ def load_config(db=None) -> dict:
     settings["streams"] = streams
     settings["instruments"] = instruments
 
-    # Apply overrides from database if available
+    # Apply overrides from JSON file (written by Vercel direct config save)
+    json_overrides_path = Path("data/config_overrides.json")
+    if json_overrides_path.exists():
+        try:
+            with open(json_overrides_path) as f:
+                json_overrides = json.load(f)
+            if json_overrides:
+                _apply_overrides(settings, json_overrides)
+        except Exception:
+            pass
+
+    # Apply overrides from database (takes precedence over JSON file)
     if db is not None:
         overrides = db.get_config_overrides()
         if overrides:
