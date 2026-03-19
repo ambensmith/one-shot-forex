@@ -237,6 +237,53 @@ def _record_all_equity(db, broker, config):
         db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
 
 
+def run_close_all():
+    """Close all open positions on Capital.com.
+
+    Fetches every live position from the broker and closes them one by one.
+    Returns the number of positions successfully closed.
+    """
+    from backend.core.config import load_config
+    from backend.core.database import Database
+
+    db = Database("data/sentinel.db")
+    config = load_config(db=db)
+    broker = create_data_provider(config)
+
+    if not broker.is_connected:
+        logger.error("Cannot close positions: broker not connected. Set CAPITALCOM_* env vars.")
+        db.close()
+        return 0
+
+    try:
+        positions = broker.get_open_trades()
+    except Exception as e:
+        logger.error(f"Failed to fetch broker positions: {e}")
+        db.close()
+        return 0
+
+    logger.info(f"Found {len(positions)} open position(s) on broker")
+
+    closed = 0
+    failed = 0
+    for pos in positions:
+        deal_id = pos.get("id", "")
+        instrument = pos.get("instrument", "?")
+        direction = pos.get("direction", "?")
+        logger.info(f"Closing {instrument} {direction} deal_id={deal_id} ...")
+        result = broker.close_trade(deal_id)
+        if result.get("status") == "error":
+            logger.error(f"  Failed to close {deal_id}: {result.get('error')}")
+            failed += 1
+        else:
+            logger.info(f"  Closed {deal_id} OK")
+            closed += 1
+
+    db.close()
+    logger.info(f"Close-all complete: {closed} closed, {failed} failed out of {len(positions)}")
+    return closed
+
+
 def run_reset():
     """Clear all data for a clean slate."""
     from backend.core.config import load_config
@@ -248,6 +295,7 @@ def run_reset():
     db.execute("DELETE FROM trades")
     db.execute("DELETE FROM equity_snapshots")
     db.execute("DELETE FROM news_items")
+    db.execute("DELETE FROM run_logs")
     db.commit()
 
     # Re-export dashboard data (now empty)
@@ -256,6 +304,15 @@ def run_reset():
 
     db.close()
     logger.info("Database reset complete.")
+
+
+def run_close_all_and_reset():
+    """Close all broker positions then reset all local data."""
+    logger.info("=== Step 1: Closing all broker positions ===")
+    run_close_all()
+    logger.info("=== Step 2: Resetting local database ===")
+    run_reset()
+    logger.info("=== Clean slate complete ===")
 
 
 def run_save_hybrid(hybrid_json: str):
@@ -513,7 +570,7 @@ def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "sync-broker", "backfill-pnl"],
+        choices=["tick", "backtest", "review", "reset", "close-all", "close-all-and-reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "sync-broker", "backfill-pnl"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -542,6 +599,10 @@ def main():
         ))
     elif args.mode == "reset":
         run_reset()
+    elif args.mode == "close-all":
+        run_close_all()
+    elif args.mode == "close-all-and-reset":
+        run_close_all_and_reset()
     elif args.mode == "save-hybrid":
         if not args.hybrid_json:
             parser.error("--hybrid-json is required for save-hybrid mode")
