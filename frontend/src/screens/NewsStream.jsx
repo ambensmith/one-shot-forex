@@ -259,7 +259,7 @@ export default function NewsStream() {
   const openTrades = trades.filter(t => t.status === 'open')
   const latestSignals = signals.filter(s => !s.is_comparison).slice(0, 10)
   const minConfidence = config?.streams?.news_stream?.min_confidence || 0.6
-  const capitalAllocation = config?.streams?.news_stream?.capital_allocation || 33333
+  const capitalAllocation = config?.streams?.news_stream?.capital_allocation || 100
   const riskPct = config?.risk?.max_risk_per_trade || 0.01
 
   async function handleRunTradingCycle() {
@@ -416,7 +416,7 @@ export default function NewsStream() {
                     SL: {t.stop_loss?.toFixed(5)} | TP: {t.take_profit?.toFixed(5)}
                   </div>
                   <div className="text-xs text-amber-400/80 mt-1 flex items-center">
-                    Risking ~£{riskAmount.toFixed(0)} ({(riskPct * 100).toFixed(1)}% of £{capitalAllocation.toLocaleString()})
+                    Risking ~€{riskAmount.toFixed(0)} ({(riskPct * 100).toFixed(1)}% of €{capitalAllocation.toLocaleString()})
                     <HelpTooltip term="max_risk_per_trade" />
                   </div>
                 </div>

@@ -258,7 +258,7 @@ class Database:
         ).fetchone()
         if row:
             return row["equity"]
-        return 33333.0  # default capital allocation
+        return 100.0  # default capital allocation
 
     # ── News ─────────────────────────────────────────────
 

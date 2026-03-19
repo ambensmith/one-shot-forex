@@ -51,7 +51,7 @@ def export_dashboard_summary(db, config):
         real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(stream_id)
         equity = db.get_stream_equity(stream_id)
-        capital_allocation = stream_cfg.get("capital_allocation", 33333)
+        capital_allocation = stream_cfg.get("capital_allocation", 100)
 
         closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
@@ -98,7 +98,7 @@ def export_dashboard_summary(db, config):
         real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(hid)
         equity = db.get_stream_equity(hid)
-        capital_allocation = hybrid.get("capital_allocation", 33333)
+        capital_allocation = hybrid.get("capital_allocation", 100)
         closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
         wins = sum(1 for t in closed if t["pnl"] > 0)

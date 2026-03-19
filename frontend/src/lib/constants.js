@@ -142,7 +142,7 @@ export function formatPnl(value) {
   return `${sign}${value.toFixed(2)}`
 }
 
-export function formatPnlCurrency(value, currency = '£') {
+export function formatPnlCurrency(value, currency = '€') {
   if (value == null) return '—'
   const sign = value >= 0 ? '+' : ''
   return `${sign}${currency}${Math.abs(value).toFixed(2)}`

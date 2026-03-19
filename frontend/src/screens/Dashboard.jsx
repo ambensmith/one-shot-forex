@@ -71,8 +71,8 @@ export default function Dashboard() {
 
   // Aggregate totals across all streams
   const totalPnl = streams.reduce((sum, s) => sum + (s.total_pnl || 0), 0)
-  const totalAllocation = streams.reduce((sum, s) => sum + (s.capital_allocation || 33333), 0)
-  const totalEquity = streams.reduce((sum, s) => sum + (s.equity || s.capital_allocation || 33333), 0)
+  const totalAllocation = streams.reduce((sum, s) => sum + (s.capital_allocation || 100), 0)
+  const totalEquity = streams.reduce((sum, s) => sum + (s.equity || s.capital_allocation || 100), 0)
   const totalReturnPct = totalAllocation > 0 ? (totalEquity - totalAllocation) / totalAllocation : 0
   const todayPnl = streams.reduce((sum, s) => sum + (s.daily_pnl || 0), 0)
   const totalOpenPositions = streams.reduce((sum, s) => sum + (s.open_positions || 0), 0)
@@ -81,7 +81,7 @@ export default function Dashboard() {
   const maxDailyLoss = config?.risk?.max_daily_loss_per_stream || 0.03
   const maxPositions = config?.risk?.max_open_positions_per_stream || 5
   const totalDailyLossUsed = streams.reduce((sum, s) => sum + Math.abs(Math.min(s.daily_pnl || 0, 0)), 0)
-  const totalDailyLossLimit = streams.reduce((sum, s) => (s.capital_allocation || 33333) * maxDailyLoss + sum, 0)
+  const totalDailyLossLimit = streams.reduce((sum, s) => (s.capital_allocation || 100) * maxDailyLoss + sum, 0)
   const totalMaxPositions = streams.length * maxPositions
 
   // Filter and sort trades
@@ -167,7 +167,7 @@ export default function Dashboard() {
       {streams.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {streams.map(s => {
-            const allocation = s.capital_allocation || 33333
+            const allocation = s.capital_allocation || 100
             const equity = s.equity || allocation
             const returnPct = allocation > 0 ? (equity - allocation) / allocation : 0
             const pnl = s.total_pnl || 0

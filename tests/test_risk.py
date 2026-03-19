@@ -34,7 +34,7 @@ def test_risk_check_approved():
 
 def test_position_sizing():
     risk, _ = _setup()
-    size = risk.calculate_position_size(33333, 0.01, 1.0800, 1.0750, "EUR_USD")
+    size = risk.calculate_position_size(100, 0.01, 1.0800, 1.0750, "EUR_USD")
     assert size > 0
 
 
