@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSignals, useTrades, useDashboard } from '../hooks/useStreamData'
+import { saveModelComparison } from '../lib/api'
 import StreamCard from '../components/StreamCard'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
@@ -224,7 +225,7 @@ export default function NewsStream() {
 
     // Brief delay then update phase message
     const phaseTimer = setTimeout(() => {
-      setLoadingPhase('News fetched. Generating LLM signals via Groq...')
+      setLoadingPhase('News fetched. Generating signals across all models...')
     }, 5000)
 
     try {
@@ -234,6 +235,10 @@ export default function NewsStream() {
       const data = await resp.json()
       setNewsData(data)
       setLastFetched(new Date().toLocaleTimeString())
+      // Cache model comparison data for the ModelComparison page
+      if (data.model_comparison) {
+        saveModelComparison(data.model_comparison)
+      }
     } catch (e) {
       clearTimeout(phaseTimer)
       setNewsError(`Failed to fetch news: ${e.message}`)
