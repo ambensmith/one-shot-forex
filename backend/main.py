@@ -142,7 +142,7 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
             streams_run.append(f"hybrid:{hybrid_config['name']}")
 
     # Record equity snapshots
-    _record_all_equity(db, broker)
+    _record_all_equity(db, broker, config)
 
     # Generate review if due
     if stream_filter == "all" and should_generate_review(config):
@@ -218,17 +218,23 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
     logger.info(f"Trading cycle complete (stream={stream_filter}).")
 
 
-def _record_all_equity(db, broker):
-    """Record equity snapshots for all streams."""
-    for stream_id in ["news", "strategy"]:
-        equity = db.get_stream_equity(stream_id)
-        open_count = db.count_open_positions(stream_id)
-        db.insert_equity_snapshot(stream_id, equity, open_count)
+def _record_all_equity(db, broker, config):
+    """Record equity snapshots for all streams based on actual trade P&L."""
+    streams_cfg = config.get("streams", {})
+
+    stream_list = [
+        ("news", streams_cfg.get("news_stream", {}).get("capital_allocation", 33333)),
+        ("strategy", streams_cfg.get("strategy_stream", {}).get("capital_allocation", 33333)),
+    ]
     for hybrid in db.get_active_hybrids():
-        sid = f"hybrid:{hybrid['name']}"
-        equity = db.get_stream_equity(sid)
-        open_count = db.count_open_positions(sid)
-        db.insert_equity_snapshot(sid, equity, open_count)
+        stream_list.append((f"hybrid:{hybrid['name']}", hybrid.get("capital_allocation", 33333)))
+
+    for stream_id, capital in stream_list:
+        trades = db.get_trades(stream_id, limit=10000)
+        realized_pnl = sum(t["pnl"] for t in trades if t.get("pnl") is not None)
+        equity = capital + realized_pnl
+        open_count = db.count_open_positions(stream_id)
+        db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
 
 
 def run_reset():
@@ -347,11 +353,51 @@ def run_fix_phantoms():
     logger.info(f"Fixed {count} phantom trade(s).")
 
 
+def run_backfill_pnl():
+    """Backfill null P&L on closed trades using SL as conservative exit estimate.
+
+    Finds all closed trades with null pnl/exit_price and fills them in
+    using the stop-loss price as a worst-case exit estimate.
+    """
+    from backend.core.database import Database
+    from backend.execution.executor import Executor
+
+    db = Database("data/sentinel.db")
+
+    rows = db.execute(
+        "SELECT * FROM trades "
+        "WHERE status IN ('closed_reconciled', 'closed_sl', 'closed_tp') "
+        "AND pnl IS NULL"
+    ).fetchall()
+
+    count = 0
+    for row in rows:
+        trade = dict(row)
+        # Use existing exit_price if available, else SL, else entry
+        exit_price = trade.get("exit_price") or trade.get("stop_loss") or trade["entry_price"]
+        pnl_info = Executor.calc_pnl(trade, exit_price)
+        db.update_trade(
+            trade["id"],
+            exit_price=pnl_info["exit_price"],
+            pnl=pnl_info["pnl"],
+            pnl_pips=pnl_info["pnl_pips"],
+        )
+        count += 1
+        logger.info(
+            f"Backfilled trade {trade['id']}: {trade['stream']} "
+            f"{trade['instrument']} {trade['direction']} -> "
+            f"exit={pnl_info['exit_price']}, pnl={pnl_info['pnl']}"
+        )
+
+    db.close()
+    logger.info(f"Backfilled {count} trade(s) with estimated P&L.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms"],
+        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "backfill-pnl"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -392,6 +438,8 @@ def main():
         run_get_config()
     elif args.mode == "fix-phantoms":
         run_fix_phantoms()
+    elif args.mode == "backfill-pnl":
+        run_backfill_pnl()
     elif args.mode == "backtest":
         from backend.backtest.runner import run_backtest
         run_backtest(args.strategy, args.instrument)

@@ -129,22 +129,21 @@ class Executor:
                     logger.info(
                         f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
                         f"{trade['direction']}) closed by broker — "
-                        f"exit={exit_info.get('exit_price')}, pnl={exit_info.get('pnl')}"
+                        f"exit={exit_info['exit_price']}, pnl={exit_info['pnl']}"
                     )
                     self.db.update_trade(
                         trade["id"],
                         status="closed_reconciled",
-                        exit_price=exit_info.get("exit_price"),
-                        pnl=exit_info.get("pnl"),
-                        pnl_pips=exit_info.get("pnl_pips"),
+                        exit_price=exit_info["exit_price"],
+                        pnl=exit_info["pnl"],
+                        pnl_pips=exit_info["pnl_pips"],
                         closed_at=datetime.now(timezone.utc).isoformat(),
                     )
 
     def _fetch_exit_details(self, trade: dict) -> dict:
-        """Try to get exit price/pnl for a reconciled trade.
+        """Get exit price/pnl for a reconciled trade. Always returns real numbers.
 
-        First tries the broker's deal activity API, then falls back to
-        estimating from the current market price.
+        Priority: broker deal activity → current market price → SL price → entry price.
         """
         # Try broker deal activity
         deal_id = trade.get("broker_deal_id", "")
@@ -153,7 +152,6 @@ class Executor:
                 activity = self.broker.get_deal_activity(deal_id)
                 if activity:
                     # Capital.com activity has 'details' with 'level' (exit price)
-                    details = activity.get("details", {})
                     actions = activity.get("actions", [])
                     close_action = next(
                         (a for a in actions if a.get("actionType") in
@@ -167,15 +165,30 @@ class Executor:
             except Exception as e:
                 logger.warning(f"Deal activity lookup failed for {deal_id}: {e}")
 
-        # Fallback: use current market price as estimate
+        # Fallback 1: use current market price as estimate
         try:
             price_data = self.broker.get_current_price(trade["instrument"])
             return self._calc_pnl(trade, price_data["mid"])
-        except Exception:
-            return {"exit_price": None, "pnl": None, "pnl_pips": None}
+        except Exception as e:
+            logger.warning(f"Market price fallback failed for trade {trade['id']}: {e}")
+
+        # Fallback 2: estimate from SL (conservative — assumes worst case)
+        sl = trade.get("stop_loss")
+        if sl:
+            logger.warning(f"Using SL as exit estimate for trade {trade['id']}")
+            return self._calc_pnl(trade, sl)
+
+        # Fallback 3: use entry price (P&L = 0, better than null)
+        logger.error(f"No exit price available for trade {trade['id']} — using entry price")
+        return self._calc_pnl(trade, trade["entry_price"])
 
     def _calc_pnl(self, trade: dict, exit_price: float) -> dict:
         """Calculate P&L from entry and exit price."""
+        return Executor.calc_pnl(trade, exit_price)
+
+    @staticmethod
+    def calc_pnl(trade: dict, exit_price: float) -> dict:
+        """Calculate P&L from entry and exit price (static, no Executor instance needed)."""
         from backend.data.provider import pip_value
         pip_val = pip_value(trade["instrument"])
         entry = trade["entry_price"]
