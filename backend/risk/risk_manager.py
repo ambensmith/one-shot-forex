@@ -87,8 +87,8 @@ class RiskManager:
                                  entry: float, stop_loss: float,
                                  instrument: str) -> float:
         """Position size = (balance * risk%) / (|entry - stop_loss| * pip_value)."""
-        from backend.data.oanda_client import OandaClient
-        pip_val = OandaClient.pip_value(instrument)
+        from backend.data.provider import pip_value
+        pip_val = pip_value(instrument)
         stop_distance = abs(entry - stop_loss)
         if stop_distance == 0:
             return 0.0
@@ -104,8 +104,8 @@ class RiskManager:
     def calculate_stop_loss(self, instrument: str, entry_price: float,
                             direction: str, df=None) -> float:
         """Calculate stop loss based on ATR or fixed pips."""
-        from backend.data.oanda_client import OandaClient
-        pip_val = OandaClient.pip_value(instrument)
+        from backend.data.provider import pip_value
+        pip_val = pip_value(instrument)
 
         if self.sl_method == "atr" and df is not None and len(df) >= self.atr_period:
             tr = df["High"] - df["Low"]

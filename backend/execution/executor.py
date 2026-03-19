@@ -1,4 +1,4 @@
-"""Trade execution — places and manages orders via OANDA."""
+"""Trade execution — places and manages orders via the configured data provider."""
 
 from __future__ import annotations
 
@@ -90,8 +90,8 @@ class Executor:
                 closed, status = True, "closed_tp"
 
         if closed:
-            from backend.data.oanda_client import OandaClient
-            pip_val = OandaClient.pip_value(trade["instrument"])
+            from backend.data.provider import pip_value
+            pip_val = pip_value(trade["instrument"])
             if direction == "long":
                 pnl_pips = (current_price - entry) / pip_val
             else:
