@@ -152,12 +152,12 @@ class CapitalComClient:
 
     def get_account_summary(self) -> dict[str, Any]:
         if not self._connected:
-            return {"balance": 100000.0, "unrealizedPL": 0.0, "currency": "USD", "openTradeCount": 0}
+            return {"balance": 100000.0, "unrealizedPL": 0.0, "currency": "EUR", "openTradeCount": 0}
 
         data = self._request("GET", "/api/v1/accounts")
         accounts = data.get("accounts", [])
         if not accounts:
-            return {"balance": 100000.0, "unrealizedPL": 0.0, "currency": "USD", "openTradeCount": 0}
+            return {"balance": 100000.0, "unrealizedPL": 0.0, "currency": "EUR", "openTradeCount": 0}
 
         # Use the preferred account, or the first one
         acct = next((a for a in accounts if a.get("preferred")), accounts[0])
@@ -165,7 +165,7 @@ class CapitalComClient:
         return {
             "balance": float(balance_info.get("balance", 0)),
             "unrealizedPL": float(balance_info.get("profitLoss", 0)),
-            "currency": acct.get("currency", "USD"),
+            "currency": acct.get("currency", "EUR"),
             "openTradeCount": 0,  # Not directly available; positions endpoint needed
         }
 
