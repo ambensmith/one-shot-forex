@@ -28,7 +28,11 @@ def compute_stream_metrics(db, stream_id: str, since: datetime) -> dict:
     if len(equity_history) >= 2:
         equities = [h["equity"] for h in equity_history]
         returns = [(equities[i] / equities[i - 1]) - 1 for i in range(1, len(equities))]
-        sharpe = (statistics.mean(returns) / (statistics.stdev(returns) if len(returns) > 1 else 1e-10)) * (252 ** 0.5)
+        std_r = statistics.stdev(returns) if len(returns) > 1 else 1e-10
+        if std_r == 0:
+            sharpe = 0.0
+        else:
+            sharpe = (statistics.mean(returns) / std_r) * (252 ** 0.5)
     else:
         sharpe = 0.0
 
