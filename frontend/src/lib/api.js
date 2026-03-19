@@ -58,6 +58,29 @@ export async function loadHybrids() {
   return data?.hybrids || []
 }
 
+export async function loadConfig() {
+  const data = await fetchJSON('config.json')
+  return data?.config || null
+}
+
+export async function loadRunReviews() {
+  const data = await fetchJSON('run_reviews.json')
+  return data?.runs || []
+}
+
+export async function saveConfig(overrides) {
+  const resp = await fetch('/api/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ overrides }),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
 export function saveModelComparison(modelComparison) {
   if (modelComparison && modelComparison.length > 0) {
     localStorage.setItem('model_comparison', JSON.stringify(modelComparison))

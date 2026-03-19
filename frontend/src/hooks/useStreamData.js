@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { loadDashboard, loadTrades, loadEquity, loadSignals, loadModels, loadReview, loadHybrids } from '../lib/api'
+import { loadDashboard, loadTrades, loadEquity, loadSignals, loadModels, loadReview, loadHybrids, loadConfig, loadRunReviews } from '../lib/api'
 
 export function useDashboard() {
   const [data, setData] = useState(null)
@@ -82,4 +82,26 @@ export function useHybrids() {
   }, [])
   useEffect(() => { refresh() }, [refresh])
   return { hybrids, loading, refresh }
+}
+
+export function useConfig() {
+  const [config, setConfig] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const refresh = useCallback(() => {
+    setLoading(true)
+    loadConfig().then(c => { setConfig(c); setLoading(false) })
+  }, [])
+  useEffect(() => { refresh() }, [refresh])
+  return { config, loading, refresh }
+}
+
+export function useRunReviews() {
+  const [runs, setRuns] = useState([])
+  const [loading, setLoading] = useState(true)
+  const refresh = useCallback(() => {
+    setLoading(true)
+    loadRunReviews().then(r => { setRuns(r); setLoading(false) })
+  }, [])
+  useEffect(() => { refresh() }, [refresh])
+  return { runs, loading, refresh }
 }

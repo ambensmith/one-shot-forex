@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { useDashboard, useTrades, useEquity, useReview } from '../hooks/useStreamData'
+import { useDashboard, useTrades, useEquity, useReview, useRunReviews } from '../hooks/useStreamData'
 import { triggerStream, pollWorkflow } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import EquityCurve from '../components/EquityCurve'
 import TradeRow from '../components/TradeRow'
-import { formatPnl, formatPercent } from '../lib/constants'
+import { formatPnl, formatPercent, timeAgo } from '../lib/constants'
+import { RunCard } from './RunHistory'
 
 export default function Dashboard() {
   const { data: dashboard, loading, refresh: refreshDashboard } = useDashboard()
   const { trades, refresh: refreshTrades } = useTrades()
   const { curves, refresh: refreshEquity } = useEquity()
   const { review, refresh: refreshReview } = useReview()
+  const { runs: recentRuns, refresh: refreshRuns } = useRunReviews()
 
   const [running, setRunning] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -18,11 +20,14 @@ export default function Dashboard() {
   const [statusMsg, setStatusMsg] = useState(null)
   const [showReview, setShowReview] = useState(false)
 
+  const [expandedRunId, setExpandedRunId] = useState(null)
+
   function refreshAll() {
     refreshDashboard()
     refreshTrades()
     refreshEquity()
     refreshReview()
+    refreshRuns()
   }
 
   async function handleWorkflow(mode, stream, label) {
@@ -224,6 +229,23 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Recent Runs */}
+      {recentRuns && recentRuns.length > 0 && (
+        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Recent Runs</h3>
+          <div className="space-y-2">
+            {recentRuns.slice(0, 3).map(run => (
+              <RunCard
+                key={run.run_id}
+                run={run}
+                expanded={expandedRunId === run.run_id}
+                onToggle={() => setExpandedRunId(expandedRunId === run.run_id ? null : run.run_id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Cowork Review Section */}
       <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">

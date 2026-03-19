@@ -20,7 +20,7 @@ def export_all(db_path: str = "data/sentinel.db"):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     db = Database(db_path)
-    config = load_config()
+    config = load_config(db=db)
 
     export_dashboard_summary(db, config)
     export_trades(db)
@@ -29,6 +29,8 @@ def export_all(db_path: str = "data/sentinel.db"):
     export_models(db, config)
     export_review(db, config)
     export_hybrids(db)
+    export_config(config)
+    export_run_reviews(db)
 
     db.close()
     logger.info(f"Dashboard JSON exported to {OUTPUT_DIR}")
@@ -260,6 +262,24 @@ def export_hybrids(db):
     """Export hybrid configs for the frontend."""
     hybrids = db.get_all_hybrids()
     _write_json("hybrids.json", {"hybrids": hybrids})
+
+
+def export_config(config: dict):
+    """Export effective config as JSON for the frontend Settings page."""
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Strip sensitive fields
+    safe_config = {k: v for k, v in config.items() if k not in ("execution",)}
+    _write_json("config.json", {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "config": safe_config,
+    })
+
+
+def export_run_reviews(db):
+    """Export recent run logs for the frontend Run History page."""
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    run_logs = db.get_run_logs(limit=48)
+    _write_json("run_reviews.json", {"runs": run_logs})
 
 
 def _get_strategy_breakdown(db) -> list[dict]:
