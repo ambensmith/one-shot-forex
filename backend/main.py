@@ -397,6 +397,78 @@ def run_reconcile_trades():
     logger.info("One-shot reconciliation complete.")
 
 
+def run_sync_broker():
+    """Import untracked broker positions into the local database.
+
+    Fetches all open positions from Capital.com and creates DB records
+    for any that don't already have a matching broker_deal_id.
+    """
+    from backend.core.database import Database
+    from backend.core.config import load_config
+
+    db = Database("data/sentinel.db")
+    config = load_config(db=db)
+    broker = create_data_provider(config)
+
+    if not broker.is_connected:
+        logger.error("Cannot sync: broker not connected. Set CAPITALCOM_* env vars.")
+        db.close()
+        return
+
+    try:
+        broker_positions = broker.get_open_trades()
+    except Exception as e:
+        logger.error(f"Failed to fetch broker positions: {e}")
+        db.close()
+        return
+
+    logger.info(f"Broker has {len(broker_positions)} open positions")
+
+    # Find which positions are already tracked
+    existing_deal_ids = set()
+    for row in db.execute("SELECT broker_deal_id FROM trades WHERE broker_deal_id IS NOT NULL").fetchall():
+        existing_deal_ids.add(dict(row)["broker_deal_id"])
+
+    created = 0
+    for pos in broker_positions:
+        deal_id = pos.get("id", "")
+        if deal_id in existing_deal_ids:
+            logger.info(f"  Already tracked: {deal_id} ({pos['instrument']} {pos['direction']})")
+            continue
+
+        entry_price = pos.get("entry_price") or 0
+        stop_loss = pos.get("stop_loss") or 0
+        take_profit = pos.get("take_profit") or 0
+        size = float(pos.get("currentUnits", 0))
+
+        # Assign to a stream — untracked positions go to "news" as default
+        stream = "news"
+
+        trade_id = db.insert_trade(
+            stream=stream,
+            instrument=pos["instrument"],
+            direction=pos["direction"],
+            entry_price=entry_price,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+            position_size=size,
+            signal_ids=[],
+            broker_deal_id=deal_id,
+        )
+        created += 1
+        logger.info(
+            f"  Created trade {trade_id}: {pos['instrument']} {pos['direction']} "
+            f"size={size} entry={entry_price} deal_id={deal_id}"
+        )
+
+    # Re-export dashboard data
+    from backend.dashboard.json_exporter import export_all
+    export_all(db_path="data/sentinel.db")
+
+    db.close()
+    logger.info(f"Sync complete: {created} new trade(s) imported from broker.")
+
+
 def run_backfill_pnl():
     """Backfill null P&L on closed trades using SL as conservative exit estimate.
 
@@ -441,7 +513,7 @@ def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "backfill-pnl"],
+        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "sync-broker", "backfill-pnl"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -484,6 +556,8 @@ def main():
         run_fix_phantoms()
     elif args.mode == "reconcile-trades":
         run_reconcile_trades()
+    elif args.mode == "sync-broker":
+        run_sync_broker()
     elif args.mode == "backfill-pnl":
         run_backfill_pnl()
     elif args.mode == "backtest":
