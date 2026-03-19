@@ -32,7 +32,7 @@ def test_parse_embedded_json():
 
 def test_model_registry():
     models = get_all_models()
-    assert len(models) == 3
+    assert len(models) == 4
     assert "groq/llama-3.3-70b" in models
 
 
