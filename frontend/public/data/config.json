@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-03-19T17:52:57.140923+00:00",
+  "generated_at": "2026-03-19T18:52:09.303232+00:00",
   "config": {
     "scheduler": {
       "interval": "1h",
       "timezone": "UTC"
     },
     "risk": {
-      "max_risk_per_trade": 0.01,
+      "max_risk_per_trade": 0.005,
       "max_open_positions_per_stream": 5,
       "max_daily_loss_per_stream": 0.03,
-      "max_correlated_positions": 2,
+      "max_correlated_positions": 4,
       "default_rr_ratio": 1.5,
       "stop_loss_method": "atr",
       "atr_multiplier": 1.5,
@@ -33,13 +33,23 @@
         "id": "news",
         "name": "News Stream",
         "enabled": true,
-        "capital_allocation": 33333,
+        "capital_allocation": 1000,
         "instruments": [
           "EUR_USD",
           "GBP_USD",
           "USD_JPY",
           "XAU_USD",
-          "BCO_USD"
+          "BCO_USD",
+          "USD_CHF",
+          "AUD_USD",
+          "USD_CAD",
+          "NZD_USD",
+          "XAG_USD",
+          "WTICO_USD",
+          "EUR_GBP",
+          "NATGAS_USD",
+          "EUR_JPY",
+          "GBP_JPY"
         ],
         "news_sources": [
           {
@@ -61,7 +71,7 @@
             "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
           }
         ],
-        "news_lookback_hours": 4,
+        "news_lookback_hours": 12,
         "min_confidence": 0.6,
         "llm": {
           "primary_model": "groq/llama-3.3-70b",
@@ -76,7 +86,7 @@
         "id": "strategy",
         "name": "Strategy Stream",
         "enabled": true,
-        "capital_allocation": 33333,
+        "capital_allocation": 1000,
         "instruments": [
           "EUR_USD",
           "GBP_USD",
