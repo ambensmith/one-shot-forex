@@ -49,8 +49,61 @@ export async function loadModels() {
   return data?.models || []
 }
 
+export async function loadReview() {
+  return fetchJSON('review.json')
+}
+
+export async function loadHybrids() {
+  const data = await fetchJSON('hybrids.json')
+  return data?.hybrids || []
+}
+
 export function saveModelComparison(modelComparison) {
   if (modelComparison && modelComparison.length > 0) {
     localStorage.setItem('model_comparison', JSON.stringify(modelComparison))
   }
+}
+
+// ── Workflow Trigger Helpers ──────────────────────────────
+
+/**
+ * Trigger a GitHub Actions workflow via the Vercel API.
+ * @param {Object} params - { mode, stream?, hybrid?, period? }
+ * @returns {{ run_id, status, message }}
+ */
+export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, period = '7d' }) {
+  const resp = await fetch('/api/trigger-stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, stream, hybrid, period }),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
+/**
+ * Poll a GitHub Actions workflow run until complete.
+ * @param {number} runId
+ * @param {function} onProgress - called with status string on each poll
+ * @param {number} maxAttempts - max poll attempts (default 60 = ~5 min)
+ * @returns {{ status, conclusion }}
+ */
+export async function pollWorkflow(runId, onProgress, maxAttempts = 60) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 5000))
+    try {
+      const resp = await fetch(`/api/workflow-status?run_id=${runId}`)
+      if (!resp.ok) continue
+      const data = await resp.json()
+      onProgress?.(data.status)
+      if (data.status === 'completed') return data
+      if (data.conclusion === 'failure' || data.conclusion === 'cancelled') return data
+    } catch {
+      // Network error, keep polling
+    }
+  }
+  return { status: 'timeout', conclusion: 'timeout' }
 }

@@ -11,8 +11,33 @@ on:
         type: choice
         options:
           - tick
+          - reset
           - review
-          - backtest
+          - save-hybrid
+      stream:
+        description: 'Which stream to run (tick mode only)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - news
+          - strategy
+          - hybrid
+      force_market_open:
+        description: 'Bypass market hours check'
+        required: false
+        default: 'true'
+        type: boolean
+      hybrid_json:
+        description: 'Hybrid config JSON (save-hybrid mode only)'
+        required: false
+        type: string
+      review_period:
+        description: 'Review period (review mode only)'
+        required: false
+        default: '7d'
+        type: string
 
 jobs:
   trade:
@@ -36,7 +61,29 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: python -m backend.main --mode ${{ github.event.inputs.mode || 'tick' }}
+          CAPITALCOM_API_KEY: ${{ secrets.CAPITALCOM_API_KEY }}
+          CAPITALCOM_EMAIL: ${{ secrets.CAPITALCOM_EMAIL }}
+          CAPITALCOM_PASSWORD: ${{ secrets.CAPITALCOM_PASSWORD }}
+        run: |
+          MODE="${{ github.event.inputs.mode || 'tick' }}"
+          STREAM="${{ github.event.inputs.stream || 'all' }}"
+          FORCE="${{ github.event.inputs.force_market_open }}"
+          HYBRID_JSON='${{ github.event.inputs.hybrid_json }}'
+          PERIOD="${{ github.event.inputs.review_period || '7d' }}"
+
+          if [ "$MODE" = "tick" ]; then
+            CMD="python -m backend.main --mode tick --stream $STREAM"
+            if [ "$FORCE" = "true" ]; then
+              CMD="$CMD --force-market-open"
+            fi
+            $CMD
+          elif [ "$MODE" = "reset" ]; then
+            python -m backend.main --mode reset
+          elif [ "$MODE" = "review" ]; then
+            python -m backend.main --mode review --period "$PERIOD"
+          elif [ "$MODE" = "save-hybrid" ]; then
+            python -m backend.main --mode save-hybrid --hybrid-json "$HYBRID_JSON"
+          fi
 
       - name: Export dashboard JSON
         run: python -m backend.dashboard.json_exporter
@@ -46,5 +93,5 @@ jobs:
           git config user.name "forex-sentinel-bot"
           git config user.email "bot@forex-sentinel"
           git add data/ logs/ reviews/ frontend/public/data/
-          git diff --staged --quiet || git commit -m "cycle $(date -u +%Y-%m-%dT%H:%M)"
+          git diff --staged --quiet || git commit -m "cycle $(date -u +%Y-%m-%dT%H:%M) [${{ github.event.inputs.mode || 'tick' }}]"
           git push

@@ -27,6 +27,8 @@ def export_all(db_path: str = "data/sentinel.db"):
     export_equity(db)
     export_signals(db)
     export_models(db, config)
+    export_review(db, config)
+    export_hybrids(db)
 
     db.close()
     logger.info(f"Dashboard JSON exported to {OUTPUT_DIR}")
@@ -223,6 +225,41 @@ def export_models(db, config):
         })
 
     _write_json("models.json", {"models": model_data})
+
+
+def export_review(db, config):
+    """Export latest review data as JSON for the frontend."""
+    from datetime import timedelta
+    from pathlib import Path as P
+
+    review_data = {"has_review": False}
+
+    # Try to read latest REVIEW.md
+    latest_dir = P(config.get("reviews", {}).get("output_dir", "reviews")) / "latest"
+    if latest_dir.exists():
+        review_md = latest_dir / "REVIEW.md"
+        if review_md.exists():
+            review_data["has_review"] = True
+            review_data["review_md"] = review_md.read_text()
+
+        # Read SYSTEM_CONTEXT.md
+        ctx_path = P(config.get("reviews", {}).get("output_dir", "reviews")) / "SYSTEM_CONTEXT.md"
+        if ctx_path.exists():
+            review_data["system_context"] = ctx_path.read_text()
+
+        # Read CSVs as strings
+        for csv_name in ["trades.csv", "signals.csv", "equity_curves.csv", "open_positions.csv"]:
+            csv_path = latest_dir / csv_name
+            if csv_path.exists():
+                review_data[csv_name.replace(".csv", "_csv")] = csv_path.read_text()
+
+    _write_json("review.json", review_data)
+
+
+def export_hybrids(db):
+    """Export hybrid configs for the frontend."""
+    hybrids = db.get_all_hybrids()
+    _write_json("hybrids.json", {"hybrids": hybrids})
 
 
 def _get_strategy_breakdown(db) -> list[dict]:
