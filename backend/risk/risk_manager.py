@@ -1,0 +1,137 @@
+"""Risk manager — validates trades against risk rules before execution."""
+
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass
+from typing import Any
+
+logger = logging.getLogger("forex_sentinel.risk")
+
+
+# Correlated instrument groups
+CORRELATION_GROUPS = [
+    {"EUR_USD", "EUR_GBP", "EUR_JPY"},
+    {"GBP_USD", "GBP_JPY", "EUR_GBP"},
+    {"USD_JPY", "EUR_JPY", "GBP_JPY"},
+    {"BCO_USD", "WTICO_USD"},
+    {"XAU_USD", "XAG_USD"},
+]
+
+
+@dataclass
+class RiskCheck:
+    approved: bool
+    position_size: float = 0.0
+    rejection_reason: str | None = None
+
+
+class RiskManager:
+    def __init__(self, config: dict, oanda, db):
+        self.config = config
+        self.oanda = oanda
+        self.db = db
+        risk_cfg = config.get("risk", {})
+        self.max_risk_per_trade = risk_cfg.get("max_risk_per_trade", 0.01)
+        self.max_open_per_stream = risk_cfg.get("max_open_positions_per_stream", 5)
+        self.max_daily_loss = risk_cfg.get("max_daily_loss_per_stream", 0.03)
+        self.max_correlated = risk_cfg.get("max_correlated_positions", 2)
+        self.default_rr = risk_cfg.get("default_rr_ratio", 1.5)
+        self.sl_method = risk_cfg.get("stop_loss_method", "atr")
+        self.atr_multiplier = risk_cfg.get("atr_multiplier", 1.5)
+        self.atr_period = risk_cfg.get("atr_period", 14)
+
+    def check_trade(self, stream_id: str, instrument: str,
+                    direction: str, entry_price: float,
+                    stop_loss: float) -> RiskCheck:
+        from backend.main import is_market_open
+        if not is_market_open():
+            return RiskCheck(approved=False, rejection_reason="Market closed")
+
+        # Max open positions check
+        open_count = self.db.count_open_positions(stream_id)
+        if open_count >= self.max_open_per_stream:
+            return RiskCheck(approved=False,
+                             rejection_reason=f"Max open positions ({self.max_open_per_stream}) reached")
+
+        # Daily loss limit check
+        equity = self.db.get_stream_equity(stream_id)
+        daily_pnl = self.db.get_daily_pnl(stream_id)
+        if daily_pnl < -(equity * self.max_daily_loss):
+            return RiskCheck(approved=False,
+                             rejection_reason=f"Daily loss limit ({self.max_daily_loss*100}%) exceeded")
+
+        # Correlation check
+        open_trades = self.db.get_open_trades(stream_id)
+        open_instruments = {t["instrument"] for t in open_trades}
+        for group in CORRELATION_GROUPS:
+            if instrument in group:
+                correlated_open = len(open_instruments & group)
+                if correlated_open >= self.max_correlated:
+                    return RiskCheck(
+                        approved=False,
+                        rejection_reason=f"Max correlated positions ({self.max_correlated}) for group",
+                    )
+
+        # Calculate position size
+        position_size = self.calculate_position_size(
+            equity, self.max_risk_per_trade, entry_price, stop_loss, instrument
+        )
+
+        if position_size <= 0:
+            return RiskCheck(approved=False, rejection_reason="Position size too small")
+
+        return RiskCheck(approved=True, position_size=position_size)
+
+    def calculate_position_size(self, account_balance: float, risk_pct: float,
+                                 entry: float, stop_loss: float,
+                                 instrument: str) -> float:
+        """Position size = (balance * risk%) / (|entry - stop_loss| * pip_value)."""
+        from backend.data.oanda_client import OandaClient
+        pip_val = OandaClient.pip_value(instrument)
+        stop_distance = abs(entry - stop_loss)
+        if stop_distance == 0:
+            return 0.0
+        risk_amount = account_balance * risk_pct
+        pips = stop_distance / pip_val
+        if pips == 0:
+            return 0.0
+        # For forex, 1 standard lot = 100,000 units; pip value ~$10 per lot
+        # Simplified: units = risk_amount / stop_distance
+        units = risk_amount / stop_distance
+        return round(units)
+
+    def calculate_stop_loss(self, instrument: str, entry_price: float,
+                            direction: str, df=None) -> float:
+        """Calculate stop loss based on ATR or fixed pips."""
+        from backend.data.oanda_client import OandaClient
+        pip_val = OandaClient.pip_value(instrument)
+
+        if self.sl_method == "atr" and df is not None and len(df) >= self.atr_period:
+            tr = df["High"] - df["Low"]
+            atr = tr.rolling(self.atr_period).mean().iloc[-1]
+            distance = atr * self.atr_multiplier
+        else:
+            # Fixed pips fallback: 50 pips for forex, scaled for commodities
+            if instrument.startswith("XAU"):
+                distance = 15.0
+            elif instrument.startswith(("BCO", "WTICO")):
+                distance = 1.5
+            elif "JPY" in instrument:
+                distance = 0.50
+            else:
+                distance = 0.0050
+
+        if direction == "long":
+            return entry_price - distance
+        else:
+            return entry_price + distance
+
+    def calculate_take_profit(self, entry_price: float, stop_loss: float,
+                               direction: str) -> float:
+        """TP = entry + RR * stop_distance."""
+        distance = abs(entry_price - stop_loss) * self.default_rr
+        if direction == "long":
+            return entry_price + distance
+        else:
+            return entry_price - distance
