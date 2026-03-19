@@ -52,6 +52,10 @@ class ReviewGenerator:
         strategy_metrics = compute_strategy_metrics(self.db, since)
         instrument_metrics = compute_instrument_metrics(self.db, since)
 
+        # Query trades and signals (used by both narrative and CSV export)
+        trades = self.db.get_trades(limit=10000, since=since)
+        signals = self.db.get_signals(limit=10000, since=since)
+
         # Generate REVIEW.md
         review_md = generate_review_md(
             period_label=period_label,
@@ -59,11 +63,11 @@ class ReviewGenerator:
             strategy_metrics=strategy_metrics,
             instrument_metrics=instrument_metrics,
             trigger=trigger,
+            trades=trades,
+            signals=signals,
         )
 
         # Export CSVs
-        trades = self.db.get_trades(limit=10000, since=since)
-        signals = self.db.get_signals(limit=10000, since=since)
         equity = []
         for sid in ["news", "strategy"]:
             equity.extend(self.db.get_equity_history(sid, since=since))
