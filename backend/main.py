@@ -46,17 +46,27 @@ def should_generate_review(config) -> bool:
     return now.hour == hour and now.minute < 5
 
 
+def create_data_provider(config: dict):
+    """Factory: instantiate the configured data provider."""
+    provider = config.get("execution", {}).get("data_provider", "oanda")
+    if provider == "capitalcom":
+        from backend.data.capitalcom_client import CapitalComClient
+        return CapitalComClient(config)
+    else:
+        from backend.data.oanda_client import OandaClient
+        return OandaClient(config)
+
+
 async def run_tick():
     """Execute one trading cycle across all active streams."""
     from backend.core.config import load_config
     from backend.core.database import Database
-    from backend.data.oanda_client import OandaClient
     from backend.risk.risk_manager import RiskManager
     from backend.execution.executor import Executor
 
     config = load_config()
     db = Database("data/sentinel.db")
-    oanda = OandaClient(config)
+    oanda = create_data_provider(config)
     risk = RiskManager(config, oanda, db)
     executor = Executor(config, oanda, db)
 
