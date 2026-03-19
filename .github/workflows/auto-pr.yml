@@ -18,15 +18,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          echo "Branch: $GITHUB_REF_NAME"
+
           # Check if PR already exists for this branch
-          existing=$(gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[0].number' 2>/dev/null || true)
-          if [ -n "$existing" ]; then
-            echo "PR #$existing already exists for $GITHUB_REF_NAME"
+          pr_count=$(gh pr list --head "$GITHUB_REF_NAME" --json number --jq 'length')
+          if [ "$pr_count" -gt 0 ]; then
+            echo "PR already exists for $GITHUB_REF_NAME"
             exit 0
           fi
 
           # Create PR using the latest commit message as title
           TITLE=$(git log -1 --pretty=%s)
+          echo "Creating PR: $TITLE"
           gh pr create \
             --base main \
             --head "$GITHUB_REF_NAME" \
