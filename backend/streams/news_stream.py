@@ -11,8 +11,8 @@ logger = logging.getLogger("forex_sentinel.news_stream")
 
 
 class NewsStream(BaseStream):
-    def __init__(self, config: dict, db, oanda, risk, executor):
-        super().__init__("news", config, db, oanda, risk, executor)
+    def __init__(self, config: dict, db, broker, risk, executor):
+        super().__init__("news", config, db, broker, risk, executor)
         self.stream_config = config.get("streams", {}).get("news_stream", {})
 
     async def tick(self) -> list[StreamSignal]:
@@ -83,8 +83,8 @@ class NewsStream(BaseStream):
 
             try:
                 # Get market context
-                df = self.oanda.get_candles(instrument, count=50)
-                price_data = self.oanda.get_current_price(instrument)
+                df = self.broker.get_candles(instrument, count=50)
+                price_data = self.broker.get_current_price(instrument)
                 current_price = price_data["mid"]
 
                 daily_change = 0.0

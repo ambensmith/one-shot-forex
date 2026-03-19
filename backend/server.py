@@ -53,10 +53,10 @@ def _get_components():
 
     config = load_config()
     db = Database("data/sentinel.db")
-    oanda = create_data_provider(config)
-    risk = RiskManager(config, oanda, db)
-    executor = Executor(config, oanda, db)
-    return config, db, oanda, risk, executor
+    broker = create_data_provider(config)
+    risk = RiskManager(config, broker, db)
+    executor = Executor(config, broker, db)
+    return config, db, broker, risk, executor
 
 
 def _export_json(db, config):
@@ -112,14 +112,14 @@ def _force_market_open():
 async def run_news_stream():
     """Run the news stream: fetch news, LLM analysis, risk check, trade."""
     _force_market_open()
-    config, db, oanda, risk, executor = _get_components()
+    config, db, broker, risk, executor = _get_components()
 
     before_signals = len(db.get_signals(stream="news", limit=10000))
     before_trades = len(db.get_trades(stream="news", limit=10000))
 
     try:
         from backend.streams.news_stream import NewsStream
-        stream = NewsStream(config=config, db=db, oanda=oanda, risk=risk, executor=executor)
+        stream = NewsStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
         signals = await stream.tick()
 
         _export_json(db, config)
@@ -145,14 +145,14 @@ async def run_news_stream():
 async def run_strategy_stream():
     """Run the strategy stream: all 5 mechanical strategies."""
     _force_market_open()
-    config, db, oanda, risk, executor = _get_components()
+    config, db, broker, risk, executor = _get_components()
 
     before_signals = len(db.get_signals(stream="strategy", limit=10000))
     before_trades = len(db.get_trades(stream="strategy", limit=10000))
 
     try:
         from backend.streams.strategy_stream import StrategyStream
-        stream = StrategyStream(config=config, db=db, oanda=oanda, risk=risk, executor=executor)
+        stream = StrategyStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
         signals = await stream.tick()
 
         _export_json(db, config)
@@ -178,7 +178,7 @@ async def run_strategy_stream():
 async def run_hybrid_stream():
     """Run all active hybrid streams."""
     _force_market_open()
-    config, db, oanda, risk, executor = _get_components()
+    config, db, broker, risk, executor = _get_components()
 
     results = []
     try:
@@ -200,7 +200,7 @@ async def run_hybrid_stream():
 
             hybrid = HybridStream(
                 hybrid_config=hybrid_config,
-                config=config, db=db, oanda=oanda,
+                config=config, db=db, broker=broker,
                 risk=risk, executor=executor,
             )
             await hybrid.tick()
@@ -219,7 +219,7 @@ async def run_hybrid_stream():
 async def run_all_streams():
     """Run all enabled streams sequentially."""
     _force_market_open()
-    config, db, oanda, risk, executor = _get_components()
+    config, db, broker, risk, executor = _get_components()
 
     results = {}
     try:
@@ -230,7 +230,7 @@ async def run_all_streams():
             from backend.streams.news_stream import NewsStream
             before_s = len(db.get_signals(stream="news", limit=10000))
             before_t = len(db.get_trades(stream="news", limit=10000))
-            stream = NewsStream(config=config, db=db, oanda=oanda, risk=risk, executor=executor)
+            stream = NewsStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
             await stream.tick()
             results["news"] = _count_results(db, "news", before_s, before_t)
 
@@ -239,7 +239,7 @@ async def run_all_streams():
             from backend.streams.strategy_stream import StrategyStream
             before_s = len(db.get_signals(stream="strategy", limit=10000))
             before_t = len(db.get_trades(stream="strategy", limit=10000))
-            stream = StrategyStream(config=config, db=db, oanda=oanda, risk=risk, executor=executor)
+            stream = StrategyStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
             await stream.tick()
             results["strategy"] = _count_results(db, "strategy", before_s, before_t)
 
@@ -252,7 +252,7 @@ async def run_all_streams():
             before_t = len(db.get_trades(stream=hid, limit=10000))
             hybrid = HybridStream(
                 hybrid_config=hybrid_config,
-                config=config, db=db, oanda=oanda,
+                config=config, db=db, broker=broker,
                 risk=risk, executor=executor,
             )
             await hybrid.tick()
@@ -262,7 +262,7 @@ async def run_all_streams():
 
         # Record equity for all streams
         from backend.main import _record_all_equity
-        _record_all_equity(db, oanda)
+        _record_all_equity(db, broker)
 
         _export_json(db, config)
         return JSONResponse({"status": "ok", "results": results})

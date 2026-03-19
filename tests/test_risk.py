@@ -1,7 +1,7 @@
 """Tests for risk manager."""
 
 from backend.core.database import Database
-from backend.data.oanda_client import OandaClient
+from backend.data.capitalcom_client import CapitalComClient
 from backend.risk.risk_manager import RiskManager
 
 
@@ -17,11 +17,11 @@ def _setup():
             "atr_multiplier": 1.5,
             "atr_period": 14,
         },
-        "execution": {"oanda_environment": "practice"},
+        "execution": {"data_provider": "capitalcom"},
     }
     db = Database(":memory:")
-    oanda = OandaClient(config)
-    risk = RiskManager(config, oanda, db)
+    broker = CapitalComClient(config)
+    risk = RiskManager(config, broker, db)
     return risk, db
 
 

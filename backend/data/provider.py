@@ -11,7 +11,7 @@ import pandas as pd
 class DataProvider(Protocol):
     """Protocol that all broker/data clients must satisfy.
 
-    Implemented by OandaClient, CapitalComClient, etc.
+    Implemented by CapitalComClient.
     """
 
     @property

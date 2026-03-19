@@ -55,8 +55,8 @@ class BacktestEngine:
 
     def run(self, strategy, df: pd.DataFrame, instrument: str) -> BacktestResult:
         """Run backtest on historical data."""
-        from backend.data.oanda_client import OandaClient
-        pip_val = OandaClient.pip_value(instrument)
+        from backend.data.provider import pip_value
+        pip_val = pip_value(instrument)
 
         trades: list[BacktestTrade] = []
         equity = self.initial_capital

@@ -37,11 +37,11 @@ class BaseStream(ABC):
     """All three stream types inherit from this.
     Each stream has its own capital allocation, trades, and P&L."""
 
-    def __init__(self, stream_id: str, config: dict, db, oanda, risk, executor):
+    def __init__(self, stream_id: str, config: dict, db, broker, risk, executor):
         self.stream_id = stream_id
         self.config = config
         self.db = db
-        self.oanda = oanda
+        self.broker = broker
         self.risk = risk
         self.executor = executor
         self.logger = logging.getLogger(f"forex_sentinel.stream.{stream_id}")

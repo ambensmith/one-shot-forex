@@ -10,8 +10,8 @@ logger = logging.getLogger("forex_sentinel.strategy_stream")
 
 
 class StrategyStream(BaseStream):
-    def __init__(self, config: dict, db, oanda, risk, executor):
-        super().__init__("strategy", config, db, oanda, risk, executor)
+    def __init__(self, config: dict, db, broker, risk, executor):
+        super().__init__("strategy", config, db, broker, risk, executor)
         self.stream_config = config.get("streams", {}).get("strategy_stream", {})
 
     async def tick(self) -> list[StreamSignal]:
@@ -39,7 +39,7 @@ class StrategyStream(BaseStream):
 
             for instrument in instruments:
                 try:
-                    df = self.oanda.get_candles(
+                    df = self.broker.get_candles(
                         instrument,
                         granularity=self.config.get("data", {}).get("candle_granularity", "H1"),
                         count=self.config.get("data", {}).get("lookback_periods", 200),

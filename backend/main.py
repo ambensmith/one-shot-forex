@@ -49,13 +49,8 @@ def should_generate_review(config) -> bool:
 
 def create_data_provider(config: dict):
     """Factory: instantiate the configured data provider."""
-    provider = config.get("execution", {}).get("data_provider", "oanda")
-    if provider == "capitalcom":
-        from backend.data.capitalcom_client import CapitalComClient
-        return CapitalComClient(config)
-    else:
-        from backend.data.oanda_client import OandaClient
-        return OandaClient(config)
+    from backend.data.capitalcom_client import CapitalComClient
+    return CapitalComClient(config)
 
 
 async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
@@ -76,9 +71,9 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
 
     config = load_config()
     db = Database("data/sentinel.db")
-    oanda = create_data_provider(config)
-    risk = RiskManager(config, oanda, db)
-    executor = Executor(config, oanda, db)
+    broker = create_data_provider(config)
+    risk = RiskManager(config, broker, db)
+    executor = Executor(config, broker, db)
 
     if not is_market_open():
         logger.info("Market closed. Skipping cycle.")
@@ -91,7 +86,7 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
         if streams_cfg.get("news_stream", {}).get("enabled", False):
             from backend.streams.news_stream import NewsStream
             news_stream = NewsStream(
-                config=config, db=db, oanda=oanda,
+                config=config, db=db, broker=broker,
                 risk=risk, executor=executor,
             )
             await news_stream.tick()
@@ -101,7 +96,7 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
         if streams_cfg.get("strategy_stream", {}).get("enabled", False):
             from backend.streams.strategy_stream import StrategyStream
             strategy_stream = StrategyStream(
-                config=config, db=db, oanda=oanda,
+                config=config, db=db, broker=broker,
                 risk=risk, executor=executor,
             )
             await strategy_stream.tick()
@@ -112,13 +107,13 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
         for hybrid_config in db.get_active_hybrids():
             hybrid = HybridStream(
                 hybrid_config=hybrid_config,
-                config=config, db=db, oanda=oanda,
+                config=config, db=db, broker=broker,
                 risk=risk, executor=executor,
             )
             await hybrid.tick()
 
     # Record equity snapshots
-    _record_all_equity(db, oanda)
+    _record_all_equity(db, broker)
 
     # Generate review if due
     if stream_filter == "all" and should_generate_review(config):
@@ -128,7 +123,7 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
     logger.info(f"Trading cycle complete (stream={stream_filter}).")
 
 
-def _record_all_equity(db, oanda):
+def _record_all_equity(db, broker):
     """Record equity snapshots for all streams."""
     for stream_id in ["news", "strategy"]:
         equity = db.get_stream_equity(stream_id)
