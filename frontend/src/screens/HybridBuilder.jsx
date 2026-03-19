@@ -18,7 +18,7 @@ const COMBINER_MODES = [
 ]
 
 export default function HybridBuilder() {
-  const { data: dashboard } = useDashboard()
+  const { data: dashboard, refresh: refreshDashboard } = useDashboard()
   const hybrids = dashboard?.streams?.filter(s => s.id.startsWith('hybrid:')) || []
 
   const [editing, setEditing] = useState(false)
@@ -26,6 +26,23 @@ export default function HybridBuilder() {
   const [selectedModules, setSelectedModules] = useState([])
   const [combinerMode, setCombinerMode] = useState('weighted')
   const [minConfidence, setMinConfidence] = useState(0.65)
+  const [running, setRunning] = useState(false)
+  const [result, setResult] = useState(null)
+
+  async function handleRunHybrid() {
+    setRunning(true)
+    setResult(null)
+    try {
+      const resp = await fetch('/api/run-stream/hybrid', { method: 'POST' })
+      const data = await resp.json()
+      setResult(data)
+      refreshDashboard()
+    } catch (e) {
+      setResult({ status: 'error', error: e.message })
+    } finally {
+      setRunning(false)
+    }
+  }
 
   const addModule = (mod) => {
     if (!selectedModules.find(m => m.name === mod.name)) {
@@ -50,13 +67,49 @@ export default function HybridBuilder() {
           <h2 className="text-2xl font-bold">Custom Hybrid</h2>
           <p className="text-sm text-gray-500 mt-1">Combine news + strategies into custom recipes</p>
         </div>
-        <button
-          onClick={() => setEditing(!editing)}
-          className="px-4 py-2 bg-brand-500 text-white rounded-lg text-sm hover:bg-brand-600 transition-colors"
-        >
-          {editing ? 'Cancel' : '+ Create New Hybrid'}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleRunHybrid}
+            disabled={running || hybrids.length === 0}
+            className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+          >
+            {running ? 'Running Hybrids...' : 'Run Hybrid Stream'}
+          </button>
+          <button
+            onClick={() => setEditing(!editing)}
+            className="px-4 py-2 bg-brand-500 text-white rounded-lg text-sm hover:bg-brand-600 transition-colors"
+          >
+            {editing ? 'Cancel' : '+ Create New Hybrid'}
+          </button>
+        </div>
       </div>
+
+      {/* Run result banner */}
+      {result && (
+        <div className={`rounded-lg p-4 mb-6 text-sm border ${
+          result.status === 'ok'
+            ? 'bg-green-900/20 border-green-800/50 text-green-300'
+            : 'bg-red-900/20 border-red-800/50 text-red-300'
+        }`}>
+          {result.status === 'ok' ? (
+            result.message ? (
+              <span>{result.message}</span>
+            ) : (
+              <div>
+                <span className="font-semibold">Hybrid streams complete:</span>{' '}
+                {result.results?.map((r, i) => (
+                  <span key={i}>
+                    {r.stream}: {r.new_signals} signals, {r.new_trades} trades
+                    {i < result.results.length - 1 ? ' | ' : ''}
+                  </span>
+                ))}
+              </div>
+            )
+          ) : (
+            <span>Error: {result.error}</span>
+          )}
+        </div>
+      )}
 
       {/* Existing Hybrids */}
       {hybrids.length > 0 && (

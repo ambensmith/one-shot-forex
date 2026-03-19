@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useSignals, useTrades, useDashboard } from '../hooks/useStreamData'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
@@ -5,12 +6,32 @@ import ConfidenceMeter from '../components/ConfidenceMeter'
 import { formatPnl, formatPercent, STRATEGY_INFO } from '../lib/constants'
 
 export default function StrategyStream() {
-  const { signals } = useSignals('strategy')
-  const { trades } = useTrades('strategy')
-  const { data: dashboard } = useDashboard()
+  const { signals, refresh: refreshSignals } = useSignals('strategy')
+  const { trades, refresh: refreshTrades } = useTrades('strategy')
+  const { data: dashboard, refresh: refreshDashboard } = useDashboard()
+
+  const [running, setRunning] = useState(false)
+  const [result, setResult] = useState(null)
 
   const stream = dashboard?.streams?.find(s => s.id === 'strategy')
   const breakdown = dashboard?.strategy_breakdown || []
+
+  async function handleRunStrategy() {
+    setRunning(true)
+    setResult(null)
+    try {
+      const resp = await fetch('/api/run-stream/strategy', { method: 'POST' })
+      const data = await resp.json()
+      setResult(data)
+      refreshSignals()
+      refreshTrades()
+      refreshDashboard()
+    } catch (e) {
+      setResult({ status: 'error', error: e.message })
+    } finally {
+      setRunning(false)
+    }
+  }
 
   return (
     <div>
@@ -19,7 +40,37 @@ export default function StrategyStream() {
           <h2 className="text-2xl font-bold">Strategy Stream</h2>
           <p className="text-sm text-gray-500 mt-1">Peer-reviewed mechanical strategies</p>
         </div>
+        <button
+          onClick={handleRunStrategy}
+          disabled={running}
+          className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+        >
+          {running ? 'Running Strategies...' : 'Run Strategy Stream'}
+        </button>
       </div>
+
+      {/* Run result banner */}
+      {result && (
+        <div className={`rounded-lg p-4 mb-6 text-sm border ${
+          result.status === 'ok'
+            ? 'bg-green-900/20 border-green-800/50 text-green-300'
+            : 'bg-red-900/20 border-red-800/50 text-red-300'
+        }`}>
+          {result.status === 'ok' ? (
+            <div>
+              <span className="font-semibold">Strategy stream complete:</span>{' '}
+              {result.new_signals} signals generated, {result.new_trades} trades executed, {result.open_positions} open positions
+              {result.rejections?.length > 0 && (
+                <div className="mt-1 text-xs text-gray-400">
+                  Rejections: {result.rejections.map(r => `${r.instrument} (${r.reason})`).join(', ')}
+                </div>
+              )}
+            </div>
+          ) : (
+            <span>Error: {result.error}</span>
+          )}
+        </div>
+      )}
 
       {/* Overall Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
