@@ -1,12 +1,15 @@
 import { NavLink } from 'react-router-dom'
-import { Newspaper, BarChart3, Wrench, LayoutDashboard, GitCompare } from 'lucide-react'
+import { Newspaper, BarChart3, Wrench, LayoutDashboard, GitCompare, Settings, History } from 'lucide-react'
+import NextRunCountdown from './NextRunCountdown'
 
 const NAV_ITEMS = [
   { to: '/news', icon: Newspaper, label: 'News Stream' },
   { to: '/strategies', icon: BarChart3, label: 'Strategies' },
   { to: '/hybrid', icon: Wrench, label: 'Custom Hybrid' },
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/runs', icon: History, label: 'Run History' },
   { to: '/models', icon: GitCompare, label: 'Models' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 
 export default function Layout({ children }) {
@@ -34,6 +37,9 @@ export default function Layout({ children }) {
               {label}
             </NavLink>
           ))}
+        </div>
+        <div className="px-4 py-3 border-t border-gray-800">
+          <NextRunCountdown />
         </div>
         <div className="p-4 border-t border-gray-800 text-xs text-gray-600">
           v0.1.0

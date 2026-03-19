@@ -5,6 +5,8 @@ import StrategyStream from './screens/StrategyStream'
 import HybridBuilder from './screens/HybridBuilder'
 import Dashboard from './screens/Dashboard'
 import ModelComparison from './screens/ModelComparison'
+import RunHistory from './screens/RunHistory'
+import Settings from './screens/Settings'
 
 export default function App() {
   return (
@@ -15,7 +17,9 @@ export default function App() {
         <Route path="/strategies" element={<StrategyStream />} />
         <Route path="/hybrid" element={<HybridBuilder />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/runs" element={<RunHistory />} />
         <Route path="/models" element={<ModelComparison />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Layout>
   )

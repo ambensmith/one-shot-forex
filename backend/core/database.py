@@ -75,6 +75,32 @@ CREATE TABLE IF NOT EXISTS hybrid_configs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS config_overrides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL UNIQUE,
+    value JSON NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS run_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id TEXT NOT NULL UNIQUE,
+    started_at TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP,
+    market_open INTEGER NOT NULL DEFAULT 1,
+    config_snapshot JSON,
+    streams_run JSON,
+    signals_generated JSON,
+    trades_opened JSON,
+    trades_closed JSON,
+    trades_carried JSON,
+    rejected_signals JSON,
+    skipped_reason TEXT,
+    review_md TEXT,
+    status TEXT DEFAULT 'running'
+);
+
+CREATE INDEX IF NOT EXISTS idx_run_logs_started ON run_logs(started_at);
 CREATE INDEX IF NOT EXISTS idx_signals_stream ON signals(stream, created_at);
 CREATE INDEX IF NOT EXISTS idx_signals_instrument ON signals(instrument, created_at);
 CREATE INDEX IF NOT EXISTS idx_trades_stream ON trades(stream, opened_at);
@@ -310,6 +336,77 @@ class Database:
     def delete_hybrid_config(self, config_id: int):
         self.execute("DELETE FROM hybrid_configs WHERE id = ?", (config_id,))
         self.commit()
+
+    # ── Config Overrides ────────────────────────────────
+
+    def set_config_override(self, key: str, value: Any):
+        self.execute(
+            """INSERT INTO config_overrides (key, value, updated_at)
+               VALUES (?, ?, CURRENT_TIMESTAMP)
+               ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP""",
+            (key, json.dumps(value)),
+        )
+        self.commit()
+
+    def get_config_overrides(self) -> dict:
+        rows = self.execute("SELECT key, value FROM config_overrides").fetchall()
+        result = {}
+        for r in rows:
+            try:
+                result[r["key"]] = json.loads(r["value"])
+            except (json.JSONDecodeError, TypeError):
+                result[r["key"]] = r["value"]
+        return result
+
+    def delete_config_override(self, key: str):
+        self.execute("DELETE FROM config_overrides WHERE key = ?", (key,))
+        self.commit()
+
+    # ── Run Logs ──────────────────────────────────────
+
+    def insert_run_log(self, **kwargs) -> int:
+        for key in ("config_snapshot", "streams_run", "signals_generated",
+                     "trades_opened", "trades_closed", "trades_carried", "rejected_signals"):
+            if key in kwargs and isinstance(kwargs[key], (list, dict)):
+                kwargs[key] = json.dumps(kwargs[key])
+        cols = ", ".join(kwargs.keys())
+        placeholders = ", ".join(["?"] * len(kwargs))
+        cur = self.execute(
+            f"INSERT INTO run_logs ({cols}) VALUES ({placeholders})",
+            tuple(kwargs.values()),
+        )
+        self.commit()
+        return cur.lastrowid
+
+    def update_run_log(self, run_id: str, **kwargs):
+        for key in ("config_snapshot", "streams_run", "signals_generated",
+                     "trades_opened", "trades_closed", "trades_carried", "rejected_signals"):
+            if key in kwargs and isinstance(kwargs[key], (list, dict)):
+                kwargs[key] = json.dumps(kwargs[key])
+        sets = ", ".join(f"{k} = ?" for k in kwargs)
+        self.execute(
+            f"UPDATE run_logs SET {sets} WHERE run_id = ?",
+            (*kwargs.values(), run_id),
+        )
+        self.commit()
+
+    def get_run_logs(self, limit: int = 24) -> list[dict]:
+        rows = self.execute(
+            "SELECT * FROM run_logs ORDER BY started_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        result = []
+        for r in rows:
+            d = self._row_to_dict(r)
+            for key in ("config_snapshot", "streams_run", "signals_generated",
+                         "trades_opened", "trades_closed", "trades_carried", "rejected_signals"):
+                if isinstance(d.get(key), str):
+                    try:
+                        d[key] = json.loads(d[key])
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+            result.append(d)
+        return result
 
     # ── Helpers ──────────────────────────────────────────
 
