@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDashboard, useHybrids } from '../hooks/useStreamData'
-import { triggerStream, pollWorkflow } from '../lib/api'
+import { triggerStream, pollWorkflow, toggleHybrid, deleteHybrid, toggleAllHybrids } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import HelpTooltip from '../components/HelpTooltip'
 import HowItWorks from '../components/HowItWorks'
@@ -35,6 +35,9 @@ export default function HybridBuilder() {
   const [running, setRunning] = useState(false)
   const [saving, setSaving] = useState(false)
   const [statusMsg, setStatusMsg] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+
+  const anyActive = savedHybrids.some(h => h.is_active)
 
   async function handleWorkflow(mode, stream, label, extra = {}) {
     const setter = mode === 'save-hybrid' ? setSaving : setRunning
@@ -92,6 +95,43 @@ export default function HybridBuilder() {
     handleWorkflow('save-hybrid', 'all', 'Hybrid save', { hybrid })
   }
 
+  async function handleToggle(h) {
+    const newActive = !h.is_active
+    setStatusMsg({ type: 'info', text: `${newActive ? 'Activating' : 'Deactivating'} ${h.name}...` })
+    try {
+      await toggleHybrid(h.id, newActive)
+      setStatusMsg({ type: 'ok', text: `${h.name} ${newActive ? 'activated' : 'deactivated'}` })
+      refreshHybrids()
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
+  }
+
+  async function handleDelete(h) {
+    setStatusMsg({ type: 'info', text: `Deleting ${h.name}...` })
+    setConfirmDelete(null)
+    try {
+      await deleteHybrid(h.id)
+      setStatusMsg({ type: 'ok', text: `${h.name} deleted` })
+      refreshHybrids()
+      refreshDashboard()
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
+  }
+
+  async function handleToggleAll() {
+    const newActive = !anyActive
+    setStatusMsg({ type: 'info', text: `${newActive ? 'Enabling' : 'Disabling'} all hybrids...` })
+    try {
+      await toggleAllHybrids(newActive)
+      setStatusMsg({ type: 'ok', text: `All hybrids ${newActive ? 'enabled' : 'disabled'}` })
+      refreshHybrids()
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
+  }
+
   const addModule = (mod) => {
     if (!selectedModules.find(m => m.name === mod.name)) {
       setSelectedModules([...selectedModules, { ...mod, weight: 0.5, mustParticipate: false }])
@@ -114,6 +154,13 @@ export default function HybridBuilder() {
     )
   }
 
+  // Build a lookup from dashboard data by hybrid name for performance metrics
+  const dashByName = {}
+  for (const dh of dashHybrids) {
+    const name = dh.id.replace('hybrid:', '')
+    dashByName[name] = dh
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -122,9 +169,20 @@ export default function HybridBuilder() {
           <p className="text-sm text-gray-500 mt-1">Combine news + strategies into custom recipes</p>
         </div>
         <div className="flex items-center gap-3">
+          {savedHybrids.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">Hybrid Trading</span>
+              <button
+                onClick={handleToggleAll}
+                className={`relative w-10 h-5 rounded-full transition-colors ${anyActive ? 'bg-brand-500' : 'bg-gray-600'}`}
+              >
+                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${anyActive ? 'left-5' : 'left-0.5'}`} />
+              </button>
+            </div>
+          )}
           <button
             onClick={() => handleWorkflow('tick', 'hybrid', 'Hybrid stream')}
-            disabled={running || saving || dashHybrids.length === 0}
+            disabled={running || saving || !anyActive}
             className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
           >
             {running ? 'Running...' : 'Run Hybrid Stream'}
@@ -156,38 +214,52 @@ export default function HybridBuilder() {
         </div>
       )}
 
-      {/* Existing Hybrids from Dashboard */}
-      {dashHybrids.length > 0 && (
+      {/* Saved Hybrids with toggle/delete and optional dashboard metrics */}
+      {savedHybrids.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {dashHybrids.map(h => (
-            <div key={h.id} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
-              <h3 className="font-semibold">{h.name}</h3>
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                <MetricTile label="P&L" value={formatPnl(h.total_pnl)} positive={h.total_pnl > 0} helpTerm="pnl" />
-                <MetricTile label="Trades" value={h.trade_count} />
-                <MetricTile label="Win %" value={`${(h.win_rate * 100).toFixed(0)}%`} helpTerm="win_rate" />
+          {savedHybrids.map(h => {
+            const perf = dashByName[h.name]
+            return (
+              <div key={h.id || h.name} className={`bg-gray-800/50 rounded-lg border p-4 ${h.is_active ? 'border-gray-700/50' : 'border-gray-700/30 opacity-60'}`}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => handleToggle(h)}
+                      className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${h.is_active ? 'bg-brand-500' : 'bg-gray-600'}`}
+                    >
+                      <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${h.is_active ? 'left-5' : 'left-0.5'}`} />
+                    </button>
+                    <h3 className="font-semibold">{h.name}</h3>
+                  </div>
+                  {confirmDelete === h.id ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">Delete?</span>
+                      <button onClick={() => handleDelete(h)} className="text-xs text-red-400 hover:text-red-300 font-medium">Yes</button>
+                      <button onClick={() => setConfirmDelete(null)} className="text-xs text-gray-400 hover:text-gray-300">No</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmDelete(h.id)} className="text-xs text-red-400/70 hover:text-red-400">
+                      Delete
+                    </button>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {h.combiner_mode} | {(h.instruments || []).join(', ')}
+                </div>
+                {perf && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <MetricTile label="P&L" value={formatPnl(perf.total_pnl)} positive={perf.total_pnl > 0} helpTerm="pnl" />
+                    <MetricTile label="Trades" value={perf.trade_count} />
+                    <MetricTile label="Win %" value={`${(perf.win_rate * 100).toFixed(0)}%`} helpTerm="win_rate" />
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      {/* Saved Hybrids from DB */}
-      {savedHybrids.length > 0 && dashHybrids.length === 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {savedHybrids.map(h => (
-            <div key={h.id || h.name} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
-              <h3 className="font-semibold">{h.name}</h3>
-              <div className="text-xs text-gray-500 mt-1">
-                {h.combiner_mode} | {(h.instruments || []).join(', ')} |
-                {h.is_active ? ' Active' : ' Inactive'}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {dashHybrids.length === 0 && savedHybrids.length === 0 && !editing && (
+      {savedHybrids.length === 0 && !editing && (
         <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-8 text-center">
           <p className="text-gray-400 mb-2">No hybrid strategies yet</p>
           <p className="text-gray-500 text-sm">Create one by combining news signals with mechanical strategies. Click "+ Create New Hybrid" above to get started.</p>
