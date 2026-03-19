@@ -163,7 +163,36 @@ export default function Dashboard() {
         <EquityCurve curves={curves} height={200} />
       </div>
 
-      {/* ── Section 2: Safety at a Glance ── */}
+      {/* ── Section 2: Stream Performance ── */}
+      {streams.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {streams.map(s => {
+            const allocation = s.capital_allocation || 33333
+            const equity = s.equity || allocation
+            const returnPct = allocation > 0 ? (equity - allocation) / allocation : 0
+            const pnl = s.total_pnl || 0
+            const color = pnl >= 0 ? 'text-green-400' : 'text-red-400'
+            return (
+              <div key={s.id} className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-4">
+                <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">{s.name}</div>
+                <div className={`text-2xl font-bold font-mono ${color}`}>
+                  {formatPnlCurrency(pnl)}
+                </div>
+                <div className={`text-xs font-mono mt-1 ${color}`}>
+                  {returnPct >= 0 ? '+' : ''}{(returnPct * 100).toFixed(1)}%
+                </div>
+                <div className="flex gap-4 mt-3 text-xs text-gray-400">
+                  <span>{formatPercent(s.win_rate)} wins</span>
+                  <span>{s.trade_count} trades</span>
+                  <span>{s.open_positions || 0} open</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* ── Section 3: Safety at a Glance ── */}
       <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
           <div>
