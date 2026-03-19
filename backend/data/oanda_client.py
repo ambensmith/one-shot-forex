@@ -14,6 +14,15 @@ logger = logging.getLogger("forex_sentinel.oanda")
 class OandaClient:
     """Wraps OANDA v20 API. Fails gracefully when keys aren't configured."""
 
+    # Base prices per instrument for offline simulation mode
+    BASE_PRICES = {
+        "EUR_USD": 1.0800, "GBP_USD": 1.2650, "USD_JPY": 150.50,
+        "USD_CHF": 0.8800, "AUD_USD": 0.6550, "USD_CAD": 1.3600,
+        "NZD_USD": 0.6100, "XAU_USD": 2350.0, "XAG_USD": 28.50,
+        "BCO_USD": 82.50, "WTICO_USD": 78.50, "NATGAS_USD": 2.80,
+        "EUR_GBP": 0.8540, "EUR_JPY": 162.50, "GBP_JPY": 190.30,
+    }
+
     def __init__(self, config: dict):
         self.api_key = os.environ.get("OANDA_API_KEY", "")
         self.account_id = os.environ.get("OANDA_ACCOUNT_ID", "")
@@ -104,7 +113,12 @@ class OandaClient:
     def get_current_price(self, instrument: str) -> dict[str, float]:
         """Get current bid/ask/mid price."""
         if not self._connected:
-            return {"bid": 1.0800, "ask": 1.0802, "mid": 1.0801}
+            import random
+            base = self.BASE_PRICES.get(instrument, 1.0)
+            spread = base * 0.0002  # typical spread
+            jitter = base * random.uniform(-0.001, 0.001)
+            mid = base + jitter
+            return {"bid": mid - spread / 2, "ask": mid + spread / 2, "mid": mid}
 
         import urllib.request
         import json
@@ -177,15 +191,7 @@ class OandaClient:
         import numpy as np
         from datetime import datetime, timedelta, timezone
 
-        # Base prices per instrument type
-        base_prices = {
-            "EUR_USD": 1.0800, "GBP_USD": 1.2650, "USD_JPY": 150.50,
-            "USD_CHF": 0.8800, "AUD_USD": 0.6550, "USD_CAD": 1.3600,
-            "NZD_USD": 0.6100, "XAU_USD": 2350.0, "XAG_USD": 28.50,
-            "BCO_USD": 82.50, "WTICO_USD": 78.50, "NATGAS_USD": 2.80,
-            "EUR_GBP": 0.8540, "EUR_JPY": 162.50, "GBP_JPY": 190.30,
-        }
-        base = base_prices.get(instrument, 1.0)
+        base = OandaClient.BASE_PRICES.get(instrument, 1.0)
         volatility = base * 0.001
 
         np.random.seed(hash(instrument) % 2**31)
