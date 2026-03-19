@@ -136,7 +136,7 @@ export default function Guide() {
           bearish (sell), or neutral. Each signal gets a confidence score from 0-100%.
         </p>
         <p className="text-gray-500 text-sm mb-4">
-          The primary model is Groq's Llama 3.3 70B. Comparison models (Mistral, DeepSeek) are logged
+          The primary model is Groq's Llama 3.3 70B. Comparison models (Mistral, Gemini, Llama 8B) are logged
           but don't generate trades — they help you evaluate model quality on the <Link to="/models" className="text-blue-400 hover:text-blue-300 underline">Models</Link> page.
         </p>
 
