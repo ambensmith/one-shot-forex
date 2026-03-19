@@ -137,6 +137,12 @@ def _trade_summary(trade: dict | None) -> dict | None:
         "direction": trade["direction"],
         "pnl": trade.get("pnl"),
         "pnl_pips": trade.get("pnl_pips"),
+        "entry_price": trade.get("entry_price"),
+        "exit_price": trade.get("exit_price"),
+        "stop_loss": trade.get("stop_loss"),
+        "take_profit": trade.get("take_profit"),
+        "position_size": trade.get("position_size"),
+        "signal_ids": trade.get("signal_ids"),
         "opened_at": trade.get("opened_at"),
         "closed_at": trade.get("closed_at"),
     }
