@@ -230,12 +230,174 @@ function mapHeadline(headline) {
   return matched;
 }
 
+// --- LLM Signal Generation ---
+
+const PROMPT_TEMPLATE = `You are a forex market analyst. Analyze the following recent news headlines
+and current market context for {instrument}. Provide a trading signal.
+
+## Recent News
+{news_headlines}
+
+## Task
+Assess the likely impact on {instrument} over the next 4-8 hours.
+Consider:
+1. Direct economic impact
+2. Central bank policy implications
+3. Risk sentiment shifts
+4. Historical precedent for similar events
+
+Respond ONLY in this exact JSON format, no other text:
+{
+  "direction": "long" | "short" | "neutral",
+  "confidence": 0.0-1.0,
+  "reasoning": "1-2 sentence explanation",
+  "time_horizon": "short" | "medium" | "long",
+  "key_factors": ["factor1", "factor2"]
+}`;
+
+const LLM_MODELS = [
+  {
+    key: "groq/llama-3.3-70b",
+    provider: "groq",
+    model: "llama-3.3-70b-versatile",
+    base_url: "https://api.groq.com/openai/v1",
+    env_key: "GROQ_API_KEY",
+  },
+  {
+    key: "mistral/mistral-small",
+    provider: "mistral",
+    model: "mistral-small-latest",
+    base_url: "https://api.mistral.ai/v1",
+    env_key: "MISTRAL_API_KEY",
+  },
+  {
+    key: "openrouter/deepseek-v3",
+    provider: "openrouter",
+    model: "deepseek/deepseek-chat-v3-0324:free",
+    base_url: "https://openrouter.ai/api/v1",
+    env_key: "OPENROUTER_API_KEY",
+  },
+];
+
+async function callLLM(modelConfig, prompt) {
+  const apiKey = process.env[modelConfig.env_key];
+  if (!apiKey) return null;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const resp = await fetch(`${modelConfig.base_url}/chat/completions`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: modelConfig.model,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.1,
+        max_tokens: 500,
+      }),
+    });
+    clearTimeout(timeout);
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => "");
+      console.warn(`LLM ${modelConfig.key} HTTP ${resp.status}: ${errText.slice(0, 200)}`);
+      return null;
+    }
+    const data = await resp.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (e) {
+    clearTimeout(timeout);
+    console.warn(`LLM ${modelConfig.key} failed:`, e.message);
+    return null;
+  }
+}
+
+function parseLLMSignal(response) {
+  if (!response) return null;
+  let text = response.trim();
+  // Strip markdown code fences
+  if (text.startsWith("```")) {
+    const lines = text.split("\n").filter((l) => !l.trim().startsWith("```"));
+    text = lines.join("\n");
+  }
+  try {
+    const data = JSON.parse(text);
+    return data;
+  } catch {
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}") + 1;
+    if (start >= 0 && end > start) {
+      try {
+        return JSON.parse(text.slice(start, end));
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+async function generateSignals(instrumentMap) {
+  const primaryModel = LLM_MODELS[0]; // Groq
+  const signals = [];
+
+  // Process instruments in parallel (max ~5 at a time on the news stream instruments)
+  const entries = Object.entries(instrumentMap);
+  const signalPromises = entries.map(async ([symbol, items]) => {
+    const headlines = items.map((i) => `- ${i.headline}`).slice(0, 10).join("\n");
+    const prompt = PROMPT_TEMPLATE
+      .replace(/{instrument}/g, symbol)
+      .replace("{news_headlines}", headlines);
+
+    // Try primary model, fall back to others
+    for (const model of LLM_MODELS) {
+      const response = await callLLM(model, prompt);
+      const parsed = parseLLMSignal(response);
+      if (parsed && parsed.direction) {
+        return {
+          instrument: symbol,
+          display_name: INSTRUMENTS[symbol]?.display_name || symbol,
+          direction: parsed.direction,
+          confidence: parseFloat(parsed.confidence) || 0,
+          reasoning: parsed.reasoning || "",
+          key_factors: parsed.key_factors || [],
+          time_horizon: parsed.time_horizon || "short",
+          model: model.key,
+          headline_count: items.length,
+          created_at: new Date().toISOString(),
+        };
+      }
+    }
+    // All models failed for this instrument
+    return {
+      instrument: symbol,
+      display_name: INSTRUMENTS[symbol]?.display_name || symbol,
+      direction: "neutral",
+      confidence: 0,
+      reasoning: "All LLM providers failed to generate a signal",
+      key_factors: [],
+      time_horizon: "short",
+      model: "none",
+      headline_count: items.length,
+      created_at: new Date().toISOString(),
+    };
+  });
+
+  return Promise.all(signalPromises);
+}
+
 // --- Handler ---
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  const generateSignalsFlag = req.query?.signals !== "false";
 
   try {
     // Fetch all sources in parallel
@@ -270,6 +432,12 @@ export default async function handler(req, res) {
       sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
     }
 
+    // Generate LLM signals if requested and we have mapped headlines
+    let signals = [];
+    if (generateSignalsFlag && Object.keys(instrumentMap).length > 0) {
+      signals = await generateSignals(instrumentMap);
+    }
+
     // Build instrument summaries
     const instruments = Object.entries(instrumentMap)
       .map(([symbol, items]) => ({
@@ -294,9 +462,11 @@ export default async function handler(req, res) {
         mapped_count: mappedHeadlineSet.size,
         unmapped_count: unmapped.length,
         instruments_active: Object.keys(instrumentMap).length,
+        signals_generated: signals.length,
         source_counts: sourceCounts,
       },
       instruments,
+      signals,
       unmapped: unmapped.map((i) => ({
         headline: i.headline,
         source: i.source,
