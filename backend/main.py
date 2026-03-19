@@ -223,11 +223,11 @@ def _record_all_equity(db, broker, config):
     streams_cfg = config.get("streams", {})
 
     stream_list = [
-        ("news", streams_cfg.get("news_stream", {}).get("capital_allocation", 33333)),
-        ("strategy", streams_cfg.get("strategy_stream", {}).get("capital_allocation", 33333)),
+        ("news", streams_cfg.get("news_stream", {}).get("capital_allocation", 100)),
+        ("strategy", streams_cfg.get("strategy_stream", {}).get("capital_allocation", 100)),
     ]
     for hybrid in db.get_active_hybrids():
-        stream_list.append((f"hybrid:{hybrid['name']}", hybrid.get("capital_allocation", 33333)))
+        stream_list.append((f"hybrid:{hybrid['name']}", hybrid.get("capital_allocation", 100)))
 
     for stream_id, capital in stream_list:
         trades = db.get_trades(stream_id, limit=10000)

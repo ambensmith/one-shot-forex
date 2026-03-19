@@ -92,8 +92,8 @@ export default function Settings() {
 
   const hasChanges = Object.keys(changes).length > 0
   const riskPct = getValue('risk.max_risk_per_trade', 0.01)
-  const capitalNews = getValue('streams.news_stream.capital_allocation', 33333)
-  const capitalStrategy = getValue('streams.strategy_stream.capital_allocation', 33333)
+  const capitalNews = getValue('streams.news_stream.capital_allocation', 100)
+  const capitalStrategy = getValue('streams.strategy_stream.capital_allocation', 100)
   const maxDailyLoss = getValue('risk.max_daily_loss_per_stream', 0.03)
 
   return (
@@ -149,7 +149,7 @@ export default function Settings() {
         />
         <NumberRow
           label="Capital Allocation"
-          value={getValue('streams.news_stream.capital_allocation', 33333)}
+          value={getValue('streams.news_stream.capital_allocation', 100)}
           onChange={v => setOverride('streams.news_stream.capital_allocation', v)}
           step={1000}
           settingKey="streams.news_stream.capital_allocation"
@@ -216,7 +216,7 @@ export default function Settings() {
         />
         <NumberRow
           label="Capital Allocation"
-          value={getValue('streams.strategy_stream.capital_allocation', 33333)}
+          value={getValue('streams.strategy_stream.capital_allocation', 100)}
           onChange={v => setOverride('streams.strategy_stream.capital_allocation', v)}
           step={1000}
           settingKey="streams.strategy_stream.capital_allocation"
@@ -394,8 +394,8 @@ export default function Settings() {
 
         {/* Live risk estimate */}
         <div className="bg-blue-900/10 border border-blue-800/20 rounded-lg p-3 mb-4 text-xs text-blue-300">
-          At current settings: max <strong>£{(capitalNews * riskPct).toFixed(0)}</strong> per trade,
-          max <strong>£{(capitalNews * maxDailyLoss).toFixed(0)}</strong> daily loss per stream
+          At current settings: max <strong>€{(capitalNews * riskPct).toFixed(0)}</strong> per trade,
+          max <strong>€{(capitalNews * maxDailyLoss).toFixed(0)}</strong> daily loss per stream
         </div>
 
         <SliderRow

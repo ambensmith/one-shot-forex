@@ -12,11 +12,11 @@ export default function Guide() {
         <p>
           Forex Sentinel is an automated paper trading system that analyzes financial markets and places
           virtual trades on a demo account. No real money is at risk — it uses Capital.com's free demo
-          account with £50,000 in virtual funds.
+          account with €1,000 in virtual funds.
         </p>
         <p>
           The system runs <strong>three independent trading streams</strong>, each with its own pool
-          of capital (default £33,333 each):
+          of capital (default €100 each):
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 my-4">
           <StreamCard
@@ -188,8 +188,8 @@ export default function Guide() {
         </h4>
         <p>
           The system automatically calculates how much to trade based on your risk percentage and the stop loss distance.
-          At 1% risk with £33,333 capital and a 50-pip stop loss, it calculates the exact number of units
-          so that if the stop loss is hit, you lose exactly £333 (1%).
+          At 1% risk with €100 capital and a 50-pip stop loss, it calculates the exact number of units
+          so that if the stop loss is hit, you lose exactly €1 (1%).
         </p>
 
         <h4 className="font-semibold text-gray-200 mb-2 flex items-center">

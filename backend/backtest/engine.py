@@ -47,7 +47,7 @@ class BacktestResult:
 class BacktestEngine:
     """Walk-forward backtester for strategies."""
 
-    def __init__(self, initial_capital: float = 33333.0,
+    def __init__(self, initial_capital: float = 100.0,
                  risk_per_trade: float = 0.01, rr_ratio: float = 1.5):
         self.initial_capital = initial_capital
         self.risk_per_trade = risk_per_trade

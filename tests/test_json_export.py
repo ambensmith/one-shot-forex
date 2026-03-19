@@ -22,7 +22,7 @@ def test_export_creates_files(tmp_path):
         entry_price=1.08, stop_loss=1.075, take_profit=1.0875,
         position_size=1000,
     )
-    db.insert_equity_snapshot("strategy", 33333, 1)
+    db.insert_equity_snapshot("strategy", 100, 1)
     db.close()
 
     # Monkey-patch output dir

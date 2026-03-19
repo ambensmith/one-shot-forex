@@ -67,7 +67,7 @@ const GLOSSARY = {
   capital_allocation: {
     term: 'Capital Allocation',
     definition: 'The amount of virtual money assigned to each trading stream. Each stream manages its own capital independently.',
-    hint: 'Default: £33,333 per stream (£100K split 3 ways).',
+    hint: 'Default: €100 per stream (€1K split 3 ways).',
   },
   equity: {
     term: 'Equity',
@@ -86,7 +86,7 @@ const GLOSSARY = {
   max_risk_per_trade: {
     term: 'Max Risk Per Trade',
     definition: 'The maximum percentage of a stream\'s capital that can be lost on a single trade. Controls position sizing.',
-    hint: 'At 1% with £33,333 capital = £333 max loss per trade. Beginners: stay at 0.5-1%.',
+    hint: 'At 1% with €100 capital = €1 max loss per trade. Beginners: stay at 0.5-1%.',
   },
   max_daily_loss: {
     term: 'Max Daily Loss',
@@ -325,7 +325,7 @@ export const SETTING_HELP = {
   },
   'risk.max_risk_per_trade': {
     glossaryKey: 'max_risk_per_trade',
-    help: 'Controls position sizing. 1% of £33,333 = £333 max loss per trade.',
+    help: 'Controls position sizing. 1% of €100 = €1 max loss per trade.',
   },
   'risk.max_open_positions_per_stream': {
     glossaryKey: 'max_open_positions',
