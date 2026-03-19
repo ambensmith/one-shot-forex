@@ -91,8 +91,8 @@ class RunReviewGenerator:
             for t in opened_records:
                 lines.append(f"| {t.get('id', '')} | {t.get('stream', '')} | "
                              f"{t.get('instrument', '')} | {t.get('direction', '')} | "
-                             f"{t.get('entry_price', 0):.5f} | {t.get('stop_loss', 0):.5f} | "
-                             f"{t.get('take_profit', 0):.5f} | {t.get('position_size', 0):.2f} |")
+                             f"{(t.get('entry_price') or 0):.5f} | {(t.get('stop_loss') or 0):.5f} | "
+                             f"{(t.get('take_profit') or 0):.5f} | {(t.get('position_size') or 0):.2f} |")
             lines.append("")
 
         closed_records = self._get_trade_records(trades_closed)
@@ -101,12 +101,12 @@ class RunReviewGenerator:
             lines.append("| # | Stream | Instrument | Dir | Entry | Exit | P&L | Pips | Status |")
             lines.append("|---|--------|-----------|-----|-------|------|-----|------|--------|")
             for t in closed_records:
-                exit_p = t.get("exit_price", 0)
-                pnl = t.get("pnl", 0)
-                pips = t.get("pnl_pips", 0)
+                exit_p = t.get("exit_price") or 0
+                pnl = t.get("pnl") or 0
+                pips = t.get("pnl_pips") or 0
                 lines.append(f"| {t.get('id', '')} | {t.get('stream', '')} | "
                              f"{t.get('instrument', '')} | {t.get('direction', '')} | "
-                             f"{t.get('entry_price', 0):.5f} | {exit_p:.5f} | "
+                             f"{(t.get('entry_price') or 0):.5f} | {exit_p:.5f} | "
                              f"{pnl:+.2f} | {pips:+.1f} | closed |")
             lines.append("")
 
@@ -118,8 +118,8 @@ class RunReviewGenerator:
             for t in carried_records:
                 lines.append(f"| {t.get('id', '')} | {t.get('stream', '')} | "
                              f"{t.get('instrument', '')} | {t.get('direction', '')} | "
-                             f"{t.get('entry_price', 0):.5f} | {t.get('stop_loss', 0):.5f} | "
-                             f"{t.get('take_profit', 0):.5f} | {t.get('position_size', 0):.2f} |")
+                             f"{(t.get('entry_price') or 0):.5f} | {(t.get('stop_loss') or 0):.5f} | "
+                             f"{(t.get('take_profit') or 0):.5f} | {(t.get('position_size') or 0):.2f} |")
             lines.append("")
 
         if not opened_records and not closed_records and not carried_records:

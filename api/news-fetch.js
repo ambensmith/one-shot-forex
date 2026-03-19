@@ -309,13 +309,6 @@ const LLM_MODELS = [
     base_url: "https://api.mistral.ai/v1",
     env_key: "MISTRAL_API_KEY",
   },
-  {
-    key: "openrouter/deepseek-v3",
-    provider: "openrouter",
-    model: "deepseek/deepseek-chat-v3-0324:free",
-    base_url: "https://openrouter.ai/api/v1",
-    env_key: "OPENROUTER_API_KEY",
-  },
 ];
 
 async function callLLM(modelConfig, prompt) {
