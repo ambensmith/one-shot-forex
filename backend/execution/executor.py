@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
 logger = logging.getLogger("forex_sentinel.executor")
@@ -103,6 +104,6 @@ class Executor:
                 pnl=pnl,
                 pnl_pips=pnl_pips,
                 status=status,
-                closed_at="datetime('now')",
+                closed_at=datetime.now(timezone.utc).isoformat(),
             )
             logger.info(f"Trade {trade['id']} {status}: PnL={pnl:.2f} ({pnl_pips:.1f} pips)")
