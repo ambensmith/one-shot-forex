@@ -323,7 +323,7 @@ jobs:
           CAPITALCOM_PASSWORD: ${{ secrets.CAPITALCOM_PASSWORD }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: python -m backend.main --mode ${{ github.event.inputs.mode || 'tick' }}
 
       - name: Export dashboard JSON
@@ -578,14 +578,23 @@ MODELS = {
         "rate_limit": "1B tokens/month",
         "notes": "Most generous free quota."
     },
-    "openrouter/deepseek-v3": {
-        "provider": "openrouter",
-        "base_url": "https://openrouter.ai/api/v1",
-        "model": "deepseek/deepseek-chat-v3-0324:free",
-        "env_key": "OPENROUTER_API_KEY",
+    "google/gemini-2.5-flash": {
+        "provider": "google",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+        "model": "gemini-2.5-flash",
+        "env_key": "GOOGLE_API_KEY",
         "cost_per_1m_tokens": 0,
-        "rate_limit": "50 req/day",
-        "notes": "Strong reasoning. Low rate limit — comparison only."
+        "rate_limit": "1500 req/day, 1M tokens/min",
+        "notes": "Google model. Strong on news/financial analysis."
+    },
+    "groq/llama-3.1-8b": {
+        "provider": "groq",
+        "base_url": "https://api.groq.com/openai/v1",
+        "model": "llama-3.1-8b-instant",
+        "env_key": "GROQ_API_KEY",
+        "cost_per_1m_tokens": 0,
+        "rate_limit": "Shared with groq/llama-3.3-70b",
+        "notes": "Small model. Disagreement with 70B = low confidence signal."
     },
 }
 ```
@@ -643,8 +652,9 @@ news_stream:
     primary_model: "groq/llama-3.3-70b"
     comparison_models:
       - "mistral/mistral-small"
-      - "openrouter/deepseek-v3"
-    comparison_enabled: false           # Off by default. Toggle in UI.
+      - "google/gemini-2.5-flash"
+      - "groq/llama-3.1-8b"
+    comparison_enabled: true
 ```
 
 Each model can be toggled on/off independently from the UI. The dashboard computes hypothetical P&L for comparison models (“if this model had been primary, it would have returned X”).
@@ -1011,8 +1021,9 @@ news_stream:
     primary_model: "groq/llama-3.3-70b"
     comparison_models:
       - "mistral/mistral-small"
-      - "openrouter/deepseek-v3"
-    comparison_enabled: false
+      - "google/gemini-2.5-flash"
+      - "groq/llama-3.1-8b"
+    comparison_enabled: true
 
 strategy_stream:
   id: "strategy"
@@ -1416,7 +1427,8 @@ Persistent left sidebar:
 │  ├────────────────────┼──────────┼──────────────┼──────────────┤│
 │  │ groq/llama-3.3-70b │ 58%      │ +£840        │ £0           ││
 │  │ mistral/small      │ 54%      │ +£520        │ £0           ││
-│  │ deepseek-v3        │ 61%      │ +£1,040      │ £0           ││
+│  │ gemini-2.5-flash   │ 61%      │ +£1,040      │ £0           ││
+│  │ llama-3.1-8b       │ 48%      │ +£280        │ £0           ││
 │  └────────────────────┴──────────┴──────────────┴──────────────┘│
 │                                                                  │
 │  RECENT TRADES                    INSTRUMENT BREAKDOWN           │
@@ -1560,7 +1572,7 @@ Deploy to Railway, Fly.io, or any VPS. Wrap the trading logic in a FastAPI serve
 |Capital.com|capital.com       |Demo account with £50K virtual funds, free API     |
 |Groq      |console.groq.com  |1000 requests/day, Llama 3.3 70B                   |
 |Mistral   |console.mistral.ai|1B tokens/month, Mistral Small                     |
-|OpenRouter|openrouter.ai     |50 req/day on free models, DeepSeek V3             |
+|Google AI |aistudio.google.com|1500 req/day, Gemini 2.5 Flash                     |
 |GitHub    |github.com        |Public repo, Actions (unlimited minutes)           |
 |Vercel    |vercel.com        |Static site hosting, auto-deploys from GitHub      |
 
@@ -1714,7 +1726,7 @@ dashboard + Cowork review system.
 - CAPITALCOM_PASSWORD — Capital.com account password
 - GROQ_API_KEY — Groq free tier
 - MISTRAL_API_KEY — Mistral free tier
-- OPENROUTER_API_KEY — OpenRouter free tier
+- GOOGLE_API_KEY — Google AI Studio free tier
 
 ## Testing
 - pytest tests/ -v
