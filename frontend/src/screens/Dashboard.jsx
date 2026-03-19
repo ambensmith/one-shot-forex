@@ -1,15 +1,12 @@
 import { useState } from 'react'
 import { useDashboard, useTrades, useEquity, useReview, useRunReviews, useConfig } from '../hooks/useStreamData'
 import { triggerStream, pollWorkflow } from '../lib/api'
-import MetricTile from '../components/MetricTile'
 import EquityCurve from '../components/EquityCurve'
 import TradeRow from '../components/TradeRow'
 import HelpTooltip from '../components/HelpTooltip'
-import HowItWorks from '../components/HowItWorks'
 import RiskGauge from '../components/RiskGauge'
 import TradeDetailModal from '../components/TradeDetailModal'
 import { formatPnl, formatPnlCurrency, formatPercent, timeAgo, TRADE_STATUS_LABELS } from '../lib/constants'
-import { RunCard } from './RunHistory'
 
 const STREAM_FILTERS = ['all', 'news', 'strategy', 'hybrid']
 const DIR_FILTERS = ['all', 'long', 'short']
@@ -20,16 +17,11 @@ export default function Dashboard() {
   const { data: dashboard, loading, refresh: refreshDashboard } = useDashboard()
   const { trades, refresh: refreshTrades } = useTrades()
   const { curves, refresh: refreshEquity } = useEquity()
-  const { review, refresh: refreshReview } = useReview()
-  const { runs: recentRuns, refresh: refreshRuns } = useRunReviews()
   const { config } = useConfig()
 
   const [running, setRunning] = useState(false)
   const [resetting, setResetting] = useState(false)
-  const [generatingReview, setGeneratingReview] = useState(false)
   const [statusMsg, setStatusMsg] = useState(null)
-  const [showReview, setShowReview] = useState(false)
-  const [expandedRunId, setExpandedRunId] = useState(null)
 
   // Trade filters
   const [streamFilter, setStreamFilter] = useState('all')
@@ -43,12 +35,10 @@ export default function Dashboard() {
     refreshDashboard()
     refreshTrades()
     refreshEquity()
-    refreshReview()
-    refreshRuns()
   }
 
   async function handleWorkflow(mode, stream, label) {
-    const setter = mode === 'reset' ? setResetting : mode === 'review' ? setGeneratingReview : setRunning
+    const setter = mode === 'reset' ? setResetting : setRunning
     setter(true)
     setStatusMsg({ type: 'info', text: `Dispatching ${label}...` })
     try {
@@ -78,7 +68,21 @@ export default function Dashboard() {
   if (!dashboard) return <p className="text-gray-500">No dashboard data available. Run a trading cycle first, or visit the <a href="/guide" className="text-blue-400 hover:text-blue-300 underline">Guide</a> to get started.</p>
 
   const streams = dashboard.streams || []
-  const instrumentBreakdown = dashboard.instrument_breakdown || []
+
+  // Aggregate totals across all streams
+  const totalPnl = streams.reduce((sum, s) => sum + (s.total_pnl || 0), 0)
+  const totalAllocation = streams.reduce((sum, s) => sum + (s.capital_allocation || 33333), 0)
+  const totalEquity = streams.reduce((sum, s) => sum + (s.equity || s.capital_allocation || 33333), 0)
+  const totalReturnPct = totalAllocation > 0 ? (totalEquity - totalAllocation) / totalAllocation : 0
+  const todayPnl = streams.reduce((sum, s) => sum + (s.daily_pnl || 0), 0)
+  const totalOpenPositions = streams.reduce((sum, s) => sum + (s.open_positions || 0), 0)
+
+  // Aggregate risk: total daily loss used vs total daily loss limit
+  const maxDailyLoss = config?.risk?.max_daily_loss_per_stream || 0.03
+  const maxPositions = config?.risk?.max_open_positions_per_stream || 5
+  const totalDailyLossUsed = streams.reduce((sum, s) => sum + Math.abs(Math.min(s.daily_pnl || 0, 0)), 0)
+  const totalDailyLossLimit = streams.reduce((sum, s) => (s.capital_allocation || 33333) * maxDailyLoss + sum, 0)
+  const totalMaxPositions = streams.length * maxPositions
 
   // Filter and sort trades
   let filteredTrades = [...trades]
@@ -96,53 +100,16 @@ export default function Dashboard() {
 
   if (sortBy === 'pnl') filteredTrades.sort((a, b) => (b.pnl || 0) - (a.pnl || 0))
   else if (sortBy === 'instrument') filteredTrades.sort((a, b) => (a.instrument || '').localeCompare(b.instrument || ''))
-  // else date (default, already sorted)
+  // else date (default, already sorted latest first)
 
   const totalTrades = trades.length
-  const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 20)
+  const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 30)
 
-  // Risk config
-  const maxDailyLoss = config?.risk?.max_daily_loss_per_stream || 0.03
-  const maxPositions = config?.risk?.max_open_positions_per_stream || 5
+  const pnlColor = totalPnl >= 0 ? 'text-green-400' : 'text-red-400'
+  const todayColor = todayPnl >= 0 ? 'text-green-400' : todayPnl < 0 ? 'text-red-400' : 'text-gray-400'
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Dashboard</h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              if (!confirm('Reset all data? This clears all signals, trades, and equity.')) return
-              handleWorkflow('reset', 'all', 'Reset')
-            }}
-            disabled={resetting || running || generatingReview}
-            className="px-3 py-2 bg-red-600/80 hover:bg-red-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
-          >
-            {resetting ? 'Resetting...' : 'Reset Data'}
-          </button>
-          <button
-            onClick={() => handleWorkflow('review', 'all', 'Review Generation')}
-            disabled={generatingReview || running || resetting}
-            className="px-3 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
-          >
-            {generatingReview ? 'Generating...' : 'Generate Review'}
-          </button>
-          <button
-            onClick={() => handleWorkflow('tick', 'all', 'All Streams')}
-            disabled={running || resetting || generatingReview}
-            className="px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
-          >
-            {running ? 'Running...' : 'Run All Streams'}
-          </button>
-        </div>
-      </div>
-
-      <HowItWorks>
-        <p>This page shows aggregate performance across all your trading streams. Equity curves track the value of each stream over time.</p>
-        <p>The stream comparison table shows which approach is performing best. Click any trade row to see the full details of why it was taken.</p>
-        <p><strong>Run All Streams</strong> triggers a full trading cycle — news analysis, all 5 strategies, and any hybrids. <strong>Generate Review</strong> creates a detailed performance report.</p>
-      </HowItWorks>
-
       {/* Status banner */}
       {statusMsg && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
@@ -154,286 +121,135 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Risk Summary */}
-      {streams.length > 0 && (
-        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
-            Risk Overview
-            <HelpTooltip term="capital_at_risk" />
-          </h3>
-          <div className="space-y-3">
-            {streams.map(s => {
-              const allocation = s.capital_allocation || 33333
-              const returnPct = allocation > 0 ? ((s.equity || allocation) - allocation) / allocation : 0
-              return (
-                <div key={s.id} className="flex items-center gap-4">
-                  <span className="text-sm font-medium w-28 shrink-0">{s.name}</span>
-                  <div className="flex-1 grid grid-cols-4 gap-3 text-xs">
-                    <div>
-                      <span className="text-gray-500">Equity: </span>
-                      <span className={`font-mono ${returnPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {formatPnlCurrency(s.equity || allocation)} ({returnPct >= 0 ? '+' : ''}{(returnPct * 100).toFixed(1)}%)
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Positions: </span>
-                      <span className="font-mono">{s.open_positions || 0} / {maxPositions}</span>
-                    </div>
-                    <div className="col-span-2">
-                      <RiskGauge
-                        label="Daily Loss"
-                        used={Math.abs(Math.min(s.daily_pnl || 0, 0))}
-                        limit={allocation * maxDailyLoss}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+      {/* ── Section 1: The Headline ── */}
+      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 mb-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Return</div>
+            <div className={`text-4xl font-bold font-mono ${pnlColor}`}>
+              {formatPnlCurrency(totalPnl)}
+            </div>
+            <div className={`text-sm font-mono mt-1 ${pnlColor}`}>
+              {totalReturnPct >= 0 ? '+' : ''}{(totalReturnPct * 100).toFixed(2)}% of {formatPnlCurrency(totalAllocation).replace('+', '')}
+            </div>
+            <div className={`text-xs font-mono mt-2 ${todayColor}`}>
+              Today: {formatPnlCurrency(todayPnl)}
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Capital Allocation Overview */}
-      {streams.length > 0 && (
-        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
-            Capital Allocation
-            <HelpTooltip term="capital_allocation" />
-          </h3>
-          <div className="flex gap-2">
-            {streams.map(s => {
-              const allocation = s.capital_allocation || 33333
-              const total = streams.reduce((sum, st) => sum + (st.capital_allocation || 33333), 0)
-              const pct = total > 0 ? (allocation / total * 100) : 0
-              const streamColor = s.id === 'news' ? '#4c6ef5' : s.id === 'strategy' ? '#37b24d' : '#f59f00'
-              return (
-                <div key={s.id} className="text-center" style={{ flex: pct }}>
-                  <div className="h-3 rounded-full mb-2" style={{ backgroundColor: streamColor }} />
-                  <div className="text-xs font-medium">{s.name}</div>
-                  <div className="text-xs text-gray-500 font-mono">{formatPnlCurrency(allocation)}</div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Equity Curves */}
-      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
-          Equity Curves
-          <HelpTooltip term="equity" />
-        </h3>
-        <EquityCurve curves={curves} height={300} />
-      </div>
-
-      {/* Stream Comparison Table */}
-      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6 overflow-x-auto">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Stream Comparison</h3>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-xs text-gray-500 uppercase">
-              <th className="pb-2 pr-4">Stream</th>
-              <th className="pb-2 pr-4">
-                <span className="flex items-center">Return <HelpTooltip term="pnl" /></span>
-              </th>
-              <th className="pb-2 pr-4">
-                <span className="flex items-center">Return % <HelpTooltip term="return_pct" /></span>
-              </th>
-              <th className="pb-2 pr-4">
-                <span className="flex items-center">Sharpe <HelpTooltip term="sharpe_ratio" /></span>
-              </th>
-              <th className="pb-2 pr-4">
-                <span className="flex items-center">Max DD <HelpTooltip term="max_drawdown" /></span>
-              </th>
-              <th className="pb-2 pr-4">
-                <span className="flex items-center">Win % <HelpTooltip term="win_rate" /></span>
-              </th>
-              <th className="pb-2 pr-4">Trades</th>
-              <th className="pb-2">Open</th>
-            </tr>
-          </thead>
-          <tbody>
-            {streams.map(s => {
-              const allocation = s.capital_allocation || 33333
-              const returnPct = allocation > 0 ? ((s.equity || allocation) - allocation) / allocation : 0
-              return (
-                <tr key={s.id} className="border-b border-gray-800/50">
-                  <td className="py-2 pr-4 font-medium">{s.name}</td>
-                  <td className={`py-2 pr-4 font-mono ${s.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {formatPnl(s.total_pnl)}
-                  </td>
-                  <td className={`py-2 pr-4 font-mono ${returnPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {returnPct >= 0 ? '+' : ''}{(returnPct * 100).toFixed(1)}%
-                  </td>
-                  <td className="py-2 pr-4 font-mono">{s.sharpe_ratio.toFixed(2)}</td>
-                  <td className="py-2 pr-4 font-mono">{formatPercent(s.max_drawdown)}</td>
-                  <td className="py-2 pr-4 font-mono">{formatPercent(s.win_rate)}</td>
-                  <td className="py-2 pr-4 font-mono">{s.trade_count}</td>
-                  <td className="py-2 font-mono">{s.open_positions}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-
-        {dashboard.strategy_breakdown?.length > 0 && (
-          <>
-            <h4 className="text-xs text-gray-500 mt-4 mb-2">Strategy Breakdown</h4>
-            <table className="w-full text-sm">
-              <tbody>
-                {dashboard.strategy_breakdown.map(s => (
-                  <tr key={s.name} className="border-b border-gray-800/30">
-                    <td className="py-1.5 pr-4 pl-6 text-gray-400 capitalize">{s.name.replace('_', ' ')}</td>
-                    <td className={`py-1.5 pr-4 font-mono text-xs ${s.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {formatPnl(s.total_pnl)}
-                    </td>
-                    <td className="py-1.5 pr-4 font-mono text-xs">{formatPercent(s.win_rate)}</td>
-                    <td className="py-1.5 pr-4 font-mono text-xs">{s.trade_count} trades</td>
-                    <td className="py-1.5 font-mono text-xs">{s.signal_count} signals</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Recent Trades */}
-        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 overflow-x-auto">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Recent Trades</h3>
-
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            <FilterPills label="Stream" options={STREAM_FILTERS} value={streamFilter} onChange={setStreamFilter} />
-            <FilterPills label="Direction" options={DIR_FILTERS} value={dirFilter} onChange={setDirFilter} />
-            <FilterPills label="Status" options={STATUS_FILTERS} value={statusFilter} onChange={setStatusFilter} />
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-              className="text-xs bg-gray-700 border border-gray-600 rounded px-2 py-1 text-gray-300"
+          {/* Action buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (!confirm('Reset all data? This clears all signals, trades, and equity.')) return
+                handleWorkflow('reset', 'all', 'Reset')
+              }}
+              disabled={resetting || running}
+              className="px-3 py-2 bg-red-600/80 hover:bg-red-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
             >
-              {SORT_OPTIONS.map(s => (
-                <option key={s} value={s}>Sort: {s}</option>
-              ))}
-            </select>
+              {resetting ? 'Resetting...' : 'Reset'}
+            </button>
+            <button
+              onClick={() => handleWorkflow('tick', 'all', 'All Streams')}
+              disabled={running || resetting}
+              className="px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
+            >
+              {running ? 'Running...' : 'Run All Streams'}
+            </button>
           </div>
+        </div>
 
-          <div className="text-xs text-gray-500 mb-2">
-            Showing {displayTrades.length} of {filteredTrades.length} trades
-            {filteredTrades.length < totalTrades && ` (${totalTrades} total)`}
+        {/* Compact equity curve */}
+        <EquityCurve curves={curves} height={200} />
+      </div>
+
+      {/* ── Section 2: Safety at a Glance ── */}
+      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div>
+            <RiskGauge
+              label="Daily loss budget"
+              used={totalDailyLossUsed}
+              limit={totalDailyLossLimit}
+              helpTerm="daily_loss_limit"
+            />
           </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-500">Open positions:</span>
+            <span className="font-mono font-medium">
+              {totalOpenPositions}
+            </span>
+            <span className="text-gray-600">/ {totalMaxPositions}</span>
+            <HelpTooltip term="max_positions" />
+          </div>
+        </div>
+      </div>
 
-          {displayTrades.length === 0 ? (
-            <p className="text-gray-500 text-sm">No trades match your filters. {totalTrades === 0 && <><a href="/guide" className="text-blue-400 hover:text-blue-300 underline">Run a trading cycle</a> to generate trades.</>}</p>
-          ) : (
-            <>
+      {/* ── Section 3: All Trades ── */}
+      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Trades</h3>
+          <div className="text-xs text-gray-500">
+            {filteredTrades.length === totalTrades
+              ? `${totalTrades} trades`
+              : `${filteredTrades.length} of ${totalTrades} trades`
+            }
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <FilterPills label="Stream" options={STREAM_FILTERS} value={streamFilter} onChange={setStreamFilter} />
+          <FilterPills label="Direction" options={DIR_FILTERS} value={dirFilter} onChange={setDirFilter} />
+          <FilterPills label="Status" options={STATUS_FILTERS} value={statusFilter} onChange={setStatusFilter} />
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value)}
+            className="text-xs bg-gray-700 border border-gray-600 rounded px-2 py-1 text-gray-300"
+          >
+            {SORT_OPTIONS.map(s => (
+              <option key={s} value={s}>Sort: {s}</option>
+            ))}
+          </select>
+        </div>
+
+        {totalTrades === 0 ? (
+          <p className="text-gray-500 text-sm py-8 text-center">
+            No trades yet. Click <strong>Run All Streams</strong> above to start a trading cycle,
+            or visit the <a href="/guide" className="text-blue-400 hover:text-blue-300 underline">Guide</a> to learn how.
+          </p>
+        ) : filteredTrades.length === 0 ? (
+          <p className="text-gray-500 text-sm py-4 text-center">No trades match your filters.</p>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-700 text-left text-xs text-gray-500">
-                    <th className="pb-2">Stream</th>
-                    <th className="pb-2">Instrument</th>
-                    <th className="pb-2">Dir</th>
-                    <th className="pb-2">Entry</th>
-                    <th className="pb-2">Exit</th>
-                    <th className="pb-2">P&L</th>
-                    <th className="pb-2">Status</th>
-                    <th className="pb-2">When</th>
+                    <th className="pb-2 px-3">Stream</th>
+                    <th className="pb-2 px-3">Instrument</th>
+                    <th className="pb-2 px-3">Dir</th>
+                    <th className="pb-2 px-3">Entry</th>
+                    <th className="pb-2 px-3">Exit</th>
+                    <th className="pb-2 px-3">P&L</th>
+                    <th className="pb-2 px-3">Status</th>
+                    <th className="pb-2 px-3">When</th>
                   </tr>
                 </thead>
                 <tbody>
                   {displayTrades.map(t => <TradeRow key={t.id} trade={t} onClick={() => setSelectedTrade(t)} />)}
                 </tbody>
               </table>
-              {!showAllTrades && filteredTrades.length > 20 && (
-                <button
-                  onClick={() => setShowAllTrades(true)}
-                  className="mt-3 text-xs text-blue-400 hover:text-blue-300"
-                >
-                  Show all {filteredTrades.length} trades
-                </button>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Instrument Breakdown */}
-        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Instrument P&L</h3>
-          {instrumentBreakdown.length === 0 ? (
-            <p className="text-gray-500 text-sm">No data yet</p>
-          ) : (
-            <div className="space-y-2">
-              {instrumentBreakdown.map(inst => {
-                const maxPnl = Math.max(...instrumentBreakdown.map(i => Math.abs(i.total_pnl)), 1)
-                const width = (Math.abs(inst.total_pnl) / maxPnl) * 100
-                return (
-                  <div key={inst.instrument} className="flex items-center gap-3">
-                    <span className="font-mono text-xs w-24">{inst.instrument}</span>
-                    <div className="flex-1 bg-gray-700/50 rounded h-4 relative">
-                      <div
-                        className="h-4 rounded transition-all"
-                        style={{
-                          width: `${Math.max(width, 2)}%`,
-                          backgroundColor: inst.total_pnl >= 0 ? '#37b24d' : '#f03e3e',
-                        }}
-                      />
-                    </div>
-                    <span className={`font-mono text-xs w-20 text-right ${
-                      inst.total_pnl >= 0 ? 'text-green-400' : 'text-red-400'
-                    }`}>
-                      {formatPnl(inst.total_pnl)}
-                    </span>
-                  </div>
-                )
-              })}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Recent Runs */}
-      {recentRuns && recentRuns.length > 0 && (
-        <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 mb-6">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Recent Runs</h3>
-          <div className="space-y-2">
-            {recentRuns.slice(0, 3).map(run => (
-              <RunCard
-                key={run.run_id}
-                run={run}
-                expanded={expandedRunId === run.run_id}
-                onToggle={() => setExpandedRunId(expandedRunId === run.run_id ? null : run.run_id)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Cowork Review Section */}
-      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Cowork Review</h3>
-          {review?.has_review && (
-            <button
-              onClick={() => setShowReview(!showReview)}
-              className="text-xs text-blue-400 hover:text-blue-300"
-            >
-              {showReview ? 'Hide' : 'Show'} Review
-            </button>
-          )}
-        </div>
-        {!review?.has_review ? (
-          <p className="text-gray-500 text-sm">No review generated yet. Click "Generate Review" above to create a detailed performance analysis.</p>
-        ) : showReview ? (
-          <div className="prose prose-invert prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap text-xs text-gray-300 bg-gray-900/50 rounded-lg p-4 overflow-x-auto">
-              {review.review_md}
-            </pre>
-          </div>
-        ) : (
-          <p className="text-gray-500 text-sm">Review available. Click "Show" to view.</p>
+            {!showAllTrades && filteredTrades.length > 30 && (
+              <button
+                onClick={() => setShowAllTrades(true)}
+                className="mt-3 text-xs text-blue-400 hover:text-blue-300 w-full text-center py-2"
+              >
+                Show all {filteredTrades.length} trades
+              </button>
+            )}
+          </>
         )}
       </div>
 
