@@ -34,6 +34,13 @@ class Executor:
             take_profit=take_profit,
         )
 
+        # Check if order was rejected
+        if result.get("status") == "REJECTED":
+            logger.warning(
+                f"Order REJECTED for {instrument}: {result.get('error', 'unknown')}"
+            )
+            return None
+
         # Record in database
         trade_id = self.db.insert_trade(
             stream=stream_id,
@@ -57,8 +64,38 @@ class Executor:
 
         return trade_id
 
+    def reconcile_positions(self):
+        """Close local DB trades that no longer exist as positions on the broker."""
+        if not self.broker.is_connected:
+            return
+
+        try:
+            broker_positions = self.broker.get_open_trades()
+        except Exception as e:
+            logger.warning(f"Reconciliation skipped — failed to fetch broker positions: {e}")
+            return
+
+        # Build set of (instrument, direction) from live broker positions
+        broker_set = {(p["instrument"], p["direction"]) for p in broker_positions}
+
+        # Find local open trades with no matching broker position
+        local_open = self.db.get_open_trades()
+        for trade in local_open:
+            key = (trade["instrument"], trade["direction"])
+            if key not in broker_set:
+                logger.info(
+                    f"Reconciliation: closing orphaned trade {trade['id']} "
+                    f"({trade['instrument']} {trade['direction']}) — not found on broker"
+                )
+                self.db.update_trade(
+                    trade["id"],
+                    status="closed_reconciled",
+                    closed_at=datetime.now(timezone.utc).isoformat(),
+                )
+
     def check_and_close_trades(self, stream_id: str):
         """Check open trades for SL/TP hits and close them."""
+        self.reconcile_positions()
         open_trades = self.db.get_open_trades(stream_id)
         for trade in open_trades:
             try:
