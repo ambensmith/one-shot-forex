@@ -60,7 +60,7 @@ const INSTRUMENTS = {
 
 const RSS_SOURCES = [
   { name: "BBC Business", url: "https://feeds.bbci.co.uk/news/business/rss.xml" },
-  { name: "Reuters", url: "https://www.reutersagency.com/feed/" },
+  { name: "CNBC Business", url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664" },
 ];
 
 const GDELT_URL =
@@ -76,11 +76,15 @@ async function fetchRSS(source) {
     const timeout = setTimeout(() => controller.abort(), 10000);
     const resp = await fetch(source.url, { signal: controller.signal });
     clearTimeout(timeout);
-    if (!resp.ok) return [];
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => "");
+      console.warn(`RSS ${source.name} HTTP ${resp.status}: ${body.slice(0, 200)}`);
+      return [];
+    }
     const xml = await resp.text();
     return parseRSSXml(xml, source.name);
   } catch (e) {
-    console.warn(`RSS ${source.name} failed:`, e.message);
+    console.warn(`RSS ${source.name} failed: ${e.name}: ${e.message}`);
     return [];
   }
 }
@@ -127,7 +131,11 @@ async function fetchGDELT() {
     const timeout = setTimeout(() => controller.abort(), 15000);
     const resp = await fetch(GDELT_URL, { signal: controller.signal });
     clearTimeout(timeout);
-    if (!resp.ok) return [];
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => "");
+      console.warn(`GDELT HTTP ${resp.status}: ${body.slice(0, 200)}`);
+      return [];
+    }
     const data = await resp.json();
     const articles = data.articles || [];
     return articles.slice(0, 20).map((a) => ({
@@ -163,7 +171,11 @@ async function fetchCalendar() {
     const timeout = setTimeout(() => controller.abort(), 10000);
     const resp = await fetch(CALENDAR_URL, { signal: controller.signal });
     clearTimeout(timeout);
-    if (!resp.ok) return [];
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => "");
+      console.warn(`Calendar HTTP ${resp.status}: ${body.slice(0, 200)}`);
+      return [];
+    }
     const data = await resp.json();
     if (!Array.isArray(data)) return [];
     return data
@@ -197,16 +209,25 @@ function deduplicateHeadlines(items) {
 
   for (const item of items) {
     const tokens = new Set(item.headline.toLowerCase().split(/\s+/));
-    let isDup = false;
-    for (const seen of seenTokenSets) {
+    let mergedIndex = -1;
+    for (let i = 0; i < seenTokenSets.length; i++) {
+      const seen = seenTokenSets[i];
       const intersection = [...tokens].filter((t) => seen.has(t)).length;
       const union = new Set([...tokens, ...seen]).size;
       if (union > 0 && intersection / union > 0.7) {
-        isDup = true;
+        mergedIndex = i;
         break;
       }
     }
-    if (!isDup) {
+    if (mergedIndex >= 0) {
+      // Merge: track that multiple sources reported this story
+      if (!unique[mergedIndex].sources.includes(item.source)) {
+        unique[mergedIndex].sources.push(item.source);
+        unique[mergedIndex].source_count = unique[mergedIndex].sources.length;
+      }
+    } else {
+      item.source_count = 1;
+      item.sources = [item.source];
       unique.push(item);
       seenTokenSets.push(tokens);
     }
@@ -348,7 +369,12 @@ async function generateSignals(instrumentMap) {
   // Process instruments in parallel (max ~5 at a time on the news stream instruments)
   const entries = Object.entries(instrumentMap);
   const signalPromises = entries.map(async ([symbol, items]) => {
-    const headlines = items.map((i) => `- ${i.headline}`).slice(0, 10).join("\n");
+    const headlines = items.map((i) => {
+      const tag = i.source_count > 1
+        ? ` [${i.source_count} sources: ${i.sources.join(", ")}]`
+        : ` [1 source: ${i.source}]`;
+      return `- ${i.headline}${tag}`;
+    }).slice(0, 10).join("\n");
     const prompt = PROMPT_TEMPLATE
       .replace(/{instrument}/g, symbol)
       .replace("{news_headlines}", headlines);
@@ -448,6 +474,8 @@ export default async function handler(req, res) {
         headlines: items.map((i) => ({
           headline: i.headline,
           source: i.source,
+          sources: i.sources || [i.source],
+          source_count: i.source_count || 1,
           published_at: i.published_at,
           url: i.url,
         })),

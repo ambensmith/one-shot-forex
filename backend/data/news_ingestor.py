@@ -17,6 +17,12 @@ class RawNewsItem:
     url: str | None = None
     summary: str | None = None
     published_at: datetime | None = None
+    source_count: int = 1
+    sources: list[str] = field(default_factory=list)
+
+    def __post_init__(self):
+        if not self.sources:
+            self.sources = [self.source]
 
 
 class NewsIngestor:
@@ -58,7 +64,8 @@ class NewsIngestor:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                     if resp.status != 200:
-                        logger.warning(f"RSS {name} returned status {resp.status}")
+                        body = await resp.text()
+                        logger.warning(f"RSS {name} returned status {resp.status}: {body[:200]}")
                         return []
                     content = await resp.text()
         except Exception as e:
@@ -121,7 +128,7 @@ class NewsIngestor:
         import json
 
         url = (
-            "http://api.gdeltproject.org/api/v2/doc/doc"
+            "https://api.gdeltproject.org/api/v2/doc/doc"
             "?query=forex+OR+economy+OR+central+bank+OR+interest+rate"
             "&mode=artlist&maxrecords=30&format=json"
         )
@@ -130,6 +137,8 @@ class NewsIngestor:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                     if resp.status != 200:
+                        body = await resp.text()
+                        logger.warning(f"GDELT returned status {resp.status}: {body[:200]}")
                         return []
                     data = await resp.json(content_type=None)
         except Exception as e:
@@ -168,10 +177,12 @@ class NewsIngestor:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                     if resp.status != 200:
+                        body = await resp.text()
+                        logger.warning(f"Calendar returned status {resp.status}: {body[:200]}")
                         return []
                     data = await resp.json(content_type=None)
         except Exception as e:
-            logger.warning(f"Calendar fetch failed: {e}")
+            logger.warning(f"Calendar fetch failed: {type(e).__name__}: {e}")
             return []
 
         items = []
@@ -205,29 +216,33 @@ class NewsIngestor:
 
 
 def deduplicate_headlines(items: list[RawNewsItem]) -> list[RawNewsItem]:
-    """Remove near-duplicate headlines using simple string similarity."""
+    """Deduplicate headlines, merging source info for cross-referencing."""
     if not items:
         return items
 
     unique: list[RawNewsItem] = []
-    seen_normalized: set[str] = set()
+    seen_token_sets: list[frozenset[str]] = []
 
     for item in items:
         normalized = item.headline.lower().strip()
-        # Simple token-based dedup
         tokens = frozenset(normalized.split())
-        is_dup = False
-        for seen in seen_normalized:
-            seen_tokens = frozenset(seen.split())
-            overlap = len(tokens & seen_tokens) / max(len(tokens | seen_tokens), 1)
+        merged_index = -1
+        for i, seen in enumerate(seen_token_sets):
+            overlap = len(tokens & seen) / max(len(tokens | seen), 1)
             if overlap > 0.7:
-                is_dup = True
+                merged_index = i
                 break
-        if not is_dup:
+        if merged_index >= 0:
+            # Merge: track that multiple sources reported this story
+            if item.source not in unique[merged_index].sources:
+                unique[merged_index].sources.append(item.source)
+                unique[merged_index].source_count = len(unique[merged_index].sources)
+        else:
             unique.append(item)
-            seen_normalized.add(normalized)
+            seen_token_sets.append(tokens)
 
-    removed = len(items) - len(unique)
-    if removed > 0:
-        logger.info(f"Dedup removed {removed} duplicate headlines")
+    merged = len(items) - len(unique)
+    multi_source = sum(1 for u in unique if u.source_count > 1)
+    if merged > 0:
+        logger.info(f"Dedup merged {merged} duplicates. {multi_source} headlines confirmed by multiple sources.")
     return unique

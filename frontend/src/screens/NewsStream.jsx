@@ -163,6 +163,11 @@ function NewsFeedPanel({ data, loading, error, loadingPhase }) {
                       {h.published_at ? new Date(h.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                     <span className="text-xs text-gray-500 shrink-0 w-24 truncate">{h.source}</span>
+                    {h.source_count > 1 && (
+                      <span className="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-medium shrink-0">
+                        {h.source_count} sources
+                      </span>
+                    )}
                     <span className="text-gray-300 text-xs leading-relaxed">
                       {h.url ? <a href={h.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">{h.headline}</a> : h.headline}
                     </span>
