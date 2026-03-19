@@ -293,6 +293,18 @@ class CapitalComClient:
             logger.warning(f"Failed to get open trades: {e}")
             return []
 
+    def get_deal_activity(self, deal_id: str) -> dict | None:
+        """Fetch activity details for a specific deal from Capital.com."""
+        if not self._connected:
+            return None
+        try:
+            data = self._request("GET", f"/api/v1/history/activity?dealId={deal_id}")
+            activities = data.get("activities", [])
+            return activities[0] if activities else None
+        except Exception as e:
+            logger.warning(f"Failed to fetch deal activity for {deal_id}: {e}")
+            return None
+
     def close_trade(self, trade_id: str) -> dict:
         """Close a specific position by dealId."""
         if not self._connected:

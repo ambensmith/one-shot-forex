@@ -16,6 +16,7 @@ on:
           - save-hybrid
           - save-config
           - get-config
+          - fix-phantoms
       stream:
         description: 'Which stream to run (tick mode only)'
         required: false
@@ -94,6 +95,8 @@ jobs:
             python -m backend.main --mode save-config --config-json "$CONFIG_JSON"
           elif [ "$MODE" = "get-config" ]; then
             python -m backend.main --mode get-config
+          elif [ "$MODE" = "fix-phantoms" ]; then
+            python -m backend.main --mode fix-phantoms
           fi
 
       - name: Export dashboard JSON

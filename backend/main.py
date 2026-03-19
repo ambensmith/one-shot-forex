@@ -295,11 +295,45 @@ def run_get_config():
     logger.info("Effective config exported.")
 
 
+def run_fix_phantoms():
+    """Mark phantom trades as failed.
+
+    Phantom trades have status='closed_reconciled' but NULL exit_price and pnl,
+    meaning they were never actually executed on the broker.
+    """
+    from backend.core.database import Database
+
+    db = Database("data/sentinel.db")
+
+    rows = db.execute(
+        "SELECT id, instrument, direction, stream FROM trades "
+        "WHERE status = 'closed_reconciled' AND exit_price IS NULL AND pnl IS NULL"
+    ).fetchall()
+
+    count = 0
+    for row in rows:
+        trade = dict(row)
+        db.update_trade(
+            trade["id"],
+            status="failed",
+            pnl=0.0,
+            pnl_pips=0.0,
+        )
+        count += 1
+        logger.info(
+            f"Fixed phantom trade {trade['id']}: {trade['stream']} "
+            f"{trade['instrument']} {trade['direction']} -> status=failed"
+        )
+
+    db.close()
+    logger.info(f"Fixed {count} phantom trade(s).")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config"],
+        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -338,6 +372,8 @@ def main():
         run_save_config(args.config_json)
     elif args.mode == "get-config":
         run_get_config()
+    elif args.mode == "fix-phantoms":
+        run_fix_phantoms()
     elif args.mode == "backtest":
         from backend.backtest.runner import run_backtest
         run_backtest(args.strategy, args.instrument)

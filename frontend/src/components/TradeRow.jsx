@@ -20,9 +20,10 @@ export default function TradeRow({ trade }) {
           trade.status === 'open' ? 'bg-blue-500/20 text-blue-400' :
           trade.status === 'closed_tp' ? 'bg-green-500/20 text-green-400' :
           trade.status === 'closed_sl' ? 'bg-red-500/20 text-red-400' :
+          trade.status === 'failed' ? 'bg-yellow-500/20 text-yellow-400' :
           'bg-gray-500/20 text-gray-400'
         }`}>
-          {trade.status}
+          {trade.status === 'failed' ? 'failed (never executed)' : trade.status}
         </span>
       </td>
       <td className="py-2 px-3 text-xs text-gray-500">{timeAgo(trade.opened_at)}</td>
