@@ -50,7 +50,6 @@ class NewsIngestor:
     async def _fetch_rss(self, source: dict) -> list[RawNewsItem]:
         """Fetch and parse RSS feed."""
         import aiohttp
-        import feedparser
 
         url = source.get("url", "")
         name = source.get("name", "RSS")
