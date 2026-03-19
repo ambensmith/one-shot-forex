@@ -64,7 +64,7 @@ const RSS_SOURCES = [
 ];
 
 const GDELT_URL =
-  "https://api.gdeltproject.org/api/v2/doc/doc?query=forex+OR+economy+OR+central+bank+OR+interest+rate&mode=artlist&maxrecords=30&format=json";
+  "https://api.gdeltproject.org/api/v2/doc/doc?query=forex+OR+%22central+bank%22+OR+%22interest+rate%22&mode=artlist&maxrecords=15&format=json";
 
 const CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
 
@@ -125,20 +125,38 @@ function extractTag(xml, tag) {
   return m ? m[1].replace(/<[^>]+>/g, "").trim() : null;
 }
 
-async function fetchGDELT() {
+async function fetchGDELT(attempt = 0) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     const resp = await fetch(GDELT_URL, { signal: controller.signal });
     clearTimeout(timeout);
+    if (resp.status === 429 && attempt < 2) {
+      const wait = (attempt + 1) * 6000; // 6s, 12s
+      console.warn(`GDELT rate-limited, retrying in ${wait / 1000}s...`);
+      await new Promise((r) => setTimeout(r, wait));
+      return fetchGDELT(attempt + 1);
+    }
     if (!resp.ok) {
       const body = await resp.text().catch(() => "");
       console.warn(`GDELT HTTP ${resp.status}: ${body.slice(0, 200)}`);
       return [];
     }
-    const data = await resp.json();
+    const text = await resp.text();
+    // GDELT sometimes returns rate-limit message as 200 with text body
+    if (text.startsWith("Please limit")) {
+      if (attempt < 2) {
+        const wait = (attempt + 1) * 6000;
+        console.warn(`GDELT soft rate-limit, retrying in ${wait / 1000}s...`);
+        await new Promise((r) => setTimeout(r, wait));
+        return fetchGDELT(attempt + 1);
+      }
+      console.warn("GDELT rate-limited after retries");
+      return [];
+    }
+    const data = JSON.parse(text);
     const articles = data.articles || [];
-    return articles.slice(0, 20).map((a) => ({
+    return articles.slice(0, 15).map((a) => ({
       headline: (a.title || "").trim(),
       source: "GDELT",
       url: a.url || null,
@@ -148,7 +166,7 @@ async function fetchGDELT() {
         : null,
     }));
   } catch (e) {
-    console.warn("GDELT failed:", e.message);
+    console.warn(`GDELT failed: ${e.name}: ${e.message}`);
     return [];
   }
 }

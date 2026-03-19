@@ -122,27 +122,43 @@ class NewsIngestor:
             pass
         return items[:20]
 
-    async def _fetch_gdelt(self) -> list[RawNewsItem]:
-        """Fetch from GDELT Project API."""
+    async def _fetch_gdelt(self, attempt: int = 0) -> list[RawNewsItem]:
+        """Fetch from GDELT Project API with retry on rate-limit."""
         import aiohttp
+        import asyncio
         import json
 
         url = (
             "https://api.gdeltproject.org/api/v2/doc/doc"
-            "?query=forex+OR+economy+OR+central+bank+OR+interest+rate"
-            "&mode=artlist&maxrecords=30&format=json"
+            "?query=forex+OR+%22central+bank%22+OR+%22interest+rate%22"
+            "&mode=artlist&maxrecords=15&format=json"
         )
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    if resp.status == 429 and attempt < 2:
+                        wait = (attempt + 1) * 6
+                        logger.warning(f"GDELT rate-limited, retrying in {wait}s...")
+                        await asyncio.sleep(wait)
+                        return await self._fetch_gdelt(attempt + 1)
                     if resp.status != 200:
                         body = await resp.text()
                         logger.warning(f"GDELT returned status {resp.status}: {body[:200]}")
                         return []
-                    data = await resp.json(content_type=None)
+                    text = await resp.text()
+                    # GDELT sometimes returns rate-limit message as 200
+                    if text.startswith("Please limit"):
+                        if attempt < 2:
+                            wait = (attempt + 1) * 6
+                            logger.warning(f"GDELT soft rate-limit, retrying in {wait}s...")
+                            await asyncio.sleep(wait)
+                            return await self._fetch_gdelt(attempt + 1)
+                        logger.warning("GDELT rate-limited after retries")
+                        return []
+                    data = json.loads(text)
         except Exception as e:
-            logger.warning(f"GDELT fetch failed: {e}")
+            logger.warning(f"GDELT fetch failed: {type(e).__name__}: {e}")
             return []
 
         items = []
