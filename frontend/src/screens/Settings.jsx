@@ -392,6 +392,22 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Leverage */}
+        <SelectRow
+          label="Leverage"
+          value={getValue('risk.leverage', 1)}
+          onChange={v => setOverride('risk.leverage', v)}
+          options={[
+            { value: 1, label: 'None (1:1)' },
+            { value: 2, label: '2:1' },
+            { value: 5, label: '5:1' },
+            { value: 10, label: '10:1' },
+            { value: 20, label: '20:1' },
+            { value: 30, label: '30:1' },
+          ]}
+          settingKey="risk.leverage"
+        />
+
         {/* Live risk estimate */}
         <div className="bg-blue-900/10 border border-blue-800/20 rounded-lg p-3 mb-4 text-xs text-blue-300">
           At current settings: max <strong>€{(capitalNews * riskPct).toFixed(0)}</strong> per trade,
@@ -539,6 +555,28 @@ function InfoRow({ label, value, settingKey }) {
         {helpInfo && <HelpTooltip text={helpInfo.help} />}
       </span>
       <span className="text-sm font-mono text-gray-400">{value}</span>
+    </div>
+  )
+}
+
+function SelectRow({ label, value, onChange, options, settingKey }) {
+  const helpInfo = settingKey ? SETTING_HELP[settingKey] : null
+  return (
+    <div className="flex items-center justify-between py-1">
+      <span className="text-sm text-gray-300 flex items-center">
+        {label}
+        {helpInfo?.glossaryKey && <HelpTooltip term={helpInfo.glossaryKey} />}
+        {helpInfo && !helpInfo.glossaryKey && <HelpTooltip text={helpInfo.help} />}
+      </span>
+      <select
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        className="w-28 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 text-right font-mono"
+      >
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </div>
   )
 }

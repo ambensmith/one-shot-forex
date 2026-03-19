@@ -262,6 +262,12 @@ const GLOSSARY = {
     definition: 'This trade could not be executed due to a broker or API error.',
   },
 
+  leverage: {
+    term: 'Leverage',
+    definition: 'Multiplies your position size beyond what your capital alone would allow. At 1:1 (no leverage), you trade only with your own capital. At 10:1, each trade is 10x larger — amplifying both gains and losses.',
+    hint: '1:1 is safest (no leverage). Higher leverage increases risk of large losses. Use with caution.',
+  },
+
   // Risk
   risk_profile: {
     term: 'Risk Profile',
@@ -350,6 +356,10 @@ export const SETTING_HELP = {
   'risk.atr_multiplier': {
     glossaryKey: 'atr_multiplier',
     help: 'Wider multiplier = bigger stop loss = more room for price to move but larger potential loss.',
+  },
+  'risk.leverage': {
+    glossaryKey: 'leverage',
+    help: 'Multiplies position size. 1 = no leverage (safest). Higher values amplify both gains and losses.',
   },
   'risk.atr_period': {
     glossaryKey: 'atr_period',
