@@ -198,6 +198,23 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
         status="completed",
     )
 
+    # Export all dashboard JSON data
+    from backend.dashboard.json_exporter import (
+        export_dashboard_summary, export_trades, export_equity,
+        export_signals, export_models, export_config, export_review,
+        export_hybrids, export_run_reviews, OUTPUT_DIR,
+    )
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    export_dashboard_summary(db, config)
+    export_trades(db)
+    export_equity(db)
+    export_signals(db)
+    export_models(db, config)
+    export_config(config)
+    export_review(db, config)
+    export_hybrids(db)
+    export_run_reviews(db)
+
     logger.info(f"Trading cycle complete (stream={stream_filter}).")
 
 
@@ -226,6 +243,11 @@ def run_reset():
     db.execute("DELETE FROM equity_snapshots")
     db.execute("DELETE FROM news_items")
     db.commit()
+
+    # Re-export dashboard data (now empty)
+    from backend.dashboard.json_exporter import export_all
+    export_all(db_path="data/sentinel.db")
+
     db.close()
     logger.info("Database reset complete.")
 
@@ -277,22 +299,18 @@ def run_save_config(config_json: str):
     overrides = json.loads(config_json)
     save_config_overrides(overrides)
 
-    # Export effective config to JSON for frontend
-    config = get_effective_config()
-    from backend.dashboard.json_exporter import export_config
-    export_config(config)
+    # Re-export all dashboard data so config-dependent views update
+    from backend.dashboard.json_exporter import export_all
+    export_all()
 
     logger.info(f"Config overrides saved: {list(overrides.keys())}")
 
 
 def run_get_config():
-    """Export effective config to JSON for frontend."""
-    from backend.core.config import get_effective_config
-    from backend.dashboard.json_exporter import export_config
-
-    config = get_effective_config()
-    export_config(config)
-    logger.info("Effective config exported.")
+    """Export effective config and all dashboard data to JSON for frontend."""
+    from backend.dashboard.json_exporter import export_all
+    export_all()
+    logger.info("All dashboard data exported.")
 
 
 def run_fix_phantoms():

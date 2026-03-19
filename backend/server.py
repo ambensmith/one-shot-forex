@@ -67,6 +67,10 @@ def _export_json(db, config):
         export_equity,
         export_signals,
         export_models,
+        export_config,
+        export_review,
+        export_hybrids,
+        export_run_reviews,
         OUTPUT_DIR,
     )
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -75,6 +79,10 @@ def _export_json(db, config):
     export_equity(db)
     export_signals(db)
     export_models(db, config)
+    export_config(config)
+    export_review(db, config)
+    export_hybrids(db)
+    export_run_reviews(db)
 
 
 def _count_results(db, stream_id: str, before_signals: int, before_trades: int) -> dict:
@@ -296,6 +304,25 @@ async def reset_data():
         return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
     finally:
         db.close()
+
+
+@app.post("/api/refresh-data")
+async def refresh_data():
+    """Re-export all dashboard JSON files from the database without running any trading."""
+    from backend.core.config import load_config
+    from backend.core.database import Database
+
+    config = load_config()
+    db = Database("data/sentinel.db")
+    try:
+        _export_json(db, config)
+        return JSONResponse({"status": "ok", "message": "Dashboard data refreshed"})
+    except Exception as e:
+        logger.exception("Refresh data failed")
+        return JSONResponse({"status": "error", "error": str(e)}, status_code=500)
+    finally:
+        db.close()
+
 
 
 @app.get("/api/status")

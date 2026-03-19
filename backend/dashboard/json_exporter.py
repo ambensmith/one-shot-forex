@@ -39,18 +39,35 @@ def export_all(db_path: str = "data/sentinel.db"):
 def export_dashboard_summary(db, config):
     """Export main dashboard summary."""
     streams_data = []
+    streams_cfg = config.get("streams", {})
 
-    for stream_id, stream_name in [("news", "News Stream"), ("strategy", "Strategy Stream")]:
+    for stream_id, stream_name, cfg_key in [
+        ("news", "News Stream", "news_stream"),
+        ("strategy", "Strategy Stream", "strategy_stream"),
+    ]:
+        stream_cfg = streams_cfg.get(cfg_key, {})
         trades = db.get_trades(stream_id, limit=1000)
         # Exclude phantom/failed trades from all metrics
         real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(stream_id)
         equity = db.get_stream_equity(stream_id)
+        capital_allocation = stream_cfg.get("capital_allocation", 33333)
 
         closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
         wins = sum(1 for t in closed if t["pnl"] > 0)
         win_rate = wins / len(closed) if closed else 0
+
+        # Daily P&L — trades closed today
+        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        daily_pnl = sum(
+            t["pnl"] for t in closed
+            if t.get("closed_at", "").startswith(today_str)
+        )
+
+        # Signal count
+        signals = db.get_signals(stream=stream_id, limit=10000)
+        signal_count = len(signals)
 
         # Compute Sharpe from equity history
         eq_history = db.get_equity_history(stream_id)
@@ -63,8 +80,11 @@ def export_dashboard_summary(db, config):
             "id": stream_id,
             "name": stream_name,
             "equity": equity,
+            "capital_allocation": capital_allocation,
             "total_pnl": round(total_pnl, 2),
+            "daily_pnl": round(daily_pnl, 2),
             "trade_count": len(real_trades),
+            "signal_count": signal_count,
             "open_positions": len(open_trades),
             "win_rate": round(win_rate, 3),
             "sharpe_ratio": round(sharpe, 2),
@@ -78,16 +98,28 @@ def export_dashboard_summary(db, config):
         real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(hid)
         equity = db.get_stream_equity(hid)
+        capital_allocation = hybrid.get("capital_allocation", 33333)
         closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
         wins = sum(1 for t in closed if t["pnl"] > 0)
+
+        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        daily_pnl = sum(
+            t["pnl"] for t in closed
+            if t.get("closed_at", "").startswith(today_str)
+        )
+
+        signals = db.get_signals(stream=hid, limit=10000)
 
         streams_data.append({
             "id": hid,
             "name": hybrid["name"],
             "equity": equity,
+            "capital_allocation": capital_allocation,
             "total_pnl": round(total_pnl, 2),
+            "daily_pnl": round(daily_pnl, 2),
             "trade_count": len(real_trades),
+            "signal_count": len(signals),
             "open_positions": len(open_trades),
             "win_rate": round(wins / len(closed), 3) if closed else 0,
             "sharpe_ratio": 0,
