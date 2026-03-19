@@ -87,11 +87,16 @@ class Executor:
     def reconcile_positions(self, stream_id: str = None):
         """Close local DB trades that no longer exist as positions on the broker.
 
+        Matches by broker_deal_id (Capital.com dealId) for accurate per-trade
+        reconciliation. This correctly handles multiple trades for the same
+        instrument+direction across different streams.
+
         Distinguishes between:
         - Phantom trades (no broker_deal_id): marked as 'failed' with pnl=0
         - Real closures (has broker_deal_id): marked as 'closed_reconciled' with exit price
         """
         if not self.broker.is_connected:
+            logger.warning("Reconciliation skipped — broker not connected")
             return
 
         try:
@@ -100,45 +105,43 @@ class Executor:
             logger.warning(f"Reconciliation skipped — failed to fetch broker positions: {e}")
             return
 
-        # Build set of (instrument, direction) from live broker positions
-        broker_set = {(p["instrument"], p["direction"]) for p in broker_positions}
+        # Build set of deal IDs from live broker positions
+        broker_deal_ids = {p["id"] for p in broker_positions if p.get("id")}
 
         # Find local open trades with no matching broker position (stream-scoped)
         local_open = self.db.get_open_trades(stream_id)
         for trade in local_open:
-            key = (trade["instrument"], trade["direction"])
-            if key not in broker_set:
-                broker_deal_id = trade.get("broker_deal_id") or ""
+            broker_deal_id = trade.get("broker_deal_id") or ""
 
-                if not broker_deal_id or broker_deal_id.startswith("offline-"):
-                    # Phantom trade — never actually executed on broker
-                    logger.info(
-                        f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
-                        f"{trade['direction']}) is phantom — marking as failed"
-                    )
-                    self.db.update_trade(
-                        trade["id"],
-                        status="failed",
-                        pnl=0.0,
-                        pnl_pips=0.0,
-                        closed_at=datetime.now(timezone.utc).isoformat(),
-                    )
-                else:
-                    # Real trade closed by broker (SL/TP hit between runs)
-                    exit_info = self._fetch_exit_details(trade)
-                    logger.info(
-                        f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
-                        f"{trade['direction']}) closed by broker — "
-                        f"exit={exit_info['exit_price']}, pnl={exit_info['pnl']}"
-                    )
-                    self.db.update_trade(
-                        trade["id"],
-                        status="closed_reconciled",
-                        exit_price=exit_info["exit_price"],
-                        pnl=exit_info["pnl"],
-                        pnl_pips=exit_info["pnl_pips"],
-                        closed_at=datetime.now(timezone.utc).isoformat(),
-                    )
+            if not broker_deal_id or broker_deal_id.startswith("offline-"):
+                # Phantom trade — never actually executed on broker
+                logger.info(
+                    f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
+                    f"{trade['direction']}) has no broker_deal_id — marking as failed"
+                )
+                self.db.update_trade(
+                    trade["id"],
+                    status="failed",
+                    pnl=0.0,
+                    pnl_pips=0.0,
+                    closed_at=datetime.now(timezone.utc).isoformat(),
+                )
+            elif broker_deal_id not in broker_deal_ids:
+                # Real trade closed by broker (SL/TP hit between runs)
+                exit_info = self._fetch_exit_details(trade)
+                logger.info(
+                    f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
+                    f"{trade['direction']}) deal_id={broker_deal_id} closed by broker — "
+                    f"exit={exit_info['exit_price']}, pnl={exit_info['pnl']}"
+                )
+                self.db.update_trade(
+                    trade["id"],
+                    status="closed_reconciled",
+                    exit_price=exit_info["exit_price"],
+                    pnl=exit_info["pnl"],
+                    pnl_pips=exit_info["pnl_pips"],
+                    closed_at=datetime.now(timezone.utc).isoformat(),
+                )
 
     def _fetch_exit_details(self, trade: dict) -> dict:
         """Get exit price/pnl for a reconciled trade. Always returns real numbers.

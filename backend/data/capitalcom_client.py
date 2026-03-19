@@ -33,7 +33,10 @@ INSTRUMENT_TO_EPIC = {
     "NATGAS_USD": "NATURALGAS",
 }
 
+# Reverse mapping — when multiple instruments share an epic (e.g. BCO_USD and
+# WTICO_USD both map to OIL_CRUDE), prefer the one used in streams config.
 EPIC_TO_INSTRUMENT: dict[str, str] = {v: k for k, v in INSTRUMENT_TO_EPIC.items()}
+EPIC_TO_INSTRUMENT["OIL_CRUDE"] = "BCO_USD"  # prefer BCO_USD (Brent) over WTICO_USD
 
 # Granularity mapping
 GRANULARITY_MAP = {
@@ -249,23 +252,32 @@ class CapitalComClient:
             "guaranteedStop": False,
         }
 
+        # Place the order — if this succeeds, the position is live on the broker
         try:
             result = self._request("POST", "/api/v1/positions", body)
             deal_ref = result.get("dealReference", "")
             logger.info(f"Order placed: {side} {abs(units)} {instrument} dealRef={deal_ref}")
+        except Exception as e:
+            logger.error(f"Order failed for {instrument}: {e}")
+            return {"id": "", "status": "REJECTED", "error": str(e)}
 
-            # Confirm the deal
-            if deal_ref:
+        # Confirm the deal — if this fails, we still return ACCEPTED since
+        # the position was already created on the broker
+        if deal_ref:
+            try:
                 confirm = self._request("GET", f"/api/v1/confirms/{deal_ref}")
                 return {
                     "id": confirm.get("dealId", deal_ref),
                     "status": confirm.get("dealStatus", "UNKNOWN"),
                     "dealReference": deal_ref,
                 }
-            return {"id": deal_ref, "status": "ACCEPTED", "dealReference": deal_ref}
-        except Exception as e:
-            logger.error(f"Order failed for {instrument}: {e}")
-            return {"id": "", "status": "REJECTED", "error": str(e)}
+            except Exception as e:
+                logger.warning(
+                    f"Order confirm failed for {instrument} dealRef={deal_ref}: {e}. "
+                    f"Position likely exists on broker — recording with dealRef as ID."
+                )
+                return {"id": deal_ref, "status": "ACCEPTED", "dealReference": deal_ref}
+        return {"id": deal_ref, "status": "ACCEPTED", "dealReference": deal_ref}
 
     def get_open_trades(self) -> list[dict]:
         """Get all open positions from Capital.com."""
@@ -287,6 +299,9 @@ class CapitalComClient:
                     "currentUnits": str(position.get("size", 0)),
                     "unrealizedPL": str(position.get("upl", 0)),
                     "direction": "long" if position.get("direction") == "BUY" else "short",
+                    "entry_price": position.get("level"),
+                    "stop_loss": position.get("stopLevel"),
+                    "take_profit": position.get("profitLevel"),
                 })
             return trades
         except Exception as e:
