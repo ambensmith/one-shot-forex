@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const { mode = "tick", stream = "all", hybrid, hybrid_id, hybrid_active, period = "7d" } = req.body || {};
+  const { mode = "tick", stream = "all", hybrid, period = "7d" } = req.body || {};
 
   // Build workflow inputs
   const inputs = {
@@ -39,14 +39,6 @@ export default async function handler(req, res) {
 
   if (mode === "save-hybrid" && hybrid) {
     inputs.hybrid_json = typeof hybrid === "string" ? hybrid : JSON.stringify(hybrid);
-  }
-
-  if ((mode === "toggle-hybrid" || mode === "delete-hybrid") && hybrid_id != null) {
-    inputs.hybrid_id = String(hybrid_id);
-  }
-
-  if ((mode === "toggle-hybrid" || mode === "toggle-all-hybrids") && hybrid_active != null) {
-    inputs.hybrid_active = String(hybrid_active);
   }
 
   try {

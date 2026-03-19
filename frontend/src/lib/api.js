@@ -111,16 +111,29 @@ export function saveModelComparison(modelComparison) {
 
 // ── Hybrid Management ────────────────────────────────────
 
+async function hybridManage(body) {
+  const resp = await fetch('/api/hybrid-manage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
+    throw new Error(err.error || `HTTP ${resp.status}`)
+  }
+  return resp.json()
+}
+
 export function toggleHybrid(configId, isActive) {
-  return triggerStream({ mode: 'toggle-hybrid', hybrid_id: configId, hybrid_active: isActive ? 1 : 0 })
+  return hybridManage({ action: 'toggle', id: configId, is_active: isActive })
 }
 
 export function deleteHybrid(configId) {
-  return triggerStream({ mode: 'delete-hybrid', hybrid_id: configId })
+  return hybridManage({ action: 'delete', id: configId })
 }
 
 export function toggleAllHybrids(isActive) {
-  return triggerStream({ mode: 'toggle-all-hybrids', hybrid_active: isActive ? 1 : 0 })
+  return hybridManage({ action: 'toggle-all', is_active: isActive })
 }
 
 // ── Workflow Trigger Helpers ──────────────────────────────
@@ -130,11 +143,11 @@ export function toggleAllHybrids(isActive) {
  * @param {Object} params - { mode, stream?, hybrid?, period? }
  * @returns {{ run_id, status, message }}
  */
-export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, hybrid_id, hybrid_active, period = '7d' }) {
+export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, period = '7d' }) {
   const resp = await fetch('/api/trigger-stream', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, stream, hybrid, hybrid_id, hybrid_active, period }),
+    body: JSON.stringify({ mode, stream, hybrid, period }),
   })
   if (!resp.ok) {
     const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))

@@ -14,9 +14,6 @@ on:
           - reset
           - review
           - save-hybrid
-          - toggle-hybrid
-          - delete-hybrid
-          - toggle-all-hybrids
           - save-config
           - get-config
           - fix-phantoms
@@ -37,14 +34,6 @@ on:
         type: boolean
       hybrid_json:
         description: 'Hybrid config JSON (save-hybrid mode only)'
-        required: false
-        type: string
-      hybrid_id:
-        description: 'Hybrid config ID (toggle-hybrid/delete-hybrid modes)'
-        required: false
-        type: string
-      hybrid_active:
-        description: 'Set is_active 0 or 1 (toggle-hybrid/toggle-all-hybrids modes)'
         required: false
         type: string
       review_period:
@@ -102,12 +91,6 @@ jobs:
             python -m backend.main --mode review --period "$PERIOD"
           elif [ "$MODE" = "save-hybrid" ]; then
             python -m backend.main --mode save-hybrid --hybrid-json "$HYBRID_JSON"
-          elif [ "$MODE" = "toggle-hybrid" ]; then
-            python -m backend.main --mode toggle-hybrid --hybrid-id "${{ github.event.inputs.hybrid_id }}" --hybrid-active "${{ github.event.inputs.hybrid_active }}"
-          elif [ "$MODE" = "delete-hybrid" ]; then
-            python -m backend.main --mode delete-hybrid --hybrid-id "${{ github.event.inputs.hybrid_id }}"
-          elif [ "$MODE" = "toggle-all-hybrids" ]; then
-            python -m backend.main --mode toggle-all-hybrids --hybrid-active "${{ github.event.inputs.hybrid_active }}"
           elif [ "$MODE" = "save-config" ]; then
             CONFIG_JSON='${{ github.event.inputs.config_json }}'
             python -m backend.main --mode save-config --config-json "$CONFIG_JSON"

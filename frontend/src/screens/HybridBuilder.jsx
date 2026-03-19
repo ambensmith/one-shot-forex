@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDashboard, useHybrids } from '../hooks/useStreamData'
-import { triggerStream, pollWorkflow } from '../lib/api'
+import { triggerStream, pollWorkflow, toggleHybrid, deleteHybrid, toggleAllHybrids } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import HelpTooltip from '../components/HelpTooltip'
 import HowItWorks from '../components/HowItWorks'
@@ -95,24 +95,40 @@ export default function HybridBuilder() {
     handleWorkflow('save-hybrid', 'all', 'Hybrid save', { hybrid })
   }
 
-  function handleToggle(h) {
+  async function handleToggle(h) {
     const newActive = !h.is_active
-    handleWorkflow('toggle-hybrid', 'all', `${newActive ? 'Activate' : 'Deactivate'} ${h.name}`, {
-      hybrid_id: h.id,
-      hybrid_active: newActive ? 1 : 0,
-    })
+    setStatusMsg({ type: 'info', text: `${newActive ? 'Activating' : 'Deactivating'} ${h.name}...` })
+    try {
+      await toggleHybrid(h.id, newActive)
+      setStatusMsg({ type: 'ok', text: `${h.name} ${newActive ? 'activated' : 'deactivated'}` })
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
   }
 
-  function handleDelete(h) {
+  async function handleDelete(h) {
     setConfirmDelete(null)
-    handleWorkflow('delete-hybrid', 'all', `Delete ${h.name}`, { hybrid_id: h.id })
+    setStatusMsg({ type: 'info', text: `Deleting ${h.name}...` })
+    try {
+      await deleteHybrid(h.id)
+      setStatusMsg({ type: 'ok', text: `${h.name} deleted` })
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
   }
 
-  function handleToggleAll() {
+  async function handleToggleAll() {
     const newActive = !anyActive
-    handleWorkflow('toggle-all-hybrids', 'all', `${newActive ? 'Enable' : 'Disable'} all hybrids`, {
-      hybrid_active: newActive ? 1 : 0,
-    })
+    setStatusMsg({ type: 'info', text: `${newActive ? 'Enabling' : 'Disabling'} all hybrids...` })
+    try {
+      await toggleAllHybrids(newActive)
+      setStatusMsg({ type: 'ok', text: `All hybrids ${newActive ? 'enabled' : 'disabled'}` })
+      setTimeout(() => { refreshHybrids(); refreshDashboard() }, 3000)
+    } catch (e) {
+      setStatusMsg({ type: 'error', text: e.message })
+    }
   }
 
   const addModule = (mod) => {
