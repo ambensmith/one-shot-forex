@@ -57,6 +57,7 @@ class NewsStream(BaseStream):
                 )
 
         # 4. Build instrument -> headlines mapping
+        headline_to_item = {item.headline: item for item in raw_items}
         headlines = [item.headline for item in raw_items]
         instrument_headlines = mapper.map_headlines(headlines)
 
@@ -101,7 +102,11 @@ class NewsStream(BaseStream):
                 # Build prompt
                 prompt = prompt_template.format(
                     instrument=instrument,
-                    news_headlines="\n".join(f"- {h}" for h in inst_headlines[:10]),
+                    news_headlines="\n".join(
+                        f"- {h} [{headline_to_item[h].source_count} source{'s' if headline_to_item[h].source_count > 1 else ''}: {', '.join(headline_to_item[h].sources)}]"
+                        if h in headline_to_item else f"- {h} [1 source]"
+                        for h in inst_headlines[:10]
+                    ),
                     current_price=f"{current_price:.5f}",
                     daily_change=f"{daily_change:.2f}",
                     trend_description=trend,
