@@ -120,6 +120,16 @@ class Database:
     def _init_schema(self):
         self.conn.executescript(SCHEMA)
         self.conn.commit()
+        self._migrate()
+
+    def _migrate(self):
+        """Apply incremental schema migrations."""
+        # Add broker_deal_id column to trades if not present
+        try:
+            self.conn.execute("ALTER TABLE trades ADD COLUMN broker_deal_id TEXT")
+            self.conn.commit()
+        except sqlite3.OperationalError:
+            pass  # Column already exists
 
     def execute(self, sql: str, params: tuple = ()) -> sqlite3.Cursor:
         return self.conn.execute(sql, params)

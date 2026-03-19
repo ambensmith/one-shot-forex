@@ -42,10 +42,12 @@ def export_dashboard_summary(db, config):
 
     for stream_id, stream_name in [("news", "News Stream"), ("strategy", "Strategy Stream")]:
         trades = db.get_trades(stream_id, limit=1000)
+        # Exclude phantom/failed trades from all metrics
+        real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(stream_id)
         equity = db.get_stream_equity(stream_id)
 
-        closed = [t for t in trades if t.get("pnl") is not None]
+        closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
         wins = sum(1 for t in closed if t["pnl"] > 0)
         win_rate = wins / len(closed) if closed else 0
@@ -62,7 +64,7 @@ def export_dashboard_summary(db, config):
             "name": stream_name,
             "equity": equity,
             "total_pnl": round(total_pnl, 2),
-            "trade_count": len(trades),
+            "trade_count": len(real_trades),
             "open_positions": len(open_trades),
             "win_rate": round(win_rate, 3),
             "sharpe_ratio": round(sharpe, 2),
@@ -73,9 +75,10 @@ def export_dashboard_summary(db, config):
     for hybrid in db.get_active_hybrids():
         hid = f"hybrid:{hybrid['name']}"
         trades = db.get_trades(hid, limit=1000)
+        real_trades = [t for t in trades if t.get("status") != "failed"]
         open_trades = db.get_open_trades(hid)
         equity = db.get_stream_equity(hid)
-        closed = [t for t in trades if t.get("pnl") is not None]
+        closed = [t for t in real_trades if t.get("pnl") is not None]
         total_pnl = sum(t["pnl"] for t in closed)
         wins = sum(1 for t in closed if t["pnl"] > 0)
 
@@ -84,7 +87,7 @@ def export_dashboard_summary(db, config):
             "name": hybrid["name"],
             "equity": equity,
             "total_pnl": round(total_pnl, 2),
-            "trade_count": len(trades),
+            "trade_count": len(real_trades),
             "open_positions": len(open_trades),
             "win_rate": round(wins / len(closed), 3) if closed else 0,
             "sharpe_ratio": 0,
