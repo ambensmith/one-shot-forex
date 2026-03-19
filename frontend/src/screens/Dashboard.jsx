@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useDashboard, useTrades, useEquity } from '../hooks/useStreamData'
+import { useDashboard, useTrades, useEquity, useReview } from '../hooks/useStreamData'
+import { triggerStream, pollWorkflow } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import EquityCurve from '../components/EquityCurve'
 import TradeRow from '../components/TradeRow'
@@ -9,45 +10,46 @@ export default function Dashboard() {
   const { data: dashboard, loading, refresh: refreshDashboard } = useDashboard()
   const { trades, refresh: refreshTrades } = useTrades()
   const { curves, refresh: refreshEquity } = useEquity()
+  const { review, refresh: refreshReview } = useReview()
 
   const [running, setRunning] = useState(false)
   const [resetting, setResetting] = useState(false)
-  const [result, setResult] = useState(null)
+  const [generatingReview, setGeneratingReview] = useState(false)
+  const [statusMsg, setStatusMsg] = useState(null)
+  const [showReview, setShowReview] = useState(false)
 
   function refreshAll() {
     refreshDashboard()
     refreshTrades()
     refreshEquity()
+    refreshReview()
   }
 
-  async function handleRunAll() {
-    setRunning(true)
-    setResult(null)
+  async function handleWorkflow(mode, stream, label) {
+    const setter = mode === 'reset' ? setResetting : mode === 'review' ? setGeneratingReview : setRunning
+    setter(true)
+    setStatusMsg({ type: 'info', text: `Dispatching ${label}...` })
     try {
-      const resp = await fetch('/api/run-all', { method: 'POST' })
-      const data = await resp.json()
-      setResult(data)
-      refreshAll()
+      const { run_id } = await triggerStream({ mode, stream })
+      if (run_id) {
+        setStatusMsg({ type: 'info', text: `Workflow started (run ${run_id}). Waiting for completion...` })
+        const result = await pollWorkflow(run_id, (status) => {
+          setStatusMsg({ type: 'info', text: `Workflow ${status}...` })
+        })
+        if (result.conclusion === 'success' || result.status === 'completed') {
+          setStatusMsg({ type: 'ok', text: `${label} complete! Data will update shortly.` })
+          // Wait for Vercel to rebuild with new data
+          setTimeout(refreshAll, 5000)
+        } else {
+          setStatusMsg({ type: 'error', text: `Workflow ${result.conclusion || result.status}` })
+        }
+      } else {
+        setStatusMsg({ type: 'ok', text: `${label} dispatched. Refresh page in ~2 min to see results.` })
+      }
     } catch (e) {
-      setResult({ status: 'error', error: e.message })
+      setStatusMsg({ type: 'error', text: e.message })
     } finally {
-      setRunning(false)
-    }
-  }
-
-  async function handleReset() {
-    if (!confirm('Reset all data? This will clear all signals, trades, and equity history.')) return
-    setResetting(true)
-    setResult(null)
-    try {
-      const resp = await fetch('/api/reset', { method: 'POST' })
-      const data = await resp.json()
-      setResult(data)
-      refreshAll()
-    } catch (e) {
-      setResult({ status: 'error', error: e.message })
-    } finally {
-      setResetting(false)
+      setter(false)
     }
   }
 
@@ -62,51 +64,42 @@ export default function Dashboard() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Dashboard</h2>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={handleReset}
-            disabled={resetting || running}
-            className="px-4 py-2 bg-red-600/80 hover:bg-red-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+            onClick={() => {
+              if (!confirm('Reset all data? This clears all signals, trades, and equity.')) return
+              handleWorkflow('reset', 'all', 'Reset')
+            }}
+            disabled={resetting || running || generatingReview}
+            className="px-3 py-2 bg-red-600/80 hover:bg-red-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
           >
             {resetting ? 'Resetting...' : 'Reset Data'}
           </button>
           <button
-            onClick={handleRunAll}
-            disabled={running || resetting}
-            className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-sm font-medium rounded-lg transition-colors"
+            onClick={() => handleWorkflow('review', 'all', 'Review Generation')}
+            disabled={generatingReview || running || resetting}
+            className="px-3 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
           >
-            {running ? 'Running All Streams...' : 'Run All Streams'}
+            {generatingReview ? 'Generating...' : 'Generate Review'}
+          </button>
+          <button
+            onClick={() => handleWorkflow('tick', 'all', 'All Streams')}
+            disabled={running || resetting || generatingReview}
+            className="px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-xs font-medium rounded-lg transition-colors"
+          >
+            {running ? 'Running...' : 'Run All Streams'}
           </button>
         </div>
       </div>
 
-      {/* Result banner */}
-      {result && (
+      {/* Status banner */}
+      {statusMsg && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
-          result.status === 'ok'
-            ? 'bg-green-900/20 border-green-800/50 text-green-300'
-            : 'bg-red-900/20 border-red-800/50 text-red-300'
+          statusMsg.type === 'ok' ? 'bg-green-900/20 border-green-800/50 text-green-300'
+          : statusMsg.type === 'error' ? 'bg-red-900/20 border-red-800/50 text-red-300'
+          : 'bg-blue-900/20 border-blue-800/50 text-blue-300'
         }`}>
-          {result.status === 'ok' ? (
-            result.message ? (
-              <span>{result.message}</span>
-            ) : (
-              <div>
-                <span className="font-semibold">All streams complete. </span>
-                {result.results?.news && (
-                  <span>News: {result.results.news.new_signals}sig/{result.results.news.new_trades}trades. </span>
-                )}
-                {result.results?.strategy && (
-                  <span>Strategy: {result.results.strategy.new_signals}sig/{result.results.strategy.new_trades}trades. </span>
-                )}
-                {result.results?.hybrid?.length > 0 && (
-                  <span>Hybrid: {result.results.hybrid.map(h => `${h.stream}: ${h.new_trades}trades`).join(', ')}. </span>
-                )}
-              </div>
-            )
-          ) : (
-            <span>Error: {result.error}</span>
-          )}
+          {statusMsg.text}
         </div>
       )}
 
@@ -148,7 +141,6 @@ export default function Dashboard() {
           </tbody>
         </table>
 
-        {/* Strategy breakdown sub-rows */}
         {dashboard.strategy_breakdown?.length > 0 && (
           <>
             <h4 className="text-xs text-gray-500 mt-4 mb-2">Strategy Breakdown</h4>
@@ -171,7 +163,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Recent Trades */}
         <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5 overflow-x-auto">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Recent Trades</h3>
@@ -231,6 +223,32 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Cowork Review Section */}
+      <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Cowork Review</h3>
+          {review?.has_review && (
+            <button
+              onClick={() => setShowReview(!showReview)}
+              className="text-xs text-blue-400 hover:text-blue-300"
+            >
+              {showReview ? 'Hide' : 'Show'} Review
+            </button>
+          )}
+        </div>
+        {!review?.has_review ? (
+          <p className="text-gray-500 text-sm">No review generated yet. Click "Generate Review" above.</p>
+        ) : showReview ? (
+          <div className="prose prose-invert prose-sm max-w-none">
+            <pre className="whitespace-pre-wrap text-xs text-gray-300 bg-gray-900/50 rounded-lg p-4 overflow-x-auto">
+              {review.review_md}
+            </pre>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">Review available. Click "Show" to view.</p>
+        )}
       </div>
     </div>
   )

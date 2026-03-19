@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSignals, useTrades, useDashboard } from '../hooks/useStreamData'
+import { triggerStream, pollWorkflow } from '../lib/api'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
 import ConfidenceMeter from '../components/ConfidenceMeter'
@@ -11,23 +12,32 @@ export default function StrategyStream() {
   const { data: dashboard, refresh: refreshDashboard } = useDashboard()
 
   const [running, setRunning] = useState(false)
-  const [result, setResult] = useState(null)
+  const [statusMsg, setStatusMsg] = useState(null)
 
   const stream = dashboard?.streams?.find(s => s.id === 'strategy')
   const breakdown = dashboard?.strategy_breakdown || []
 
   async function handleRunStrategy() {
     setRunning(true)
-    setResult(null)
+    setStatusMsg({ type: 'info', text: 'Dispatching strategy stream workflow...' })
     try {
-      const resp = await fetch('/api/run-stream/strategy', { method: 'POST' })
-      const data = await resp.json()
-      setResult(data)
-      refreshSignals()
-      refreshTrades()
-      refreshDashboard()
+      const { run_id } = await triggerStream({ mode: 'tick', stream: 'strategy' })
+      if (run_id) {
+        setStatusMsg({ type: 'info', text: `Workflow started (run ${run_id}). Running strategies...` })
+        const result = await pollWorkflow(run_id, (status) => {
+          setStatusMsg({ type: 'info', text: `Workflow ${status}...` })
+        })
+        if (result.conclusion === 'success' || result.status === 'completed') {
+          setStatusMsg({ type: 'ok', text: 'Strategy stream complete! Data will update shortly.' })
+          setTimeout(() => { refreshSignals(); refreshTrades(); refreshDashboard() }, 5000)
+        } else {
+          setStatusMsg({ type: 'error', text: `Workflow ${result.conclusion || result.status}` })
+        }
+      } else {
+        setStatusMsg({ type: 'ok', text: 'Workflow dispatched. Refresh in ~2 min to see results.' })
+      }
     } catch (e) {
-      setResult({ status: 'error', error: e.message })
+      setStatusMsg({ type: 'error', text: e.message })
     } finally {
       setRunning(false)
     }
@@ -49,26 +59,14 @@ export default function StrategyStream() {
         </button>
       </div>
 
-      {/* Run result banner */}
-      {result && (
+      {/* Status banner */}
+      {statusMsg && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
-          result.status === 'ok'
-            ? 'bg-green-900/20 border-green-800/50 text-green-300'
-            : 'bg-red-900/20 border-red-800/50 text-red-300'
+          statusMsg.type === 'ok' ? 'bg-green-900/20 border-green-800/50 text-green-300'
+          : statusMsg.type === 'error' ? 'bg-red-900/20 border-red-800/50 text-red-300'
+          : 'bg-blue-900/20 border-blue-800/50 text-blue-300'
         }`}>
-          {result.status === 'ok' ? (
-            <div>
-              <span className="font-semibold">Strategy stream complete:</span>{' '}
-              {result.new_signals} signals generated, {result.new_trades} trades executed, {result.open_positions} open positions
-              {result.rejections?.length > 0 && (
-                <div className="mt-1 text-xs text-gray-400">
-                  Rejections: {result.rejections.map(r => `${r.instrument} (${r.reason})`).join(', ')}
-                </div>
-              )}
-            </div>
-          ) : (
-            <span>Error: {result.error}</span>
-          )}
+          {statusMsg.text}
         </div>
       )}
 

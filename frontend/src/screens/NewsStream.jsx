@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSignals, useTrades, useDashboard } from '../hooks/useStreamData'
-import { saveModelComparison } from '../lib/api'
+import { saveModelComparison, triggerStream, pollWorkflow } from '../lib/api'
 import StreamCard from '../components/StreamCard'
 import MetricTile from '../components/MetricTile'
 import SignalBadge from '../components/SignalBadge'
@@ -224,12 +224,21 @@ export default function NewsStream() {
     setTradingRunning(true)
     setTradingResult(null)
     try {
-      const resp = await fetch('/api/run-stream/news', { method: 'POST' })
-      const data = await resp.json()
-      setTradingResult(data)
-      refreshSignals()
-      refreshTrades()
-      refreshDashboard()
+      const { run_id } = await triggerStream({ mode: 'tick', stream: 'news' })
+      if (run_id) {
+        setTradingResult({ status: 'info', text: `Workflow started (run ${run_id}). Analyzing news...` })
+        const result = await pollWorkflow(run_id, (status) => {
+          setTradingResult({ status: 'info', text: `Workflow ${status}...` })
+        })
+        if (result.conclusion === 'success' || result.status === 'completed') {
+          setTradingResult({ status: 'ok', text: 'News trading cycle complete! Data updating shortly.' })
+          setTimeout(() => { refreshSignals(); refreshTrades(); refreshDashboard() }, 5000)
+        } else {
+          setTradingResult({ status: 'error', error: `Workflow ${result.conclusion || result.status}` })
+        }
+      } else {
+        setTradingResult({ status: 'ok', text: 'Workflow dispatched. Refresh in ~2 min.' })
+      }
     } catch (e) {
       setTradingResult({ status: 'error', error: e.message })
     } finally {
@@ -298,30 +307,11 @@ export default function NewsStream() {
       {/* Trading cycle result banner */}
       {tradingResult && (
         <div className={`rounded-lg p-4 mb-6 text-sm border ${
-          tradingResult.status === 'ok'
-            ? 'bg-green-900/20 border-green-800/50 text-green-300'
-            : 'bg-red-900/20 border-red-800/50 text-red-300'
+          tradingResult.status === 'ok' ? 'bg-green-900/20 border-green-800/50 text-green-300'
+          : tradingResult.status === 'error' ? 'bg-red-900/20 border-red-800/50 text-red-300'
+          : 'bg-blue-900/20 border-blue-800/50 text-blue-300'
         }`}>
-          {tradingResult.status === 'ok' ? (
-            <div>
-              <span className="font-semibold">News trading cycle complete:</span>{' '}
-              {tradingResult.new_signals} signals, {tradingResult.new_trades} trades executed, {tradingResult.open_positions} open
-              {tradingResult.signals_detail?.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  {tradingResult.signals_detail.map((s, i) => (
-                    <div key={i} className="text-xs">
-                      <span className={`font-mono ${s.direction === 'long' ? 'text-green-400' : s.direction === 'short' ? 'text-red-400' : 'text-gray-400'}`}>
-                        {s.direction.toUpperCase()}
-                      </span>{' '}
-                      {s.instrument} ({(s.confidence * 100).toFixed(0)}%) — {s.reasoning}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <span>Error: {tradingResult.error}</span>
-          )}
+          {tradingResult.text || tradingResult.error || 'Processing...'}
         </div>
       )}
 
