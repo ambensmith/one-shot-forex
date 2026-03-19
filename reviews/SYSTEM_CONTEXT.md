@@ -28,6 +28,14 @@ It provides full context for Cowork review sessions.
   Instruments: EUR_USD, GBP_USD, XAU_USD
   - momentum (weight: 0.6, must_participate: False)
   - mean_reversion (weight: 0.4, must_participate: False)
+- **All-equal-majority**: majority combiner
+  Instruments: EUR_USD, GBP_USD, USD_JPY, XAU_USD, BCO_USD
+  - news (weight: 0.5, must_participate: False)
+  - momentum (weight: 0.5, must_participate: False)
+  - carry (weight: 0.5, must_participate: False)
+  - breakout (weight: 0.5, must_participate: False)
+  - mean_reversion (weight: 0.5, must_participate: False)
+  - volatility_breakout (weight: 0.5, must_participate: False)
 
 ---
 
