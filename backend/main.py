@@ -6,6 +6,9 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
+Path("data").mkdir(exist_ok=True)
+Path("logs").mkdir(exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -126,10 +129,6 @@ def main():
     parser.add_argument("--instrument", help="Instrument for backtest mode")
     parser.add_argument("--period", help="Period for review, e.g. '7d' or '30d'")
     args = parser.parse_args()
-
-    # Ensure data directories exist
-    Path("data").mkdir(exist_ok=True)
-    Path("logs").mkdir(exist_ok=True)
 
     if args.mode == "tick":
         asyncio.run(run_tick())
