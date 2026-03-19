@@ -21,15 +21,6 @@ MODELS = {
         "rate_limit": "1B tokens/month",
         "notes": "Most generous free quota.",
     },
-    "openrouter/deepseek-v3": {
-        "provider": "openrouter",
-        "base_url": "https://openrouter.ai/api/v1",
-        "model": "deepseek/deepseek-chat-v3-0324:free",
-        "env_key": "OPENROUTER_API_KEY",
-        "cost_per_1m_tokens": 0,
-        "rate_limit": "50 req/day",
-        "notes": "Strong reasoning. Low rate limit — comparison only.",
-    },
 }
 
 
