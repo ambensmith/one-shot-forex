@@ -32,8 +32,8 @@ class BreakoutStrategy(Strategy):
                 metadata={"reason": "Insufficient data"},
             )
 
-        from backend.data.oanda_client import OandaClient
-        pip_val = OandaClient.pip_value(instrument)
+        from backend.data.provider import pip_value
+        pip_val = pip_value(instrument)
         buffer = self._breakout_buffer_pips * pip_val
 
         # Get Asian session range from recent data

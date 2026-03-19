@@ -4,7 +4,7 @@
 
 Forex Sentinel is a modular, automated forex and commodities trading system with three independent signal streams, a custom hybrid builder, a performance dashboard, model comparison testing, and a Cowork review system.
 
-It runs for free on GitHub Actions (hourly schedule), with a static React dashboard on Vercel. State is stored in SQLite committed to the repository. All LLM providers are free tier. Broker is OANDA (free demo account, zero platform fees on live).
+It runs for free on GitHub Actions (hourly schedule), with a static React dashboard on Vercel. State is stored in SQLite committed to the repository. All LLM providers are free tier. Broker is Capital.com (free demo account with £50K virtual funds).
 
 The architecture is designed to extend without code changes: new models, instruments, and strategies are added through configuration and plugin files.
 
@@ -28,7 +28,7 @@ The architecture is designed to extend without code changes: new models, instrum
 │  │     ├─ Run peer-reviewed strategies              │             │
 │  │     ├─ Run active hybrid streams                 │             │
 │  │     ├─ Risk check all proposed trades            │             │
-│  │     ├─ Execute approved trades via OANDA API     │             │
+│  │     ├─ Execute approved trades via Capital.com API     │             │
 │  │     ├─ Log signals, trades, equity to SQLite     │             │
 │  │     └─ Export dashboard JSON files               │             │
 │  │  3. Generate Cowork review (if scheduled)        │             │
@@ -65,7 +65,7 @@ Forex operates 24 hours Monday through Friday. The market opens Sunday ~22:00 UT
 
 London + New York overlap (12:00-16:00 UTC) is the highest-volume window. The system runs hourly and naturally captures all sessions.
 
-Gold and oil CFDs trade during the same forex hours via OANDA, with a brief daily pause around 21:00-22:00 UTC.
+Gold and oil CFDs trade during the same forex hours via Capital.com, with a brief daily pause around 21:00-22:00 UTC.
 
 -----
 
@@ -98,7 +98,6 @@ Compares performance of all streams and sub-strategies side by side. Time period
 ```
 pandas           — Data manipulation and indicator calculation
 backtesting.py   — Strategy backtesting engine
-oandapyV20       — OANDA v20 REST API client
 openai           — Unified LLM client (OpenAI-compatible API)
 aiohttp          — Async HTTP for news fetching
 feedparser       — RSS parsing
@@ -156,7 +155,7 @@ forex-sentinel/
 │   │
 │   ├── data/
 │   │   ├── __init__.py
-│   │   ├── oanda_client.py            # OANDA v20: candles, orders, account
+│   │   ├── capitalcom_client.py        # Capital.com REST: candles, orders, account
 │   │   └── news_ingestor.py           # RSS + GDELT + calendar fetching
 │   │
 │   ├── streams/
@@ -191,12 +190,12 @@ forex-sentinel/
 │   │
 │   ├── execution/
 │   │   ├── __init__.py
-│   │   └── executor.py                # OANDA order placement + management
+│   │   └── executor.py                # Capital.com order placement + management
 │   │
 │   ├── backtest/
 │   │   ├── __init__.py
 │   │   ├── engine.py                  # Backtesting harness
-│   │   ├── data_loader.py             # Historical OANDA data → parquet cache
+│   │   ├── data_loader.py             # Historical data → parquet cache
 │   │   └── runner.py                  # CLI backtest execution
 │   │
 │   ├── reviews/
@@ -319,8 +318,9 @@ jobs:
 
       - name: Run trading cycle
         env:
-          OANDA_API_KEY: ${{ secrets.OANDA_API_KEY }}
-          OANDA_ACCOUNT_ID: ${{ secrets.OANDA_ACCOUNT_ID }}
+          CAPITALCOM_API_KEY: ${{ secrets.CAPITALCOM_API_KEY }}
+          CAPITALCOM_EMAIL: ${{ secrets.CAPITALCOM_EMAIL }}
+          CAPITALCOM_PASSWORD: ${{ secrets.CAPITALCOM_PASSWORD }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -353,9 +353,9 @@ async def run_tick():
     """Execute one trading cycle across all active streams."""
     config = load_config()
     db = Database("data/sentinel.db")
-    oanda = OandaClient(config)
-    risk = RiskManager(config, oanda, db)
-    executor = Executor(config, oanda, db)
+    broker = CapitalComClient(config)
+    risk = RiskManager(config, broker, db)
+    executor = Executor(config, broker, db)
 
     # Check if forex market is open
     if not is_market_open():
@@ -365,7 +365,7 @@ async def run_tick():
     # Run News Stream
     if config.streams.news.enabled:
         news_stream = NewsStream(
-            config=config, db=db, oanda=oanda,
+            config=config, db=db, broker=broker,
             risk=risk, executor=executor
         )
         await news_stream.tick()
@@ -373,7 +373,7 @@ async def run_tick():
     # Run Strategy Stream
     if config.streams.strategy.enabled:
         strategy_stream = StrategyStream(
-            config=config, db=db, oanda=oanda,
+            config=config, db=db, broker=broker,
             risk=risk, executor=executor
         )
         await strategy_stream.tick()
@@ -382,13 +382,13 @@ async def run_tick():
     for hybrid_config in db.get_active_hybrids():
         hybrid = HybridStream(
             hybrid_config=hybrid_config,
-            config=config, db=db, oanda=oanda,
+            config=config, db=db, broker=broker,
             risk=risk, executor=executor
         )
         await hybrid.tick()
 
     # Record equity snapshots for all streams
-    record_all_equity_snapshots(db, oanda)
+    record_all_equity_snapshots(db, broker)
 
     # Generate review if due
     if should_generate_review(config):
@@ -516,11 +516,11 @@ CREATE INDEX idx_equity_stream ON equity_snapshots(stream, recorded_at);
 
 ## Instruments
 
-All instruments are OANDA CFDs. Add new instruments by adding entries to `instruments.yaml`.
+All instruments are Capital.com CFDs. Add new instruments by adding entries to `instruments.yaml`.
 
 ### Forex Majors
 
-|OANDA Symbol|Pair                    |Geopolitical Keywords                                                                 |
+|Symbol|Pair                    |Geopolitical Keywords                                                                 |
 |------------|------------------------|--------------------------------------------------------------------------------------|
 |EUR_USD     |Euro / US Dollar        |ecb, european central bank, eurozone, lagarde, federal reserve, fed rate, us inflation|
 |GBP_USD     |Pound / US Dollar       |bank of england, boe, uk economy, uk gdp, uk inflation, sterling                      |
@@ -532,7 +532,7 @@ All instruments are OANDA CFDs. Add new instruments by adding entries to `instru
 
 ### Commodities
 
-|OANDA Symbol|Instrument     |Geopolitical Keywords                                                               |
+|Symbol|Instrument     |Geopolitical Keywords                                                               |
 |------------|---------------|------------------------------------------------------------------------------------|
 |XAU_USD     |Gold           |gold, safe haven, real yields, treasury, geopolitical risk, war, conflict, sanctions|
 |XAG_USD     |Silver         |silver, industrial demand, precious metals                                          |
@@ -542,7 +542,7 @@ All instruments are OANDA CFDs. Add new instruments by adding entries to `instru
 
 ### Crosses (for correlation plays)
 
-|OANDA Symbol|Pair        |Use Case             |
+|Symbol|Pair        |Use Case             |
 |------------|------------|---------------------|
 |EUR_GBP     |Euro / Pound|EU vs UK divergence  |
 |EUR_JPY     |Euro / Yen  |Risk-on/off barometer|
@@ -752,7 +752,7 @@ class Strategy(ABC):
             df: DataFrame with columns [Open, High, Low, Close, Volume]
                 indexed by datetime, most recent last.
                 Contains self.lookback_periods rows.
-            instrument: OANDA instrument symbol (e.g., 'EUR_USD')
+            instrument: instrument symbol (e.g., 'EUR_USD')
 
         Returns:
             TechnicalSignal with direction and confidence.
@@ -847,11 +847,11 @@ class BaseStream(ABC):
     Each stream has its own capital allocation, trades, and P&L.
     """
 
-    def __init__(self, stream_id: str, config, db, oanda, risk, executor):
+    def __init__(self, stream_id: str, config, db, broker, risk, executor):
         self.stream_id = stream_id
         self.config = config
         self.db = db
-        self.oanda = oanda
+        self.broker = broker
         self.risk = risk
         self.executor = executor
 
@@ -964,7 +964,7 @@ risk:
 
 execution:
   mode: "practice"                 # "practice" or "live"
-  oanda_environment: "practice"    # "practice" or "live"
+  data_provider: "capitalcom"      # "capitalcom" or "offline"
 
 data:
   candle_granularity: "H1"         # Matches scheduler interval
@@ -1065,7 +1065,7 @@ hybrid_defaults:
 ### instruments.yaml
 
 ```yaml
-# Each instrument has an OANDA symbol and keyword list for news mapping.
+# Each instrument has a symbol and keyword list for news mapping.
 # Add new instruments by appending entries.
 
 EUR_USD:
@@ -1533,7 +1533,7 @@ Add the API key to GitHub Secrets. The model appears in the UI automatically.
 
 ### Adding a new instrument
 
-Add an entry to `instruments.yaml` with OANDA symbol, display name, type, and keywords. Add the symbol to the relevant streams in `streams.yaml`. No code changes.
+Add an entry to `instruments.yaml` with symbol, display name, type, and keywords. Add the symbol to the relevant streams in `streams.yaml`. No code changes.
 
 ### Adding a new strategy
 
@@ -1557,7 +1557,7 @@ Deploy to Railway, Fly.io, or any VPS. Wrap the trading logic in a FastAPI serve
 
 |Service   |URL               |What You Get                                       |
 |----------|------------------|---------------------------------------------------|
-|OANDA     |oanda.com         |Demo account with £100K fake money, free API access|
+|Capital.com|capital.com       |Demo account with £50K virtual funds, free API     |
 |Groq      |console.groq.com  |1000 requests/day, Llama 3.3 70B                   |
 |Mistral   |console.mistral.ai|1B tokens/month, Mistral Small                     |
 |OpenRouter|openrouter.ai     |50 req/day on free models, DeepSeek V3             |
@@ -1582,9 +1582,9 @@ Total setup time: ~30 minutes. Total cost: £0.
 
 1. Pydantic config loader (`settings.yaml`, `streams.yaml`, `instruments.yaml`)
 1. SQLite database schema + connection
-1. OANDA client (connect to practice account, fetch candles, get account info)
+1. Capital.com client (connect to demo account, fetch candles, get account info)
 1. Basic CLI entry point
-1. **Milestone:** `python -m backend.main --mode tick` connects to OANDA and prints account balance
+1. **Milestone:** `python -m backend.main --mode tick` connects to Capital.com and prints account balance
 
 ### Phase 2: Strategy Stream (Day 2-3)
 
@@ -1607,9 +1607,9 @@ Total setup time: ~30 minutes. Total cost: £0.
 ### Phase 4: Risk + Execution (Day 4-5)
 
 1. Risk manager (per-stream checks, position sizing)
-1. Executor (OANDA practice mode order placement)
+1. Executor (Capital.com demo order placement)
 1. Wire both streams through risk → execution pipeline
-1. **Milestone:** Both streams place paper trades on OANDA demo account
+1. **Milestone:** Both streams place paper trades on Capital.com demo account
 
 ### Phase 5: Dashboard JSON Export (Day 5-6)
 
@@ -1663,7 +1663,7 @@ dashboard + Cowork review system.
 
 ## Tech Stack
 - Python 3.12+, pip
-- pandas, backtesting.py, oandapyV20, openai, aiohttp, feedparser, pydantic
+- pandas, backtesting.py, openai, aiohttp, feedparser, pydantic
 - React 18, Vite, Tailwind, Recharts
 - SQLite (single file: data/sentinel.db)
 - GitHub Actions (scheduled hourly)
@@ -1709,15 +1709,16 @@ dashboard + Cowork review system.
 2. Implement fetcher in backend/data/news_ingestor.py
 
 ## Environment Variables (GitHub Secrets)
-- OANDA_API_KEY — OANDA practice account API key
-- OANDA_ACCOUNT_ID — OANDA account ID
+- CAPITALCOM_API_KEY — Capital.com API key
+- CAPITALCOM_EMAIL — Capital.com account email
+- CAPITALCOM_PASSWORD — Capital.com account password
 - GROQ_API_KEY — Groq free tier
 - MISTRAL_API_KEY — Mistral free tier
 - OPENROUTER_API_KEY — OpenRouter free tier
 
 ## Testing
 - pytest tests/ -v
-- Mock external calls (OANDA, LLM) in tests
+- Mock external calls (Capital.com, LLM) in tests
 - Strategies should have backtest-based integration tests
 
 ## Code Style
@@ -1730,8 +1731,8 @@ dashboard + Cowork review system.
 
 ## Risk Warnings
 
-- **76.8% of retail CFD accounts lose money** (OANDA’s own regulatory disclosure).
-- **Start on demo.** Run for at least 3 months on the OANDA practice account before considering real money.
+- **76.8% of retail CFD accounts lose money** (Capital.com’s regulatory disclosure).
+- **Start on demo.** Run for at least 3 months on the Capital.com demo account before considering real money.
 - **Backtest results do not equal live results.** Slippage, spread widening during news events, and execution delays all erode backtested returns.
 - **The LLM is not an oracle.** It is pattern-matching on training data. It can and will produce incorrect signals. The multi-stream architecture exists specifically so you can measure which approach works and which does not.
 - **Never risk money you cannot afford to lose.** When you do go live, start with the absolute minimum amount.

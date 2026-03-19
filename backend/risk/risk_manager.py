@@ -27,9 +27,9 @@ class RiskCheck:
 
 
 class RiskManager:
-    def __init__(self, config: dict, oanda, db):
+    def __init__(self, config: dict, broker, db):
         self.config = config
-        self.oanda = oanda
+        self.broker = broker
         self.db = db
         risk_cfg = config.get("risk", {})
         self.max_risk_per_trade = risk_cfg.get("max_risk_per_trade", 0.01)

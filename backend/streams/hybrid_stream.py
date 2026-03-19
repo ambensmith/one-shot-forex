@@ -13,9 +13,9 @@ logger = logging.getLogger("forex_sentinel.hybrid_stream")
 class HybridStream(BaseStream):
     """Combines news signals and strategy signals with configurable combiner logic."""
 
-    def __init__(self, hybrid_config: dict, config: dict, db, oanda, risk, executor):
+    def __init__(self, hybrid_config: dict, config: dict, db, broker, risk, executor):
         stream_id = f"hybrid:{hybrid_config['name']}"
-        super().__init__(stream_id, config, db, oanda, risk, executor)
+        super().__init__(stream_id, config, db, broker, risk, executor)
         self.hybrid_config = hybrid_config
         self.modules = hybrid_config.get("modules", [])
         self.combiner_mode = hybrid_config.get("combiner_mode", "weighted")
@@ -59,8 +59,8 @@ class HybridStream(BaseStream):
                     continue
 
                 # Get price and risk check
-                df = self.oanda.get_candles(instrument, count=50)
-                price_data = self.oanda.get_current_price(instrument)
+                df = self.broker.get_candles(instrument, count=50)
+                price_data = self.broker.get_current_price(instrument)
                 entry_price = price_data["mid"]
 
                 stop_loss = self.risk.calculate_stop_loss(
@@ -153,7 +153,7 @@ class HybridStream(BaseStream):
         from backend.strategies.registry import get_strategy
 
         strategy = get_strategy(strategy_name)
-        df = self.oanda.get_candles(
+        df = self.broker.get_candles(
             instrument,
             granularity=self.config.get("data", {}).get("candle_granularity", "H1"),
             count=self.config.get("data", {}).get("lookback_periods", 200),

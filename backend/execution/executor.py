@@ -10,9 +10,9 @@ logger = logging.getLogger("forex_sentinel.executor")
 
 
 class Executor:
-    def __init__(self, config: dict, oanda, db):
+    def __init__(self, config: dict, broker, db):
         self.config = config
-        self.oanda = oanda
+        self.broker = broker
         self.db = db
         self.mode = config.get("execution", {}).get("mode", "practice")
 
@@ -25,8 +25,8 @@ class Executor:
             f"entry={entry_price} SL={stop_loss} TP={take_profit} stream={stream_id}"
         )
 
-        # Place order via OANDA
-        result = self.oanda.place_order(
+        # Place order via broker
+        result = self.broker.place_order(
             instrument=instrument,
             units=position_size,
             side=direction,
@@ -62,7 +62,7 @@ class Executor:
         open_trades = self.db.get_open_trades(stream_id)
         for trade in open_trades:
             try:
-                price_data = self.oanda.get_current_price(trade["instrument"])
+                price_data = self.broker.get_current_price(trade["instrument"])
                 current_price = price_data["mid"]
                 self._check_trade_exit(trade, current_price)
             except Exception as e:

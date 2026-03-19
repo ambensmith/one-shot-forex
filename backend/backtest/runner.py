@@ -10,13 +10,13 @@ logger = logging.getLogger("forex_sentinel.backtest")
 def run_backtest(strategy_name: str | None = None, instrument: str | None = None):
     """Run backtest for a strategy on an instrument."""
     from backend.core.config import load_config
-    from backend.data.oanda_client import OandaClient
+    from backend.main import create_data_provider
     from backend.strategies.registry import get_strategy
     from backend.backtest.engine import BacktestEngine
     from backend.backtest.data_loader import load_historical_data
 
     config = load_config()
-    oanda = OandaClient(config)
+    broker = create_data_provider(config)
 
     strategies_cfg = config.get("streams", {}).get("strategy_stream", {}).get("strategies", [])
     instruments_cfg = config.get("streams", {}).get("strategy_stream", {}).get("instruments", [])
@@ -47,7 +47,7 @@ def run_backtest(strategy_name: str | None = None, instrument: str | None = None
         print("-" * 60)
 
         for inst in instruments_to_test:
-            df = load_historical_data(oanda, inst, count=2000)
+            df = load_historical_data(broker, inst, count=2000)
             if df.empty or len(df) < 100:
                 print(f"  {inst}: Insufficient data ({len(df)} candles)")
                 continue

@@ -1,4 +1,4 @@
-"""Capital.com REST API client — demo stopgap while awaiting OANDA approval."""
+"""Capital.com REST API client — candles, orders, and account info."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import pandas as pd
 
 logger = logging.getLogger("forex_sentinel.capitalcom")
 
-# Map OANDA instrument names → Capital.com epics
+# Map instrument symbols to Capital.com epics
 # Forex pairs: strip underscores. Commodities: use Capital.com-specific names.
 INSTRUMENT_TO_EPIC = {
     "EUR_USD": "EURUSD",
@@ -35,7 +35,7 @@ INSTRUMENT_TO_EPIC = {
 
 EPIC_TO_INSTRUMENT: dict[str, str] = {v: k for k, v in INSTRUMENT_TO_EPIC.items()}
 
-# Granularity mapping: OANDA → Capital.com resolution
+# Granularity mapping
 GRANULARITY_MAP = {
     "M1": "MINUTE",
     "M5": "MINUTE_5",
@@ -49,13 +49,13 @@ GRANULARITY_MAP = {
 
 
 class CapitalComClient:
-    """Capital.com REST API client with the same interface as OandaClient.
+    """Capital.com REST API client.
 
     Uses the demo environment by default. Falls back to offline mode
     if credentials are not configured.
     """
 
-    # Reuse the same base prices as OandaClient for offline fallback
+    # Base prices for offline simulation
     BASE_PRICES = {
         "EUR_USD": 1.0800, "GBP_USD": 1.2650, "USD_JPY": 150.50,
         "USD_CHF": 0.8800, "AUD_USD": 0.6550, "USD_CAD": 1.3600,
@@ -138,7 +138,7 @@ class CapitalComClient:
             raise
 
     def _to_epic(self, instrument: str) -> str:
-        """Convert OANDA instrument name to Capital.com epic."""
+        """Convert instrument symbol to Capital.com epic."""
         epic = INSTRUMENT_TO_EPIC.get(instrument)
         if epic:
             return epic
