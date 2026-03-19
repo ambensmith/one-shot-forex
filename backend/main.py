@@ -353,6 +353,50 @@ def run_fix_phantoms():
     logger.info(f"Fixed {count} phantom trade(s).")
 
 
+def run_reconcile_trades():
+    """One-shot reconciliation: find open trades with no matching broker position.
+
+    Connects to the broker and reconciles all open trades across all streams
+    using broker_deal_id matching. Useful for cleaning up stuck/phantom trades.
+    """
+    from backend.core.database import Database
+    from backend.core.config import load_config
+    from backend.execution.executor import Executor
+
+    db = Database("data/sentinel.db")
+    config = load_config(db=db)
+    broker = create_data_provider(config)
+    executor = Executor(config, broker, db)
+
+    if not broker.is_connected:
+        logger.error("Cannot reconcile: broker not connected. Set CAPITALCOM_* env vars.")
+        db.close()
+        return
+
+    # Show current open trades before reconciliation
+    open_trades = db.get_open_trades()
+    logger.info(f"Open trades before reconciliation: {len(open_trades)}")
+    for t in open_trades:
+        logger.info(
+            f"  Trade {t['id']}: {t['stream']} {t['instrument']} {t['direction']} "
+            f"deal_id={t.get('broker_deal_id', '')}"
+        )
+
+    # Run reconciliation across all streams (stream_id=None)
+    executor.reconcile_positions(stream_id=None)
+
+    # Show remaining open trades
+    remaining = db.get_open_trades()
+    logger.info(f"Open trades after reconciliation: {len(remaining)}")
+
+    # Re-export dashboard data
+    from backend.dashboard.json_exporter import export_all
+    export_all(db_path="data/sentinel.db")
+
+    db.close()
+    logger.info("One-shot reconciliation complete.")
+
+
 def run_backfill_pnl():
     """Backfill null P&L on closed trades using SL as conservative exit estimate.
 
@@ -397,7 +441,7 @@ def main():
     parser = argparse.ArgumentParser(description="Forex Sentinel")
     parser.add_argument(
         "--mode",
-        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "backfill-pnl"],
+        choices=["tick", "backtest", "review", "reset", "save-hybrid", "save-config", "get-config", "fix-phantoms", "reconcile-trades", "backfill-pnl"],
         default="tick",
         help="tick: run trading cycle. reset: clear all data. review: generate Cowork review. save-hybrid: save a hybrid config. save-config: save config overrides. get-config: export effective config.",
     )
@@ -438,6 +482,8 @@ def main():
         run_get_config()
     elif args.mode == "fix-phantoms":
         run_fix_phantoms()
+    elif args.mode == "reconcile-trades":
+        run_reconcile_trades()
     elif args.mode == "backfill-pnl":
         run_backfill_pnl()
     elif args.mode == "backtest":

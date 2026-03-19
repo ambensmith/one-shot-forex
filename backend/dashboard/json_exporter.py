@@ -143,10 +143,22 @@ def export_dashboard_summary(db, config):
 
 
 def export_trades(db):
-    """Export recent trades."""
-    trades = db.get_trades(limit=200)
+    """Export recent trades, ensuring all open trades are always included."""
+    # Always include ALL open trades regardless of age
+    open_trades = db.get_open_trades()
+    open_ids = {t["id"] for t in open_trades}
+
+    # Get recent trades (may overlap with open trades)
+    recent_trades = db.get_trades(limit=200)
+
+    # Merge: open trades first, then recent that aren't already included
+    all_trades = list(open_trades)
+    for t in recent_trades:
+        if t["id"] not in open_ids:
+            all_trades.append(t)
+
     trade_list = []
-    for t in trades:
+    for t in all_trades:
         trade_list.append({
             "id": t["id"],
             "stream": t["stream"],
