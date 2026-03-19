@@ -381,10 +381,9 @@ function parseLLMSignal(response) {
 }
 
 async function generateSignals(instrumentMap) {
-  const primaryModel = LLM_MODELS[0]; // Groq
   const signals = [];
 
-  // Process instruments in parallel (max ~5 at a time on the news stream instruments)
+  // Process instruments in parallel
   const entries = Object.entries(instrumentMap);
   const signalPromises = entries.map(async ([symbol, items]) => {
     const headlines = items.map((i) => {
@@ -397,41 +396,34 @@ async function generateSignals(instrumentMap) {
       .replace(/{instrument}/g, symbol)
       .replace("{news_headlines}", headlines);
 
-    // Try primary model, fall back to others
-    for (const model of LLM_MODELS) {
-      const response = await callLLM(model, prompt);
-      const parsed = parseLLMSignal(response);
-      if (parsed && parsed.direction) {
-        return {
-          instrument: symbol,
-          display_name: INSTRUMENTS[symbol]?.display_name || symbol,
-          direction: parsed.direction,
-          confidence: parseFloat(parsed.confidence) || 0,
-          reasoning: parsed.reasoning || "",
-          key_factors: parsed.key_factors || [],
-          time_horizon: parsed.time_horizon || "short",
-          model: model.key,
-          headline_count: items.length,
-          created_at: new Date().toISOString(),
-        };
-      }
-    }
-    // All models failed for this instrument
-    return {
-      instrument: symbol,
-      display_name: INSTRUMENTS[symbol]?.display_name || symbol,
-      direction: "neutral",
-      confidence: 0,
-      reasoning: "All LLM providers failed to generate a signal",
-      key_factors: [],
-      time_horizon: "short",
-      model: "none",
-      headline_count: items.length,
-      created_at: new Date().toISOString(),
-    };
+    // Run ALL available models in parallel for comparison
+    const modelResults = await Promise.all(
+      LLM_MODELS.map(async (model) => {
+        const response = await callLLM(model, prompt);
+        const parsed = parseLLMSignal(response);
+        if (parsed && parsed.direction) {
+          return {
+            instrument: symbol,
+            display_name: INSTRUMENTS[symbol]?.display_name || symbol,
+            direction: parsed.direction,
+            confidence: parseFloat(parsed.confidence) || 0,
+            reasoning: parsed.reasoning || "",
+            key_factors: parsed.key_factors || [],
+            time_horizon: parsed.time_horizon || "short",
+            model: model.key,
+            headline_count: items.length,
+            created_at: new Date().toISOString(),
+          };
+        }
+        return null;
+      })
+    );
+
+    return modelResults.filter(Boolean);
   });
 
-  return Promise.all(signalPromises);
+  const results = await Promise.all(signalPromises);
+  return results.flat();
 }
 
 // --- Handler ---
@@ -500,6 +492,45 @@ export default async function handler(req, res) {
       }))
       .sort((a, b) => b.headline_count - a.headline_count);
 
+    // Build per-model comparison summary from live signals
+    const modelComparison = LLM_MODELS.map((m) => {
+      const modelSignals = signals.filter((s) => s.model === m.key);
+      const bd = {};
+      for (const s of modelSignals) {
+        bd[s.direction] = (bd[s.direction] || 0) + 1;
+      }
+      return {
+        key: m.key,
+        provider: m.provider,
+        model: m.model,
+        signal_count: modelSignals.length,
+        direction_breakdown: bd,
+        avg_confidence: modelSignals.length > 0
+          ? +(modelSignals.reduce((sum, s) => sum + s.confidence, 0) / modelSignals.length).toFixed(2)
+          : 0,
+      };
+    });
+
+    // Primary signal per instrument = highest confidence from any model
+    const primarySignals = Object.keys(instrumentMap).map((symbol) => {
+      const instrSignals = signals.filter((s) => s.instrument === symbol);
+      if (instrSignals.length === 0) {
+        return {
+          instrument: symbol,
+          display_name: INSTRUMENTS[symbol]?.display_name || symbol,
+          direction: "neutral",
+          confidence: 0,
+          reasoning: "All LLM providers failed to generate a signal",
+          key_factors: [],
+          time_horizon: "short",
+          model: "none",
+          headline_count: instrumentMap[symbol].length,
+          created_at: new Date().toISOString(),
+        };
+      }
+      return instrSignals.reduce((best, s) => s.confidence > best.confidence ? s : best);
+    });
+
     res.status(200).json({
       fetched_at: new Date().toISOString(),
       summary: {
@@ -508,11 +539,14 @@ export default async function handler(req, res) {
         mapped_count: mappedHeadlineSet.size,
         unmapped_count: unmapped.length,
         instruments_active: Object.keys(instrumentMap).length,
-        signals_generated: signals.length,
+        signals_generated: primarySignals.length,
+        models_active: modelComparison.filter((m) => m.signal_count > 0).length,
         source_counts: sourceCounts,
       },
       instruments,
-      signals,
+      signals: primarySignals,
+      all_signals: signals,
+      model_comparison: modelComparison,
       unmapped: unmapped.map((i) => ({
         headline: i.headline,
         source: i.source,

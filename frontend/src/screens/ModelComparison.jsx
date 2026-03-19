@@ -79,7 +79,7 @@ export default function ModelComparison() {
             Signal Agreement Analysis
           </h3>
           <p className="text-xs text-gray-500 mb-4">
-            Enable comparison models in settings to see how different LLMs would trade the same news.
+            Showing how different LLMs trade the same news. Data updates when you fetch news on the News Stream page.
           </p>
           <table className="w-full text-sm">
             <thead>

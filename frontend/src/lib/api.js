@@ -30,6 +30,27 @@ export async function loadSignals() {
 }
 
 export async function loadModels() {
+  // Check for live model comparison data saved by the last news fetch
+  try {
+    const cached = localStorage.getItem('model_comparison')
+    if (cached) {
+      const live = JSON.parse(cached)
+      const staticData = await fetchJSON('models.json')
+      const staticModels = staticData?.models || []
+      return live.map(m => {
+        const meta = staticModels.find(s => s.key === m.key) || {}
+        return { ...meta, ...m }
+      })
+    }
+  } catch {
+    // Fall through to static data
+  }
   const data = await fetchJSON('models.json')
   return data?.models || []
+}
+
+export function saveModelComparison(modelComparison) {
+  if (modelComparison && modelComparison.length > 0) {
+    localStorage.setItem('model_comparison', JSON.stringify(modelComparison))
+  }
 }
