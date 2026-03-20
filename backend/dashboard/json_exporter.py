@@ -143,7 +143,7 @@ def export_dashboard_summary(db, config):
 
 
 def export_trades(db):
-    """Export recent trades, ensuring all open trades are always included."""
+    """Export recent trades with trade events timeline."""
     # Always include ALL open trades regardless of age
     open_trades = db.get_open_trades()
     open_ids = {t["id"] for t in open_trades}
@@ -159,7 +159,19 @@ def export_trades(db):
 
     trade_list = []
     for t in all_trades:
-        trade_list.append({
+        events = db.get_trade_events(t["id"])
+
+        # Extract close context from events if present
+        close_context = None
+        for e in events:
+            if e.get("event_type") == "close_context":
+                close_context = e.get("data")
+
+        # Count snapshots for summary stats
+        snapshots = [e for e in events if e.get("event_type") == "snapshot"]
+        latest_snapshot = snapshots[-1] if snapshots else None
+
+        trade_entry = {
             "id": t["id"],
             "stream": t["stream"],
             "instrument": t["instrument"],
@@ -174,7 +186,16 @@ def export_trades(db):
             "status": t["status"],
             "opened_at": t.get("opened_at"),
             "closed_at": t.get("closed_at"),
-        })
+            "events": events,
+        }
+
+        if close_context:
+            trade_entry["close_context"] = close_context
+
+        if latest_snapshot and latest_snapshot.get("data"):
+            trade_entry["latest_snapshot"] = latest_snapshot["data"]
+
+        trade_list.append(trade_entry)
 
     _write_json("trades.json", {"trades": trade_list})
 

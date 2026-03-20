@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDashboard, useTrades, useEquity, useReview, useRunReviews, useConfig } from '../hooks/useStreamData'
 import { triggerStream, pollWorkflow } from '../lib/api'
+import useLivePositions from '../hooks/useLivePositions'
 import EquityCurve from '../components/EquityCurve'
 import TradeRow from '../components/TradeRow'
 import HelpTooltip from '../components/HelpTooltip'
@@ -18,6 +19,8 @@ export default function Dashboard() {
   const { trades, refresh: refreshTrades } = useTrades()
   const { curves, refresh: refreshEquity } = useEquity()
   const { config } = useConfig()
+
+  const { positions: livePositions, account: liveAccount, timestamp: liveTimestamp, loading: liveLoading, enabled: liveEnabled, setEnabled: setLiveEnabled, refresh: refreshLive } = useLivePositions({ interval: 30000 })
 
   const [running, setRunning] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -105,6 +108,17 @@ export default function Dashboard() {
   const totalTrades = trades.length
   const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 30)
 
+  // Build live data lookup by instrument+direction for matching trades
+  const liveByKey = {}
+  for (const lp of livePositions) {
+    const key = `${lp.instrument}_${lp.direction}`
+    liveByKey[key] = lp
+  }
+  function getLiveForTrade(trade) {
+    if (trade.status !== 'open') return null
+    return liveByKey[`${trade.instrument}_${trade.direction}`] || null
+  }
+
   const pnlColor = totalPnl >= 0 ? 'text-green-400' : 'text-red-400'
   const todayColor = todayPnl >= 0 ? 'text-green-400' : todayPnl < 0 ? 'text-red-400' : 'text-gray-400'
 
@@ -120,6 +134,47 @@ export default function Dashboard() {
           {statusMsg.text}
         </div>
       )}
+
+      {/* ── Live Status Bar ── */}
+      <div className="flex items-center justify-between bg-gray-800/30 rounded-lg border border-gray-700/30 px-4 py-2 mb-4 text-xs">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setLiveEnabled(!liveEnabled)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
+              liveEnabled
+                ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                : 'bg-gray-700/50 text-gray-500 border border-gray-600/50'
+            }`}
+          >
+            {liveEnabled && (
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+              </span>
+            )}
+            {liveEnabled ? 'Live' : 'Live Off'}
+          </button>
+          {liveTimestamp && (
+            <span className="text-gray-500">
+              Updated {timeAgo(liveTimestamp)}
+            </span>
+          )}
+          {liveLoading && <span className="text-gray-500">Refreshing...</span>}
+        </div>
+        <div className="flex items-center gap-4">
+          {liveAccount && (
+            <>
+              <span className="text-gray-400">
+                Balance: <span className="font-mono text-gray-300">{liveAccount.currency === 'EUR' ? '\u20AC' : '$'}{liveAccount.balance?.toFixed(2)}</span>
+              </span>
+              <span className={liveAccount.unrealizedPL >= 0 ? 'text-green-400' : 'text-red-400'}>
+                Unrealized: <span className="font-mono">{formatPnl(liveAccount.unrealizedPL)}</span>
+              </span>
+            </>
+          )}
+          <span className="text-gray-500">{livePositions.length} live positions</span>
+        </div>
+      </div>
 
       {/* ── Section 1: The Headline ── */}
       <div className="bg-gray-800/50 rounded-lg border border-gray-700/50 p-6 mb-6">
@@ -259,14 +314,15 @@ export default function Dashboard() {
                     <th className="pb-2 px-3">Instrument</th>
                     <th className="pb-2 px-3">Dir</th>
                     <th className="pb-2 px-3">Entry</th>
-                    <th className="pb-2 px-3">Exit</th>
+                    <th className="pb-2 px-3">Current/Exit</th>
                     <th className="pb-2 px-3">P&L</th>
                     <th className="pb-2 px-3">Status</th>
-                    <th className="pb-2 px-3">When</th>
+                    <th className="pb-2 px-3">Age/When</th>
+                    <th className="pb-2 px-3">SL/TP</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {displayTrades.map(t => <TradeRow key={t.id} trade={t} onClick={() => setSelectedTrade(t)} />)}
+                  {displayTrades.map(t => <TradeRow key={t.id} trade={t} onClick={() => setSelectedTrade(t)} liveData={getLiveForTrade(t)} />)}
                 </tbody>
               </table>
             </div>

@@ -109,6 +109,18 @@ export function saveModelComparison(modelComparison) {
   }
 }
 
+// ── Live Positions ────────────────────────────────────────
+
+export async function loadLivePositions() {
+  try {
+    const resp = await fetch('/api/live-positions')
+    if (!resp.ok) return null
+    return await resp.json()
+  } catch {
+    return null
+  }
+}
+
 // ── Hybrid Management ────────────────────────────────────
 
 async function hybridManage(body) {

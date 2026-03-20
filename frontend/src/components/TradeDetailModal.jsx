@@ -120,6 +120,65 @@ export default function TradeDetailModal({ trade, onClose }) {
               <p className="text-sm text-gray-300">{trade.source}</p>
             </div>
           )}
+
+          {/* Trade Timeline */}
+          {trade.events && trade.events.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Trade Timeline</div>
+              <div className="space-y-2">
+                {trade.events.map((event, i) => (
+                  <TradeEvent key={i} event={event} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Close Context */}
+          {trade.close_context && (
+            <div>
+              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Market Context at Close</div>
+              <div className="bg-gray-800/50 rounded-lg p-3 space-y-2 text-sm">
+                {trade.close_context.trade_duration_hours != null && (
+                  <div className="text-gray-400">
+                    Duration: <span className="text-gray-200">{trade.close_context.trade_duration_hours.toFixed(1)}h</span>
+                  </div>
+                )}
+                {trade.close_context.atr_14 != null && (
+                  <div className="text-gray-400">
+                    ATR(14): <span className="font-mono text-gray-200">{trade.close_context.atr_14.toFixed(5)}</span>
+                  </div>
+                )}
+                {(trade.close_context.max_favorable_pips != null || trade.close_context.max_adverse_pips != null) && (
+                  <div className="flex gap-4">
+                    <span className="text-green-400">
+                      MFE: {trade.close_context.max_favorable_pips?.toFixed(1)} pips
+                    </span>
+                    <span className="text-red-400">
+                      MAE: {trade.close_context.max_adverse_pips?.toFixed(1)} pips
+                    </span>
+                  </div>
+                )}
+                {trade.close_context.active_signals_at_close?.length > 0 && (
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Active signals at close:</div>
+                    {trade.close_context.active_signals_at_close.map((s, i) => (
+                      <div key={i} className="text-xs text-gray-300">
+                        {s.stream} / {s.instrument}: {s.direction} ({(s.confidence * 100).toFixed(0)}%)
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {trade.close_context.recent_headlines?.length > 0 && (
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Recent headlines:</div>
+                    {trade.close_context.recent_headlines.map((h, i) => (
+                      <div key={i} className="text-xs text-gray-300">{h.headline}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -134,6 +193,50 @@ function DetailRow({ label, value, valueClass = 'text-gray-200', helpTerm }) {
         {helpTerm && <HelpTooltip term={helpTerm} />}
       </div>
       <div className={`text-sm font-mono ${valueClass}`}>{value}</div>
+    </div>
+  )
+}
+
+function TradeEvent({ event }) {
+  const labels = {
+    opened: { icon: '>', color: 'text-blue-400', label: 'Opened' },
+    snapshot: { icon: '.', color: 'text-gray-500', label: 'Snapshot' },
+    closed_sl: { icon: 'x', color: 'text-red-400', label: 'Stopped Out' },
+    closed_tp: { icon: '+', color: 'text-green-400', label: 'Target Hit' },
+    closed_reconciled: { icon: '~', color: 'text-gray-400', label: 'Reconciled' },
+    sl_updated: { icon: '!', color: 'text-yellow-400', label: 'SL Updated' },
+    tp_updated: { icon: '!', color: 'text-yellow-400', label: 'TP Updated' },
+    size_adjusted: { icon: '#', color: 'text-yellow-400', label: 'Size Adjusted' },
+    close_context: { icon: '*', color: 'text-purple-400', label: 'Context Captured' },
+  }
+  const info = labels[event.event_type] || { icon: '?', color: 'text-gray-400', label: event.event_type }
+  const data = event.data || {}
+
+  // Skip snapshot events in timeline (too many), only show them in aggregate
+  if (event.event_type === 'snapshot') return null
+
+  return (
+    <div className="flex items-start gap-2 text-xs">
+      <span className={`font-mono font-bold ${info.color}`}>{info.icon}</span>
+      <div className="flex-1">
+        <span className={info.color}>{info.label}</span>
+        <span className="text-gray-600 ml-2">
+          {event.created_at ? new Date(event.created_at).toLocaleString() : ''}
+        </span>
+        {data.exit_price != null && (
+          <span className="text-gray-400 ml-2">@ {data.exit_price.toFixed(5)}</span>
+        )}
+        {data.pnl != null && (
+          <span className={`ml-2 font-mono ${data.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+            {data.pnl >= 0 ? '+' : ''}{data.pnl.toFixed(2)}
+          </span>
+        )}
+        {data.old_value != null && data.new_value != null && (
+          <span className="text-gray-400 ml-2">
+            {data.old_value} &rarr; {data.new_value}
+          </span>
+        )}
+      </div>
     </div>
   )
 }
