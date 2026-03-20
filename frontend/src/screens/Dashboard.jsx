@@ -105,18 +105,6 @@ export default function Dashboard() {
   else if (sortBy === 'instrument') filteredTrades.sort((a, b) => (a.instrument || '').localeCompare(b.instrument || ''))
   // else date (default, already sorted latest first)
 
-  // Merge untracked broker positions into the trade list
-  const shouldShowUntracked = streamFilter === 'all' || streamFilter === 'broker'
-  const statusShowsOpen = statusFilter === 'all' || statusFilter === 'open'
-  if (shouldShowUntracked && statusShowsOpen && dirFilter === 'all') {
-    filteredTrades = [...filteredTrades, ...untrackedPositions]
-  } else if (shouldShowUntracked && statusShowsOpen) {
-    filteredTrades = [...filteredTrades, ...untrackedPositions.filter(t => t.direction === dirFilter)]
-  }
-
-  const totalTrades = trades.length
-  const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 30)
-
   // Build live data lookups — prefer dealId matching, fallback to instrument+direction
   const liveByDealId = {}
   const liveByKey = {}
@@ -158,6 +146,18 @@ export default function Dashboard() {
       _isUntracked: true,
       _liveData: lp,
     }))
+
+  // Merge untracked broker positions into the trade list
+  const shouldShowUntracked = streamFilter === 'all' || streamFilter === 'broker'
+  const statusShowsOpen = statusFilter === 'all' || statusFilter === 'open'
+  if (shouldShowUntracked && statusShowsOpen && dirFilter === 'all') {
+    filteredTrades = [...filteredTrades, ...untrackedPositions]
+  } else if (shouldShowUntracked && statusShowsOpen) {
+    filteredTrades = [...filteredTrades, ...untrackedPositions.filter(t => t.direction === dirFilter)]
+  }
+
+  const totalTrades = trades.length
+  const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 30)
 
   const pnlColor = totalPnl >= 0 ? 'text-green-400' : 'text-red-400'
   const todayColor = todayPnl >= 0 ? 'text-green-400' : todayPnl < 0 ? 'text-red-400' : 'text-gray-400'
