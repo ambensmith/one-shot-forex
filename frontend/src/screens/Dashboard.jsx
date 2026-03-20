@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDashboard, useTrades, useEquity, useReview, useRunReviews, useConfig } from '../hooks/useStreamData'
 import { triggerStream, pollWorkflow } from '../lib/api'
 import useLivePositions from '../hooks/useLivePositions'
@@ -200,6 +200,10 @@ export default function Dashboard() {
             </span>
           )}
           {liveLoading && <span className="text-gray-500">Refreshing...</span>}
+          {/* Sync status */}
+          {dashboard?.generated_at && (
+            <SyncStatus generatedAt={dashboard.generated_at} />
+          )}
         </div>
         <div className="flex items-center gap-4">
           {liveAccount && (
@@ -387,6 +391,43 @@ export default function Dashboard() {
         <TradeDetailModal trade={selectedTrade} liveData={getLiveForTrade(selectedTrade) || selectedTrade._liveData} onClose={() => setSelectedTrade(null)} />
       )}
     </div>
+  )
+}
+
+function SyncStatus({ generatedAt }) {
+  const [, setTick] = useState(0)
+
+  // Re-render every 30s to keep countdown fresh
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 30000)
+    return () => clearInterval(id)
+  }, [])
+
+  const syncTime = new Date(generatedAt).getTime()
+  const now = Date.now()
+  const agoMs = now - syncTime
+  const agoMins = Math.floor(agoMs / 60000)
+
+  const SYNC_INTERVAL = 5 * 60000 // 5 minutes
+  const nextSyncMs = syncTime + SYNC_INTERVAL - now
+  const nextMins = Math.max(0, Math.ceil(nextSyncMs / 60000))
+
+  const agoLabel = agoMins < 1 ? 'just now' : agoMins < 60 ? `${agoMins}m ago` : `${Math.floor(agoMins / 60)}h ${agoMins % 60}m ago`
+  const nextLabel = nextMins <= 0 ? 'due' : `in ${nextMins}m`
+  const isOverdue = nextMins <= 0
+  const isFresh = agoMins < 6
+
+  return (
+    <span className="flex items-center gap-1.5 text-gray-500 border-l border-gray-700 pl-3 ml-1">
+      <span className={`inline-flex h-1.5 w-1.5 rounded-full ${isFresh ? 'bg-violet-500' : 'bg-gray-600'}`} />
+      <span>
+        Synced <span className={isFresh ? 'text-violet-400' : 'text-gray-400'}>{agoLabel}</span>
+      </span>
+      <span className="text-gray-600">·</span>
+      <span>
+        Next <span className={isOverdue ? 'text-amber-400' : 'text-gray-400'}>{nextLabel}</span>
+      </span>
+    </span>
   )
 }
 
