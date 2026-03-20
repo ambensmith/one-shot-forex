@@ -129,14 +129,15 @@ class Executor:
             elif broker_deal_id not in broker_deal_ids:
                 # Real trade closed by broker (SL/TP hit between runs)
                 exit_info = self._fetch_exit_details(trade)
+                status = self._infer_exit_status(trade, exit_info["exit_price"])
                 logger.info(
                     f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
                     f"{trade['direction']}) deal_id={broker_deal_id} closed by broker — "
-                    f"exit={exit_info['exit_price']}, pnl={exit_info['pnl']}"
+                    f"exit={exit_info['exit_price']}, pnl={exit_info['pnl']}, status={status}"
                 )
                 self.db.update_trade(
                     trade["id"],
-                    status="closed_reconciled",
+                    status=status,
                     exit_price=exit_info["exit_price"],
                     pnl=exit_info["pnl"],
                     pnl_pips=exit_info["pnl_pips"],
@@ -184,6 +185,34 @@ class Executor:
         # Fallback 3: use entry price (P&L = 0, better than null)
         logger.error(f"No exit price available for trade {trade['id']} — using entry price")
         return self._calc_pnl(trade, trade["entry_price"])
+
+    @staticmethod
+    def _infer_exit_status(trade: dict, exit_price: float) -> str:
+        """Determine whether a broker-closed trade hit TP, SL, or is ambiguous.
+
+        Compares exit_price to the trade's take_profit and stop_loss levels,
+        accounting for direction. Falls back to 'closed_reconciled' when the
+        exit price doesn't clearly match either level.
+        """
+        tp = trade.get("take_profit")
+        sl = trade.get("stop_loss")
+        direction = trade.get("direction", "long")
+
+        if not tp or not sl:
+            return "closed_reconciled"
+
+        if direction == "long":
+            if exit_price >= tp:
+                return "closed_tp"
+            if exit_price <= sl:
+                return "closed_sl"
+        else:  # short
+            if exit_price <= tp:
+                return "closed_tp"
+            if exit_price >= sl:
+                return "closed_sl"
+
+        return "closed_reconciled"
 
     def _calc_pnl(self, trade: dict, exit_price: float) -> dict:
         """Calculate P&L from entry and exit price."""
