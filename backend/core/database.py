@@ -100,12 +100,22 @@ CREATE TABLE IF NOT EXISTS run_logs (
     status TEXT DEFAULT 'running'
 );
 
+CREATE TABLE IF NOT EXISTS trade_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    trade_id INTEGER NOT NULL,
+    event_type TEXT NOT NULL,
+    data JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_run_logs_started ON run_logs(started_at);
 CREATE INDEX IF NOT EXISTS idx_signals_stream ON signals(stream, created_at);
 CREATE INDEX IF NOT EXISTS idx_signals_instrument ON signals(instrument, created_at);
 CREATE INDEX IF NOT EXISTS idx_trades_stream ON trades(stream, opened_at);
 CREATE INDEX IF NOT EXISTS idx_trades_status ON trades(status);
+CREATE INDEX IF NOT EXISTS idx_trades_deal ON trades(broker_deal_id);
 CREATE INDEX IF NOT EXISTS idx_equity_stream ON equity_snapshots(stream, recorded_at);
+CREATE INDEX IF NOT EXISTS idx_trade_events_trade ON trade_events(trade_id, created_at);
 """
 
 
@@ -417,6 +427,58 @@ class Database:
                         pass
             result.append(d)
         return result
+
+    # ── Trade Events ─────────────────────────────────────
+
+    def insert_trade_event(self, trade_id: int, event_type: str, data: dict | None = None) -> int:
+        data_json = json.dumps(data) if data else None
+        cur = self.execute(
+            "INSERT INTO trade_events (trade_id, event_type, data) VALUES (?, ?, ?)",
+            (trade_id, event_type, data_json),
+        )
+        self.commit()
+        return cur.lastrowid
+
+    def get_trade_events(self, trade_id: int) -> list[dict]:
+        rows = self.execute(
+            "SELECT * FROM trade_events WHERE trade_id = ? ORDER BY created_at ASC",
+            (trade_id,),
+        ).fetchall()
+        result = []
+        for r in rows:
+            d = self._row_to_dict(r)
+            if isinstance(d.get("data"), str):
+                try:
+                    d["data"] = json.loads(d["data"])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            result.append(d)
+        return result
+
+    def get_latest_snapshot(self, trade_id: int) -> dict | None:
+        """Get the most recent snapshot event for a trade."""
+        row = self.execute(
+            "SELECT * FROM trade_events WHERE trade_id = ? AND event_type = 'snapshot' "
+            "ORDER BY created_at DESC LIMIT 1",
+            (trade_id,),
+        ).fetchone()
+        if not row:
+            return None
+        d = self._row_to_dict(row)
+        if isinstance(d.get("data"), str):
+            try:
+                d["data"] = json.loads(d["data"])
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return d
+
+    def get_trade_by_deal_id(self, broker_deal_id: str) -> dict | None:
+        """Find a trade by its broker deal ID."""
+        row = self.execute(
+            "SELECT * FROM trades WHERE broker_deal_id = ? LIMIT 1",
+            (broker_deal_id,),
+        ).fetchone()
+        return self._row_to_dict(row) if row else None
 
     # ── Helpers ──────────────────────────────────────────
 

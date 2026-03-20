@@ -1,0 +1,119 @@
+"""Position sync — lightweight 5-minute reconciliation with Capital.com.
+
+Does NOT generate signals or place trades. Only:
+1. Reconciles positions (detects broker-closed trades)
+2. Records position snapshots (unrealized P&L)
+3. Captures rich context for newly closed trades
+4. Re-exports dashboard JSON
+"""
+
+import logging
+from datetime import datetime, timezone
+from pathlib import Path
+
+Path("data").mkdir(exist_ok=True)
+Path("logs").mkdir(exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(Path("logs/sync.log"), mode="a"),
+    ],
+)
+logger = logging.getLogger("forex_sentinel.sync")
+
+
+def run_sync():
+    """Execute one position sync cycle."""
+    from backend.core.config import load_config
+    from backend.core.database import Database
+    from backend.data.capitalcom_client import CapitalComClient
+    from backend.execution.executor import Executor
+    from backend.sync.context_capture import capture_position_snapshot, capture_close_context
+
+    db = Database("data/sentinel.db")
+    config = load_config(db=db)
+    broker = CapitalComClient(config)
+
+    if not broker.is_connected:
+        logger.warning("Sync skipped — broker not connected")
+        db.close()
+        return
+
+    executor = Executor(config, broker, db)
+
+    logger.info("Position sync starting")
+
+    # Reconcile all streams (no stream filter = check everything)
+    newly_closed = executor.reconcile_positions(stream_id=None)
+
+    # Capture rich context for newly closed trades
+    for trade_id in newly_closed:
+        try:
+            trade = db.execute("SELECT * FROM trades WHERE id = ?", (trade_id,)).fetchone()
+            if trade:
+                trade_dict = dict(trade)
+                context = capture_close_context(trade_dict, broker, db)
+                if context:
+                    db.insert_trade_event(trade_id, "close_context", context)
+                    logger.info(f"Captured close context for trade {trade_id}")
+        except Exception as e:
+            logger.warning(f"Failed to capture close context for trade {trade_id}: {e}")
+
+    # Record position snapshots for all open trades
+    open_trades = db.get_open_trades()
+    snapshot_count = 0
+    for trade in open_trades:
+        try:
+            snapshot = capture_position_snapshot(trade, broker)
+            if snapshot:
+                db.insert_trade_event(trade["id"], "snapshot", snapshot)
+                snapshot_count += 1
+        except Exception as e:
+            logger.warning(f"Failed to snapshot trade {trade['id']}: {e}")
+
+    # Log untracked positions (broker positions not in our DB)
+    untracked = executor.get_untracked_positions()
+    if untracked:
+        logger.warning(f"Found {len(untracked)} untracked broker positions")
+
+    logger.info(
+        f"Sync complete: {len(newly_closed)} closed, "
+        f"{snapshot_count} snapshots, {len(untracked)} untracked"
+    )
+
+    # Re-export dashboard JSON
+    try:
+        from backend.dashboard.json_exporter import (
+            export_dashboard_summary,
+            export_trades,
+            export_equity,
+            export_signals,
+            export_config,
+            export_review,
+            export_hybrids,
+            export_run_reviews,
+            export_models,
+            OUTPUT_DIR,
+        )
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        export_dashboard_summary(db, config)
+        export_trades(db)
+        export_equity(db)
+        export_signals(db)
+        export_models(db, config)
+        export_config(config)
+        export_review(db, config)
+        export_hybrids(db)
+        export_run_reviews(db)
+        logger.info("Dashboard JSON re-exported")
+    except Exception as e:
+        logger.warning(f"JSON export failed: {e}")
+
+    db.close()
+
+
+if __name__ == "__main__":
+    run_sync()

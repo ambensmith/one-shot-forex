@@ -81,34 +81,43 @@ class Executor:
                 )
             self.db.commit()
 
+        # Record trade open event
+        self.db.insert_trade_event(trade_id, "opened", {
+            "entry_price": entry_price,
+            "stop_loss": stop_loss,
+            "take_profit": take_profit,
+            "position_size": position_size,
+            "broker_deal_id": broker_deal_id,
+        })
+
         logger.info(f"Trade {trade_id} recorded: {direction} {instrument} deal_id={broker_deal_id}")
         return trade_id
 
-    def reconcile_positions(self, stream_id: str = None):
-        """Close local DB trades that no longer exist as positions on the broker.
+    def reconcile_positions(self, stream_id: str = None) -> list[int]:
+        """Full bidirectional reconciliation between local DB and broker.
 
-        Matches by broker_deal_id (Capital.com dealId) for accurate per-trade
-        reconciliation. This correctly handles multiple trades for the same
-        instrument+direction across different streams.
+        DB→Broker: Close local trades that no longer exist on the broker.
+        Broker→DB: Detect unknown broker positions, verify SL/TP and sizes.
 
-        Distinguishes between:
-        - Phantom trades (no broker_deal_id): marked as 'failed' with pnl=0
-        - Real closures (has broker_deal_id): marked as 'closed_reconciled' with exit price
+        Returns list of trade IDs that were just closed by reconciliation.
         """
         if not self.broker.is_connected:
             logger.warning("Reconciliation skipped — broker not connected")
-            return
+            return []
 
         try:
             broker_positions = self.broker.get_open_trades()
         except Exception as e:
             logger.warning(f"Reconciliation skipped — failed to fetch broker positions: {e}")
-            return
+            return []
 
-        # Build set of deal IDs from live broker positions
-        broker_deal_ids = {p["id"] for p in broker_positions if p.get("id")}
+        # Build maps for bidirectional matching
+        broker_by_deal_id = {p["id"]: p for p in broker_positions if p.get("id")}
+        broker_deal_ids = set(broker_by_deal_id.keys())
 
-        # Find local open trades with no matching broker position (stream-scoped)
+        newly_closed = []
+
+        # ── DB→Broker: find local trades missing from broker ──
         local_open = self.db.get_open_trades(stream_id)
         for trade in local_open:
             broker_deal_id = trade.get("broker_deal_id") or ""
@@ -129,6 +138,8 @@ class Executor:
             elif broker_deal_id not in broker_deal_ids:
                 # Real trade closed by broker (SL/TP hit between runs)
                 exit_info = self._fetch_exit_details(trade)
+                actual_close_time = exit_info.get("actual_close_time")
+                close_time = actual_close_time or datetime.now(timezone.utc).isoformat()
                 status = self._infer_exit_status(trade, exit_info["exit_price"])
                 logger.info(
                     f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
@@ -141,13 +152,104 @@ class Executor:
                     exit_price=exit_info["exit_price"],
                     pnl=exit_info["pnl"],
                     pnl_pips=exit_info["pnl_pips"],
-                    closed_at=datetime.now(timezone.utc).isoformat(),
+                    closed_at=close_time,
+                )
+                self.db.insert_trade_event(trade["id"], status, {
+                    "exit_price": exit_info["exit_price"],
+                    "pnl": exit_info["pnl"],
+                    "pnl_pips": exit_info["pnl_pips"],
+                    "actual_close_time": actual_close_time,
+                    "detection_time": datetime.now(timezone.utc).isoformat(),
+                })
+                newly_closed.append(trade["id"])
+            else:
+                # Trade still open on broker — verify SL/TP and size match
+                self._verify_position(trade, broker_by_deal_id[broker_deal_id])
+
+        # ── Broker→DB: detect unknown broker positions ──
+        all_local_deal_ids = set()
+        all_open = self.db.get_open_trades()
+        for t in all_open:
+            did = t.get("broker_deal_id") or ""
+            if did:
+                all_local_deal_ids.add(did)
+
+        self._untracked_positions = []
+        for deal_id, pos in broker_by_deal_id.items():
+            if deal_id not in all_local_deal_ids:
+                # Also check if it exists as a closed trade (recently reconciled)
+                existing = self.db.get_trade_by_deal_id(deal_id)
+                if not existing:
+                    logger.warning(
+                        f"Reconciliation: UNTRACKED broker position deal_id={deal_id} "
+                        f"{pos.get('instrument')} {pos.get('direction')} — not in local DB"
+                    )
+                    self._untracked_positions.append(pos)
+
+        return newly_closed
+
+    def _verify_position(self, trade: dict, broker_pos: dict):
+        """Verify local trade matches broker position (SL/TP/size)."""
+        changes = {}
+
+        # Check stop loss
+        broker_sl = broker_pos.get("stop_loss")
+        if broker_sl is not None and trade.get("stop_loss"):
+            if abs(float(broker_sl) - trade["stop_loss"]) > 1e-6:
+                old_sl = trade["stop_loss"]
+                changes["stop_loss"] = float(broker_sl)
+                self.db.insert_trade_event(trade["id"], "sl_updated", {
+                    "old_value": old_sl,
+                    "new_value": float(broker_sl),
+                    "source": "broker_sync",
+                })
+                logger.info(
+                    f"Trade {trade['id']}: SL updated {old_sl} → {broker_sl} (broker)"
                 )
 
+        # Check take profit
+        broker_tp = broker_pos.get("take_profit")
+        if broker_tp is not None and trade.get("take_profit"):
+            if abs(float(broker_tp) - trade["take_profit"]) > 1e-6:
+                old_tp = trade["take_profit"]
+                changes["take_profit"] = float(broker_tp)
+                self.db.insert_trade_event(trade["id"], "tp_updated", {
+                    "old_value": old_tp,
+                    "new_value": float(broker_tp),
+                    "source": "broker_sync",
+                })
+                logger.info(
+                    f"Trade {trade['id']}: TP updated {old_tp} → {broker_tp} (broker)"
+                )
+
+        # Check position size
+        broker_size = broker_pos.get("currentUnits")
+        if broker_size is not None:
+            broker_size_f = abs(float(broker_size))
+            if broker_size_f > 0 and abs(broker_size_f - trade["position_size"]) > 0.01:
+                old_size = trade["position_size"]
+                changes["position_size"] = broker_size_f
+                self.db.insert_trade_event(trade["id"], "size_adjusted", {
+                    "old_value": old_size,
+                    "new_value": broker_size_f,
+                    "source": "broker_sync",
+                })
+                logger.info(
+                    f"Trade {trade['id']}: size adjusted {old_size} → {broker_size_f} (broker)"
+                )
+
+        if changes:
+            self.db.update_trade(trade["id"], **changes)
+
+    def get_untracked_positions(self) -> list[dict]:
+        """Return broker positions not found in local DB (populated after reconcile)."""
+        return getattr(self, "_untracked_positions", [])
+
     def _fetch_exit_details(self, trade: dict) -> dict:
-        """Get exit price/pnl for a reconciled trade. Always returns real numbers.
+        """Get exit price/pnl/close time for a reconciled trade.
 
         Priority: broker deal activity → current market price → SL price → entry price.
+        Returns dict with exit_price, pnl, pnl_pips, and optionally actual_close_time.
         """
         # Try broker deal activity
         deal_id = trade.get("broker_deal_id", "")
@@ -155,7 +257,6 @@ class Executor:
             try:
                 activity = self.broker.get_deal_activity(deal_id)
                 if activity:
-                    # Capital.com activity has 'details' with 'level' (exit price)
                     actions = activity.get("actions", [])
                     close_action = next(
                         (a for a in actions if a.get("actionType") in
@@ -165,7 +266,12 @@ class Executor:
                     if close_action:
                         exit_price = float(close_action.get("level", 0))
                         if exit_price > 0:
-                            return self._calc_pnl(trade, exit_price)
+                            result = self._calc_pnl(trade, exit_price)
+                            # Extract actual close timestamp from activity
+                            close_time = activity.get("date") or activity.get("timestamp")
+                            if close_time:
+                                result["actual_close_time"] = close_time
+                            return result
             except Exception as e:
                 logger.warning(f"Deal activity lookup failed for {deal_id}: {e}")
 
