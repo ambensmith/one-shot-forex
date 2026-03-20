@@ -7,10 +7,12 @@ import HelpTooltip from './HelpTooltip'
  * TradeDetailModal — full detail view for a single trade.
  * Shown when a user clicks a trade row.
  */
-export default function TradeDetailModal({ trade, onClose }) {
+export default function TradeDetailModal({ trade, liveData, onClose }) {
   if (!trade) return null
 
   const statusInfo = TRADE_STATUS_LABELS[trade.status] || { label: trade.status, desc: '', color: 'text-gray-400' }
+  const isOpen = trade.status === 'open'
+  const live = isOpen && liveData ? liveData : null
   const duration = trade.opened_at && trade.closed_at
     ? formatDuration(new Date(trade.opened_at), new Date(trade.closed_at))
     : trade.opened_at ? 'Still open' : '—'
@@ -68,6 +70,13 @@ export default function TradeDetailModal({ trade, onClose }) {
                   className="absolute top-0 bottom-0 w-0.5 bg-green-500"
                   style={{ left: `${((trade.take_profit - minPrice) / range) * 100}%` }}
                 />
+                {/* Current price marker (live) */}
+                {live?.currentPrice && (
+                  <div
+                    className="absolute top-0 bottom-0 w-1 bg-cyan-400/80"
+                    style={{ left: `${Math.max(0, Math.min(100, ((live.currentPrice - minPrice) / range) * 100))}%` }}
+                  />
+                )}
                 {/* Exit marker */}
                 {trade.exit_price && (
                   <div
@@ -79,6 +88,9 @@ export default function TradeDetailModal({ trade, onClose }) {
               <div className="flex justify-between text-[10px] text-gray-500 mt-1">
                 <span className="text-red-400">SL: {trade.stop_loss?.toFixed(5)}</span>
                 <span className="text-blue-400">Entry: {trade.entry_price?.toFixed(5)}</span>
+                {live?.currentPrice && (
+                  <span className="text-cyan-400">Now: {live.currentPrice.toFixed(5)}</span>
+                )}
                 <span className="text-green-500">TP: {trade.take_profit?.toFixed(5)}</span>
               </div>
             </div>
@@ -87,22 +99,38 @@ export default function TradeDetailModal({ trade, onClose }) {
           {/* Key metrics grid */}
           <div className="grid grid-cols-2 gap-3">
             <DetailRow label="Entry Price" value={trade.entry_price?.toFixed(5)} />
-            <DetailRow label="Exit Price" value={trade.exit_price?.toFixed(5) || '—'} />
+            {live ? (
+              <DetailRow label="Current Price" value={live.currentPrice?.toFixed(5)} valueClass="text-cyan-400" />
+            ) : (
+              <DetailRow label="Exit Price" value={trade.exit_price?.toFixed(5) || '—'} />
+            )}
             <DetailRow label="Stop Loss" value={trade.stop_loss?.toFixed(5)} />
             <DetailRow label="Take Profit" value={trade.take_profit?.toFixed(5)} />
-            <DetailRow
-              label="P&L"
-              value={formatPnlCurrency(trade.pnl)}
-              valueClass={trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}
-            />
-            <DetailRow
-              label="P&L (pips)"
-              value={trade.pnl_pips != null ? `${trade.pnl_pips.toFixed(1)} pips` : '—'}
-              helpTerm="pips"
-            />
+            {live ? (
+              <DetailRow
+                label="Unrealized P&L"
+                value={formatPnlCurrency(live.unrealizedPL)}
+                valueClass={live.unrealizedPL >= 0 ? 'text-green-400' : 'text-red-400'}
+              />
+            ) : (
+              <DetailRow
+                label="P&L"
+                value={formatPnlCurrency(trade.pnl)}
+                valueClass={trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}
+              />
+            )}
+            {live ? (
+              <DetailRow label="SL/TP Distance" value={`SL: ${live.distanceToSL_pips?.toFixed(1)}p / TP: ${live.distanceToTP_pips?.toFixed(1)}p`} />
+            ) : (
+              <DetailRow
+                label="P&L (pips)"
+                value={trade.pnl_pips != null ? `${trade.pnl_pips.toFixed(1)} pips` : '—'}
+                helpTerm="pips"
+              />
+            )}
             <DetailRow label="Position Size" value={trade.position_size?.toFixed(0) || '—'} helpTerm="position_size" />
             <DetailRow label="Duration" value={duration} />
-            <DetailRow label="Stream" value={trade.stream} />
+            <DetailRow label="Stream" value={trade._isUntracked ? 'broker (untracked)' : trade.stream} />
             <DetailRow label="Opened" value={trade.opened_at ? new Date(trade.opened_at).toLocaleString() : '—'} />
           </div>
 
@@ -208,6 +236,7 @@ function TradeEvent({ event }) {
     tp_updated: { icon: '!', color: 'text-yellow-400', label: 'TP Updated' },
     size_adjusted: { icon: '#', color: 'text-yellow-400', label: 'Size Adjusted' },
     close_context: { icon: '*', color: 'text-purple-400', label: 'Context Captured' },
+    imported: { icon: '+', color: 'text-amber-400', label: 'Imported from Broker' },
   }
   const info = labels[event.event_type] || { icon: '?', color: 'text-gray-400', label: event.event_type }
   const data = event.data || {}

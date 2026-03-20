@@ -105,19 +105,59 @@ export default function Dashboard() {
   else if (sortBy === 'instrument') filteredTrades.sort((a, b) => (a.instrument || '').localeCompare(b.instrument || ''))
   // else date (default, already sorted latest first)
 
+  // Merge untracked broker positions into the trade list
+  const shouldShowUntracked = streamFilter === 'all' || streamFilter === 'broker'
+  const statusShowsOpen = statusFilter === 'all' || statusFilter === 'open'
+  if (shouldShowUntracked && statusShowsOpen && dirFilter === 'all') {
+    filteredTrades = [...filteredTrades, ...untrackedPositions]
+  } else if (shouldShowUntracked && statusShowsOpen) {
+    filteredTrades = [...filteredTrades, ...untrackedPositions.filter(t => t.direction === dirFilter)]
+  }
+
   const totalTrades = trades.length
   const displayTrades = showAllTrades ? filteredTrades : filteredTrades.slice(0, 30)
 
-  // Build live data lookup by instrument+direction for matching trades
+  // Build live data lookups — prefer dealId matching, fallback to instrument+direction
+  const liveByDealId = {}
   const liveByKey = {}
   for (const lp of livePositions) {
+    if (lp.dealId) liveByDealId[lp.dealId] = lp
     const key = `${lp.instrument}_${lp.direction}`
     liveByKey[key] = lp
   }
   function getLiveForTrade(trade) {
     if (trade.status !== 'open') return null
+    if (trade.broker_deal_id && liveByDealId[trade.broker_deal_id]) {
+      return liveByDealId[trade.broker_deal_id]
+    }
     return liveByKey[`${trade.instrument}_${trade.direction}`] || null
   }
+
+  // Find live positions not matched to any DB trade (truly untracked)
+  const matchedDealIds = new Set()
+  for (const t of trades) {
+    if (t.status === 'open' && t.broker_deal_id) matchedDealIds.add(t.broker_deal_id)
+  }
+  const untrackedPositions = livePositions
+    .filter(lp => lp.dealId && !matchedDealIds.has(lp.dealId))
+    .map(lp => ({
+      id: `live-${lp.dealId}`,
+      stream: 'broker',
+      instrument: lp.instrument,
+      direction: lp.direction,
+      entry_price: lp.entryPrice,
+      exit_price: null,
+      stop_loss: lp.stopLevel,
+      take_profit: lp.profitLevel,
+      position_size: lp.size,
+      pnl: lp.unrealizedPL,
+      pnl_pips: null,
+      status: 'open',
+      opened_at: null,
+      closed_at: null,
+      _isUntracked: true,
+      _liveData: lp,
+    }))
 
   const pnlColor = totalPnl >= 0 ? 'text-green-400' : 'text-red-400'
   const todayColor = todayPnl >= 0 ? 'text-green-400' : todayPnl < 0 ? 'text-red-400' : 'text-gray-400'
@@ -326,7 +366,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayTrades.map(t => <TradeRow key={t.id} trade={t} onClick={() => setSelectedTrade(t)} liveData={getLiveForTrade(t)} />)}
+                  {displayTrades.map(t => <TradeRow key={t.id} trade={t} onClick={() => setSelectedTrade(t)} liveData={getLiveForTrade(t) || t._liveData} />)}
                 </tbody>
               </table>
             </div>
@@ -344,7 +384,7 @@ export default function Dashboard() {
 
       {/* Trade Detail Modal */}
       {selectedTrade && (
-        <TradeDetailModal trade={selectedTrade} onClose={() => setSelectedTrade(null)} />
+        <TradeDetailModal trade={selectedTrade} liveData={getLiveForTrade(selectedTrade) || selectedTrade._liveData} onClose={() => setSelectedTrade(null)} />
       )}
     </div>
   )

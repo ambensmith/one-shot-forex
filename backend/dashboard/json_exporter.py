@@ -186,8 +186,26 @@ def export_trades(db):
             "status": t["status"],
             "opened_at": t.get("opened_at"),
             "closed_at": t.get("closed_at"),
+            "broker_deal_id": t.get("broker_deal_id"),
             "events": events,
         }
+
+        # Attach signal reasoning and source
+        raw_signal_ids = t.get("signal_ids")
+        if isinstance(raw_signal_ids, str):
+            try:
+                raw_signal_ids = json.loads(raw_signal_ids)
+            except (json.JSONDecodeError, TypeError):
+                raw_signal_ids = None
+        if raw_signal_ids:
+            sig = db.execute(
+                "SELECT reasoning, source FROM signals WHERE id = ?",
+                (raw_signal_ids[0],),
+            ).fetchone()
+            if sig:
+                sig_dict = dict(sig)
+                trade_entry["reasoning"] = sig_dict.get("reasoning")
+                trade_entry["source"] = sig_dict.get("source")
 
         if close_context:
             trade_entry["close_context"] = close_context

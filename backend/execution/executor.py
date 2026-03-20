@@ -180,10 +180,31 @@ class Executor:
                 # Also check if it exists as a closed trade (recently reconciled)
                 existing = self.db.get_trade_by_deal_id(deal_id)
                 if not existing:
-                    logger.warning(
-                        f"Reconciliation: UNTRACKED broker position deal_id={deal_id} "
-                        f"{pos.get('instrument')} {pos.get('direction')} — not in local DB"
+                    logger.info(
+                        f"Reconciliation: importing untracked broker position deal_id={deal_id} "
+                        f"{pos.get('instrument')} {pos.get('direction')}"
                     )
+                    trade_id = self.db.insert_trade(
+                        stream="broker",
+                        instrument=pos.get("instrument", ""),
+                        direction=pos.get("direction", ""),
+                        entry_price=pos.get("entry_price"),
+                        stop_loss=pos.get("stop_loss"),
+                        take_profit=pos.get("take_profit"),
+                        position_size=float(pos.get("currentUnits", 0)),
+                        status="open",
+                        opened_at=datetime.now(timezone.utc).isoformat(),
+                        broker_deal_id=deal_id,
+                    )
+                    self.db.insert_trade_event(trade_id, "imported", {
+                        "source": "broker_reconciliation",
+                        "broker_data": {
+                            "dealId": deal_id,
+                            "instrument": pos.get("instrument"),
+                            "direction": pos.get("direction"),
+                            "unrealizedPL": pos.get("unrealizedPL"),
+                        },
+                    })
                     self._untracked_positions.append(pos)
 
         return newly_closed

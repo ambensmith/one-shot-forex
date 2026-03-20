@@ -30,7 +30,13 @@ export default function TradeRow({ trade, onClick, liveData }) {
       onClick={onClick}
       title={onClick ? 'Click to view trade details' : undefined}
     >
-      <td className="py-2 px-3 text-xs text-gray-400">{trade.stream}</td>
+      <td className="py-2 px-3 text-xs">
+        {trade._isUntracked ? (
+          <span className="text-amber-400">broker</span>
+        ) : (
+          <span className="text-gray-400">{trade.stream}</span>
+        )}
+      </td>
       <td className="py-2 px-3 font-mono text-sm">{meta.name}</td>
       <td className="py-2 px-3"><SignalBadge direction={trade.direction} size="sm" /></td>
       <td className="py-2 px-3 font-mono text-xs">{trade.entry_price?.toFixed(5)}</td>
@@ -47,7 +53,17 @@ export default function TradeRow({ trade, onClick, liveData }) {
         {displayPnl != null ? formatPnl(displayPnl) : '—'}
       </td>
       <td className="py-2 px-3">
-        {isOpen && live ? (
+        {trade._isUntracked ? (
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+              Untracked
+            </span>
+          </div>
+        ) : isOpen && live ? (
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
