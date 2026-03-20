@@ -20,7 +20,7 @@ export default function Dashboard() {
   const { curves, refresh: refreshEquity } = useEquity()
   const { config } = useConfig()
 
-  const { positions: livePositions, account: liveAccount, timestamp: liveTimestamp, loading: liveLoading, enabled: liveEnabled, setEnabled: setLiveEnabled, refresh: refreshLive } = useLivePositions({ interval: 30000 })
+  const { positions: livePositions, account: liveAccount, timestamp: liveTimestamp, loading: liveLoading, error: liveError, enabled: liveEnabled, setEnabled: setLiveEnabled, refresh: refreshLive } = useLivePositions({ interval: 30000 })
 
   const [running, setRunning] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -172,7 +172,11 @@ export default function Dashboard() {
               </span>
             </>
           )}
-          <span className="text-gray-500">{livePositions.length} live positions</span>
+          {liveError && livePositions.length === 0 ? (
+            <span className="text-amber-400" title={liveError}>Live: connection error</span>
+          ) : (
+            <span className="text-gray-500">{livePositions.length} live positions</span>
+          )}
         </div>
       </div>
 
