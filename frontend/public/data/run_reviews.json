@@ -1,6 +1,381 @@
 {
   "runs": [
     {
+      "id": 69,
+      "run_id": "2026-03-25T12:56:29Z",
+      "started_at": "2026-03-25T12:56:29.871716+00:00",
+      "completed_at": "2026-03-25T12:58:35.005504+00:00",
+      "market_open": 1,
+      "config_snapshot": {
+        "scheduler": {
+          "interval": "1h",
+          "timezone": "UTC"
+        },
+        "risk": {
+          "max_risk_per_trade": 0.01,
+          "max_open_positions_per_stream": 3,
+          "max_daily_loss_per_stream": 0.03,
+          "max_correlated_positions": 1,
+          "default_rr_ratio": 1.5,
+          "stop_loss_method": "atr",
+          "atr_multiplier": 1.5,
+          "atr_period": 14,
+          "leverage": 1
+        },
+        "execution": {
+          "mode": "practice",
+          "data_provider": "capitalcom"
+        },
+        "data": {
+          "candle_granularity": "H1",
+          "lookback_periods": 200,
+          "secondary_granularity": "D"
+        },
+        "reviews": {
+          "auto_generate": true,
+          "schedule": "daily",
+          "time": "22:00",
+          "review_period_days": 7,
+          "max_archive_count": 30,
+          "output_dir": "reviews"
+        },
+        "streams": {
+          "news_stream": {
+            "id": "news",
+            "name": "News Stream",
+            "enabled": true,
+            "capital_allocation": 100,
+            "instruments": [
+              "EUR_USD",
+              "GBP_USD",
+              "USD_JPY",
+              "XAU_USD",
+              "BCO_USD",
+              "USD_CHF",
+              "AUD_USD",
+              "USD_CAD",
+              "NZD_USD",
+              "XAG_USD",
+              "WTICO_USD",
+              "EUR_GBP",
+              "NATGAS_USD",
+              "EUR_JPY",
+              "GBP_JPY"
+            ],
+            "news_sources": [
+              {
+                "type": "rss",
+                "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+                "name": "BBC Business"
+              },
+              {
+                "type": "rss",
+                "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664",
+                "name": "CNBC Business"
+              },
+              {
+                "type": "gdelt",
+                "enabled": true
+              },
+              {
+                "type": "economic_calendar",
+                "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+              }
+            ],
+            "news_lookback_hours": 12,
+            "min_confidence": 0.6,
+            "llm": {
+              "primary_model": "groq/llama-3.3-70b",
+              "comparison_models": [
+                "mistral/mistral-small",
+                "google/gemini-2.5-flash",
+                "groq/llama-3.1-8b"
+              ],
+              "comparison_enabled": true
+            }
+          },
+          "strategy_stream": {
+            "id": "strategy",
+            "name": "Strategy Stream",
+            "enabled": true,
+            "capital_allocation": 100,
+            "instruments": [
+              "EUR_USD",
+              "GBP_USD",
+              "USD_JPY",
+              "USD_CHF",
+              "AUD_USD",
+              "XAU_USD",
+              "USD_CAD",
+              "NZD_USD",
+              "XAG_USD",
+              "BCO_USD",
+              "WTICO_USD",
+              "NATGAS_USD",
+              "EUR_GBP",
+              "EUR_JPY",
+              "GBP_JPY"
+            ],
+            "strategies": [
+              {
+                "name": "momentum",
+                "enabled": true,
+                "params": {
+                  "lookback_months": 12,
+                  "rebalance_frequency": "weekly"
+                }
+              },
+              {
+                "name": "carry",
+                "enabled": true,
+                "params": {
+                  "rate_data": "manual"
+                }
+              },
+              {
+                "name": "breakout",
+                "enabled": true,
+                "params": {
+                  "asian_start": "22:00",
+                  "asian_end": "06:00",
+                  "breakout_buffer_pips": 10
+                }
+              },
+              {
+                "name": "mean_reversion",
+                "enabled": true,
+                "params": {
+                  "bb_period": 20,
+                  "bb_std": 2.0,
+                  "rsi_period": 14,
+                  "rsi_oversold": 30,
+                  "rsi_overbought": 70
+                }
+              },
+              {
+                "name": "volatility_breakout",
+                "enabled": true,
+                "params": {
+                  "atr_period": 14,
+                  "atr_contraction_threshold": 0.7,
+                  "breakout_atr_multiplier": 1.0
+                }
+              }
+            ]
+          },
+          "hybrid_defaults": {
+            "capital_allocation": 100,
+            "min_confidence": 0.6
+          }
+        },
+        "instruments": {
+          "EUR_USD": {
+            "display_name": "EUR/USD",
+            "type": "forex",
+            "keywords": [
+              "ecb",
+              "european central bank",
+              "eurozone",
+              "euro area",
+              "lagarde",
+              "bundesbank",
+              "federal reserve",
+              "fed rate",
+              "us dollar",
+              "us inflation",
+              "us jobs",
+              "non-farm payrolls",
+              "fomc"
+            ]
+          },
+          "GBP_USD": {
+            "display_name": "GBP/USD",
+            "type": "forex",
+            "keywords": [
+              "bank of england",
+              "boe",
+              "uk economy",
+              "uk gdp",
+              "uk inflation",
+              "sterling",
+              "british pound",
+              "bailey"
+            ]
+          },
+          "USD_JPY": {
+            "display_name": "USD/JPY",
+            "type": "forex",
+            "keywords": [
+              "bank of japan",
+              "boj",
+              "yen",
+              "intervention",
+              "japan economy",
+              "ueda",
+              "risk sentiment",
+              "risk off",
+              "risk on"
+            ]
+          },
+          "USD_CHF": {
+            "display_name": "USD/CHF",
+            "type": "forex",
+            "keywords": [
+              "swiss national bank",
+              "snb",
+              "safe haven",
+              "swiss franc"
+            ]
+          },
+          "AUD_USD": {
+            "display_name": "AUD/USD",
+            "type": "forex",
+            "keywords": [
+              "reserve bank australia",
+              "rba",
+              "china demand",
+              "iron ore",
+              "australian economy",
+              "australia employment"
+            ]
+          },
+          "USD_CAD": {
+            "display_name": "USD/CAD",
+            "type": "forex",
+            "keywords": [
+              "bank of canada",
+              "boc",
+              "canadian economy",
+              "canada jobs"
+            ]
+          },
+          "NZD_USD": {
+            "display_name": "NZD/USD",
+            "type": "forex",
+            "keywords": [
+              "reserve bank new zealand",
+              "rbnz",
+              "dairy prices",
+              "new zealand economy"
+            ]
+          },
+          "XAU_USD": {
+            "display_name": "Gold",
+            "type": "commodity",
+            "keywords": [
+              "gold",
+              "safe haven",
+              "real yields",
+              "treasury yields",
+              "geopolitical risk",
+              "war",
+              "conflict",
+              "sanctions",
+              "central bank gold"
+            ]
+          },
+          "XAG_USD": {
+            "display_name": "Silver",
+            "type": "commodity",
+            "keywords": [
+              "silver",
+              "industrial demand",
+              "precious metals"
+            ]
+          },
+          "BCO_USD": {
+            "display_name": "Brent Crude",
+            "type": "commodity",
+            "keywords": [
+              "oil",
+              "opec",
+              "crude",
+              "petroleum",
+              "saudi arabia",
+              "iran",
+              "pipeline",
+              "energy crisis",
+              "brent"
+            ]
+          },
+          "WTICO_USD": {
+            "display_name": "WTI Crude",
+            "type": "commodity",
+            "keywords": [
+              "wti",
+              "us oil",
+              "shale",
+              "strategic petroleum reserve",
+              "us production"
+            ]
+          },
+          "NATGAS_USD": {
+            "display_name": "Natural Gas",
+            "type": "commodity",
+            "keywords": [
+              "natural gas",
+              "lng",
+              "european energy",
+              "gas pipeline",
+              "gas storage"
+            ]
+          },
+          "EUR_GBP": {
+            "display_name": "EUR/GBP",
+            "type": "forex",
+            "keywords": [
+              "eu uk",
+              "brexit",
+              "euro pound",
+              "european uk divergence"
+            ]
+          },
+          "EUR_JPY": {
+            "display_name": "EUR/JPY",
+            "type": "forex",
+            "keywords": [
+              "euro yen",
+              "risk appetite",
+              "risk barometer"
+            ]
+          },
+          "GBP_JPY": {
+            "display_name": "GBP/JPY",
+            "type": "forex",
+            "keywords": [
+              "pound yen",
+              "carry trade"
+            ]
+          }
+        }
+      },
+      "streams_run": [
+        "news",
+        "strategy",
+        "hybrid:Geopolitical Edge",
+        "hybrid:All-equal-majority"
+      ],
+      "signals_generated": [],
+      "trades_opened": [
+        196
+      ],
+      "trades_closed": [],
+      "trades_carried": [
+        192,
+        194,
+        175,
+        176,
+        178,
+        183,
+        184,
+        189
+      ],
+      "rejected_signals": [],
+      "skipped_reason": null,
+      "review_md": "# Run Review \u2014 2026-03-25T12:56:29Z\n\n## Run Configuration\n- **Streams:** news, strategy, hybrid:Geopolitical Edge, hybrid:All-equal-majority\n- **Risk:** 1.0% per trade, max 3 open, 3% daily loss limit\n- **News confidence threshold:** 0.6\n\n## Signal Analysis\n\n## Trade Activity\n\n### New Trades Opened\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 196 | broker | XAG_USD | short | 72.81300 | 74.25600 | 70.83300 | 1.00 |\n\n### Carried Trades (Still Open)\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 192 | broker | XAG_USD | short | 73.07800 | 74.50700 | 70.83900 | 1.00 |\n| 194 | broker | XAG_USD | short | 72.18400 | 73.84200 | 70.29400 | 1.00 |\n| 175 | broker | NATGAS_USD | short | 2.86710 | 2.92140 | 2.79950 | 19.00 |\n| 176 | broker | USD_CHF | long | 0.78811 | 0.78568 | 0.79238 | 300.00 |\n| 178 | broker | USD_CHF | long | 0.78854 | 0.78573 | 0.79192 | 300.00 |\n| 183 | broker | NATGAS_USD | short | 2.88580 | 2.93140 | 2.81110 | 19.00 |\n| 184 | broker | USD_CHF | long | 0.78857 | 0.78576 | 0.79196 | 300.00 |\n| 189 | broker | XAG_USD | short | 73.56100 | 75.15500 | 71.21500 | 1.00 |\n\n## Run Summary\n- **Signals analyzed:** 0\n- **Trades opened:** 1\n- **Trades closed:** 0\n- **Trades carried:** 8\n- **Net realized P&L:** +0.00\n- **Started:** 2026-03-25T12:56:29.871716+00:00\n- **Completed:** 2026-03-25T12:58:35.005504+00:00\n",
+      "status": "completed"
+    },
+    {
       "id": 68,
       "run_id": "2026-03-25T11:38:09Z",
       "started_at": "2026-03-25T11:38:09.812184+00:00",
@@ -17456,383 +17831,6 @@
       "rejected_signals": [],
       "skipped_reason": null,
       "review_md": "# Run Review \u2014 2026-03-20T20:31:14Z\n\n## Run Configuration\n- **Streams:** news, strategy, hybrid:Geopolitical Edge, hybrid:All-equal-majority\n- **Risk:** 1.0% per trade, max 3 open, 3% daily loss limit\n- **News confidence threshold:** 0.6\n\n## Signal Analysis\n\n## Trade Activity\n\n### New Trades Opened\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 99 | broker | XAG_USD | short | 67.88200 | 69.96200 | 65.01100 | 1.00 |\n\n### Carried Trades (Still Open)\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 97 | broker | GBP_USD | short | 1.33212 | 1.33663 | 1.32556 | 200.00 |\n| 83 | broker | EUR_USD | short | 1.15584 | 1.15854 | 1.15188 | 300.00 |\n| 85 | broker | XAG_USD | short | 70.14400 | 72.15400 | 67.36000 | 1.00 |\n| 87 | broker | XAG_USD | short | 69.93100 | 71.92800 | 66.91000 | 1.00 |\n| 88 | broker | EUR_USD | short | 1.15645 | 1.16019 | 1.15092 | 200.00 |\n| 89 | broker | NATGAS_USD | short | 3.08790 | 3.16280 | 2.97810 | 14.00 |\n| 90 | broker | GBP_USD | short | 1.33208 | 1.33543 | 1.32648 | 200.00 |\n| 91 | broker | AUD_USD | short | 0.70403 | 0.70669 | 0.70032 | 400.00 |\n| 92 | broker | XAG_USD | short | 69.62800 | 71.49900 | 66.72700 | 1.00 |\n| 94 | broker | BCO_USD | short | 97.87900 | 99.89200 | 94.94200 | 1.00 |\n\n## Run Summary\n- **Signals analyzed:** 0\n- **Trades opened:** 1\n- **Trades closed:** 0\n- **Trades carried:** 10\n- **Net realized P&L:** +0.00\n- **Started:** 2026-03-20T20:31:14.979973+00:00\n- **Completed:** 2026-03-20T20:32:39.136058+00:00\n",
-      "status": "completed"
-    },
-    {
-      "id": 21,
-      "run_id": "2026-03-20T19:36:37Z",
-      "started_at": "2026-03-20T19:36:37.040513+00:00",
-      "completed_at": "2026-03-20T19:38:15.179009+00:00",
-      "market_open": 1,
-      "config_snapshot": {
-        "scheduler": {
-          "interval": "1h",
-          "timezone": "UTC"
-        },
-        "risk": {
-          "max_risk_per_trade": 0.01,
-          "max_open_positions_per_stream": 3,
-          "max_daily_loss_per_stream": 0.03,
-          "max_correlated_positions": 1,
-          "default_rr_ratio": 1.5,
-          "stop_loss_method": "atr",
-          "atr_multiplier": 1.5,
-          "atr_period": 14,
-          "leverage": 1
-        },
-        "execution": {
-          "mode": "practice",
-          "data_provider": "capitalcom"
-        },
-        "data": {
-          "candle_granularity": "H1",
-          "lookback_periods": 200,
-          "secondary_granularity": "D"
-        },
-        "reviews": {
-          "auto_generate": true,
-          "schedule": "daily",
-          "time": "22:00",
-          "review_period_days": 7,
-          "max_archive_count": 30,
-          "output_dir": "reviews"
-        },
-        "streams": {
-          "news_stream": {
-            "id": "news",
-            "name": "News Stream",
-            "enabled": true,
-            "capital_allocation": 100,
-            "instruments": [
-              "EUR_USD",
-              "GBP_USD",
-              "USD_JPY",
-              "XAU_USD",
-              "BCO_USD",
-              "USD_CHF",
-              "AUD_USD",
-              "USD_CAD",
-              "NZD_USD",
-              "XAG_USD",
-              "WTICO_USD",
-              "EUR_GBP",
-              "NATGAS_USD",
-              "EUR_JPY",
-              "GBP_JPY"
-            ],
-            "news_sources": [
-              {
-                "type": "rss",
-                "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
-                "name": "BBC Business"
-              },
-              {
-                "type": "rss",
-                "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664",
-                "name": "CNBC Business"
-              },
-              {
-                "type": "gdelt",
-                "enabled": true
-              },
-              {
-                "type": "economic_calendar",
-                "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
-              }
-            ],
-            "news_lookback_hours": 12,
-            "min_confidence": 0.6,
-            "llm": {
-              "primary_model": "groq/llama-3.3-70b",
-              "comparison_models": [
-                "mistral/mistral-small",
-                "google/gemini-2.5-flash",
-                "groq/llama-3.1-8b"
-              ],
-              "comparison_enabled": true
-            }
-          },
-          "strategy_stream": {
-            "id": "strategy",
-            "name": "Strategy Stream",
-            "enabled": true,
-            "capital_allocation": 100,
-            "instruments": [
-              "EUR_USD",
-              "GBP_USD",
-              "USD_JPY",
-              "USD_CHF",
-              "AUD_USD",
-              "XAU_USD",
-              "USD_CAD",
-              "NZD_USD",
-              "XAG_USD",
-              "BCO_USD",
-              "WTICO_USD",
-              "NATGAS_USD",
-              "EUR_GBP",
-              "EUR_JPY",
-              "GBP_JPY"
-            ],
-            "strategies": [
-              {
-                "name": "momentum",
-                "enabled": true,
-                "params": {
-                  "lookback_months": 12,
-                  "rebalance_frequency": "weekly"
-                }
-              },
-              {
-                "name": "carry",
-                "enabled": true,
-                "params": {
-                  "rate_data": "manual"
-                }
-              },
-              {
-                "name": "breakout",
-                "enabled": true,
-                "params": {
-                  "asian_start": "22:00",
-                  "asian_end": "06:00",
-                  "breakout_buffer_pips": 10
-                }
-              },
-              {
-                "name": "mean_reversion",
-                "enabled": true,
-                "params": {
-                  "bb_period": 20,
-                  "bb_std": 2.0,
-                  "rsi_period": 14,
-                  "rsi_oversold": 30,
-                  "rsi_overbought": 70
-                }
-              },
-              {
-                "name": "volatility_breakout",
-                "enabled": true,
-                "params": {
-                  "atr_period": 14,
-                  "atr_contraction_threshold": 0.7,
-                  "breakout_atr_multiplier": 1.0
-                }
-              }
-            ]
-          },
-          "hybrid_defaults": {
-            "capital_allocation": 100,
-            "min_confidence": 0.6
-          }
-        },
-        "instruments": {
-          "EUR_USD": {
-            "display_name": "EUR/USD",
-            "type": "forex",
-            "keywords": [
-              "ecb",
-              "european central bank",
-              "eurozone",
-              "euro area",
-              "lagarde",
-              "bundesbank",
-              "federal reserve",
-              "fed rate",
-              "us dollar",
-              "us inflation",
-              "us jobs",
-              "non-farm payrolls",
-              "fomc"
-            ]
-          },
-          "GBP_USD": {
-            "display_name": "GBP/USD",
-            "type": "forex",
-            "keywords": [
-              "bank of england",
-              "boe",
-              "uk economy",
-              "uk gdp",
-              "uk inflation",
-              "sterling",
-              "british pound",
-              "bailey"
-            ]
-          },
-          "USD_JPY": {
-            "display_name": "USD/JPY",
-            "type": "forex",
-            "keywords": [
-              "bank of japan",
-              "boj",
-              "yen",
-              "intervention",
-              "japan economy",
-              "ueda",
-              "risk sentiment",
-              "risk off",
-              "risk on"
-            ]
-          },
-          "USD_CHF": {
-            "display_name": "USD/CHF",
-            "type": "forex",
-            "keywords": [
-              "swiss national bank",
-              "snb",
-              "safe haven",
-              "swiss franc"
-            ]
-          },
-          "AUD_USD": {
-            "display_name": "AUD/USD",
-            "type": "forex",
-            "keywords": [
-              "reserve bank australia",
-              "rba",
-              "china demand",
-              "iron ore",
-              "australian economy",
-              "australia employment"
-            ]
-          },
-          "USD_CAD": {
-            "display_name": "USD/CAD",
-            "type": "forex",
-            "keywords": [
-              "bank of canada",
-              "boc",
-              "canadian economy",
-              "canada jobs"
-            ]
-          },
-          "NZD_USD": {
-            "display_name": "NZD/USD",
-            "type": "forex",
-            "keywords": [
-              "reserve bank new zealand",
-              "rbnz",
-              "dairy prices",
-              "new zealand economy"
-            ]
-          },
-          "XAU_USD": {
-            "display_name": "Gold",
-            "type": "commodity",
-            "keywords": [
-              "gold",
-              "safe haven",
-              "real yields",
-              "treasury yields",
-              "geopolitical risk",
-              "war",
-              "conflict",
-              "sanctions",
-              "central bank gold"
-            ]
-          },
-          "XAG_USD": {
-            "display_name": "Silver",
-            "type": "commodity",
-            "keywords": [
-              "silver",
-              "industrial demand",
-              "precious metals"
-            ]
-          },
-          "BCO_USD": {
-            "display_name": "Brent Crude",
-            "type": "commodity",
-            "keywords": [
-              "oil",
-              "opec",
-              "crude",
-              "petroleum",
-              "saudi arabia",
-              "iran",
-              "pipeline",
-              "energy crisis",
-              "brent"
-            ]
-          },
-          "WTICO_USD": {
-            "display_name": "WTI Crude",
-            "type": "commodity",
-            "keywords": [
-              "wti",
-              "us oil",
-              "shale",
-              "strategic petroleum reserve",
-              "us production"
-            ]
-          },
-          "NATGAS_USD": {
-            "display_name": "Natural Gas",
-            "type": "commodity",
-            "keywords": [
-              "natural gas",
-              "lng",
-              "european energy",
-              "gas pipeline",
-              "gas storage"
-            ]
-          },
-          "EUR_GBP": {
-            "display_name": "EUR/GBP",
-            "type": "forex",
-            "keywords": [
-              "eu uk",
-              "brexit",
-              "euro pound",
-              "european uk divergence"
-            ]
-          },
-          "EUR_JPY": {
-            "display_name": "EUR/JPY",
-            "type": "forex",
-            "keywords": [
-              "euro yen",
-              "risk appetite",
-              "risk barometer"
-            ]
-          },
-          "GBP_JPY": {
-            "display_name": "GBP/JPY",
-            "type": "forex",
-            "keywords": [
-              "pound yen",
-              "carry trade"
-            ]
-          }
-        }
-      },
-      "streams_run": [
-        "news",
-        "strategy",
-        "hybrid:Geopolitical Edge",
-        "hybrid:All-equal-majority"
-      ],
-      "signals_generated": [],
-      "trades_opened": [
-        97
-      ],
-      "trades_closed": [],
-      "trades_carried": [
-        83,
-        84,
-        85,
-        87,
-        88,
-        89,
-        90,
-        91,
-        92,
-        94
-      ],
-      "rejected_signals": [],
-      "skipped_reason": null,
-      "review_md": "# Run Review \u2014 2026-03-20T19:36:37Z\n\n## Run Configuration\n- **Streams:** news, strategy, hybrid:Geopolitical Edge, hybrid:All-equal-majority\n- **Risk:** 1.0% per trade, max 3 open, 3% daily loss limit\n- **News confidence threshold:** 0.6\n\n## Signal Analysis\n\n## Trade Activity\n\n### New Trades Opened\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 97 | broker | GBP_USD | short | 1.33212 | 1.33663 | 1.32556 | 200.00 |\n\n### Carried Trades (Still Open)\n| # | Stream | Instrument | Dir | Entry | SL | TP | Size |\n|---|--------|-----------|-----|-------|----|----|------|\n| 83 | broker | EUR_USD | short | 1.15584 | 1.15854 | 1.15188 | 300.00 |\n| 84 | broker | AUD_USD | short | 0.70431 | 0.70670 | 0.70085 | 400.00 |\n| 85 | broker | XAG_USD | short | 70.14400 | 72.15400 | 67.36000 | 1.00 |\n| 87 | broker | XAG_USD | short | 69.93100 | 71.92800 | 66.91000 | 1.00 |\n| 88 | broker | EUR_USD | short | 1.15645 | 1.16019 | 1.15092 | 200.00 |\n| 89 | broker | NATGAS_USD | short | 3.08790 | 3.16280 | 2.97810 | 14.00 |\n| 90 | broker | GBP_USD | short | 1.33208 | 1.33543 | 1.32648 | 200.00 |\n| 91 | broker | AUD_USD | short | 0.70403 | 0.70669 | 0.70032 | 400.00 |\n| 92 | broker | XAG_USD | short | 69.62800 | 71.49900 | 66.72700 | 1.00 |\n| 94 | broker | BCO_USD | short | 97.87900 | 99.89200 | 94.94200 | 1.00 |\n\n## Run Summary\n- **Signals analyzed:** 0\n- **Trades opened:** 1\n- **Trades closed:** 0\n- **Trades carried:** 10\n- **Net realized P&L:** +0.00\n- **Started:** 2026-03-20T19:36:37.040513+00:00\n- **Completed:** 2026-03-20T19:38:15.179009+00:00\n",
       "status": "completed"
     }
   ]
