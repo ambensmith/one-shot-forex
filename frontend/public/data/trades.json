@@ -1,6 +1,74 @@
 {
   "trades": [
     {
+      "id": 234,
+      "stream": "broker",
+      "instrument": "XAG_USD",
+      "direction": "short",
+      "entry_price": 69.741,
+      "exit_price": null,
+      "stop_loss": 71.195,
+      "take_profit": 67.645,
+      "position_size": 1.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-03-26T06:11:24.583524+00:00",
+      "closed_at": null,
+      "broker_deal_id": "006011e7-0055-311e-0000-000081403b88",
+      "events": [
+        {
+          "id": 1078,
+          "trade_id": 234,
+          "event_type": "imported",
+          "data": {
+            "source": "broker_reconciliation",
+            "broker_data": {
+              "dealId": "006011e7-0055-311e-0000-000081403b88",
+              "instrument": "XAG_USD",
+              "direction": "short",
+              "unrealizedPL": "0.11"
+            }
+          },
+          "created_at": "2026-03-26 06:11:24"
+        }
+      ]
+    },
+    {
+      "id": 232,
+      "stream": "broker",
+      "instrument": "BCO_USD",
+      "direction": "long",
+      "entry_price": 91.814,
+      "exit_price": null,
+      "stop_loss": 90.651,
+      "take_profit": 93.496,
+      "position_size": 1.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-03-26T06:10:32.440042+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00018509-0055-311e-0000-0000824ce000",
+      "events": [
+        {
+          "id": 1076,
+          "trade_id": 232,
+          "event_type": "imported",
+          "data": {
+            "source": "broker_reconciliation",
+            "broker_data": {
+              "dealId": "00018509-0055-311e-0000-0000824ce000",
+              "instrument": "BCO_USD",
+              "direction": "long",
+              "unrealizedPL": "-0.06"
+            }
+          },
+          "created_at": "2026-03-26 06:10:32"
+        }
+      ]
+    },
+    {
       "id": 230,
       "stream": "broker",
       "instrument": "BCO_USD",
@@ -79,6 +147,74 @@
         "distance_sl_pips": 257.5,
         "distance_tp_pips": 156.8
       }
+    },
+    {
+      "id": 233,
+      "stream": "strategy",
+      "instrument": "XAG_USD",
+      "direction": "short",
+      "entry_price": 69.775,
+      "exit_price": null,
+      "stop_loss": 71.19507142857144,
+      "take_profit": 67.64489285714285,
+      "position_size": 1.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-03-26 06:10:39",
+      "closed_at": null,
+      "broker_deal_id": "006011e7-0055-311e-0000-000081403b87",
+      "events": [
+        {
+          "id": 1077,
+          "trade_id": 233,
+          "event_type": "opened",
+          "data": {
+            "entry_price": 69.775,
+            "stop_loss": 71.19507142857144,
+            "take_profit": 67.64489285714285,
+            "position_size": 1,
+            "broker_deal_id": "006011e7-0055-311e-0000-000081403b87"
+          },
+          "created_at": "2026-03-26 06:10:39"
+        }
+      ],
+      "reasoning": "momentum: {'lookback_return': np.float64(-0.13483), 'short_return': np.float64(-0.04502), 'combined_signal': np.float64(-0.0989)}",
+      "source": "momentum"
+    },
+    {
+      "id": 231,
+      "stream": "news",
+      "instrument": "BCO_USD",
+      "direction": "long",
+      "entry_price": 91.78899999999999,
+      "exit_price": null,
+      "stop_loss": 90.65130357142856,
+      "take_profit": 93.49554464285714,
+      "position_size": 1.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-03-26 06:10:14",
+      "closed_at": null,
+      "broker_deal_id": "00018509-0055-311e-0000-0000824cdfff",
+      "events": [
+        {
+          "id": 1075,
+          "trade_id": 231,
+          "event_type": "opened",
+          "data": {
+            "entry_price": 91.78899999999999,
+            "stop_loss": 90.65130357142856,
+            "take_profit": 93.49554464285714,
+            "position_size": 1,
+            "broker_deal_id": "00018509-0055-311e-0000-0000824cdfff"
+          },
+          "created_at": "2026-03-26 06:10:14"
+        }
+      ],
+      "reasoning": "The recent news headlines suggest increased volatility in oil prices due to the Iran war, which could lead to a surge in demand for Brent crude oil, thus driving up the BCO_USD price. The bullish recent trend and 3.41% increase in the last 24 hours also support this outlook.",
+      "source": "groq/llama-3.3-70b"
     },
     {
       "id": 228,
@@ -43209,46 +43345,6 @@
       "broker_deal_id": "00001544-0055-311e-0000-000080d82406",
       "events": [],
       "reasoning": "The recent bullish trend and potential for a hawkish RBA statement may lead to further AUD appreciation, while the press conference could provide additional insight into the central bank's policy stance, supporting a long position. The limited news sources may reduce the reliability of the signal, but the overall trend and potential for positive news suggest a bullish outlook.",
-      "source": "groq/llama-3.3-70b"
-    },
-    {
-      "id": 34,
-      "stream": "news",
-      "instrument": "EUR_USD",
-      "direction": "short",
-      "entry_price": 1.156485,
-      "exit_price": 1.155815,
-      "stop_loss": 1.1601926785714285,
-      "take_profit": 1.1509234821428573,
-      "position_size": 270.0,
-      "pnl": 0.18,
-      "pnl_pips": 6.7,
-      "status": "closed_reconciled",
-      "opened_at": "2026-03-20 02:01:23",
-      "closed_at": "2026-03-20T04:21:05.873696+00:00",
-      "broker_deal_id": "00005552-0055-311e-0000-000081dfb60d",
-      "events": [],
-      "reasoning": "The expectation of a delayed Fed rate cut, as reported by CNBC Business, may lead to a stronger USD, negatively impacting EUR_USD, and the current bullish trend may reverse in the short term due to this shift in monetary policy expectations.",
-      "source": "groq/llama-3.3-70b"
-    },
-    {
-      "id": 33,
-      "stream": "news",
-      "instrument": "GBP_USD",
-      "direction": "short",
-      "entry_price": 1.34155,
-      "exit_price": 1.34058,
-      "stop_loss": 1.3460633928571428,
-      "take_profit": 1.334779910714286,
-      "position_size": 222.0,
-      "pnl": 0.22,
-      "pnl_pips": 9.7,
-      "status": "closed_reconciled",
-      "opened_at": "2026-03-20 02:01:16",
-      "closed_at": "2026-03-20T04:21:06.610808+00:00",
-      "broker_deal_id": "00007090-0055-311e-0000-00008115272e",
-      "events": [],
-      "reasoning": "The potential negative impact of the Iran war on the UK economy, as reported by Faisal Islam, may lead to a decrease in investor confidence and a subsequent decline in GBP_USD, despite the current bullish trend. However, the limited number of sources confirming this story reduces the confidence in this assessment.",
       "source": "groq/llama-3.3-70b"
     }
   ]
