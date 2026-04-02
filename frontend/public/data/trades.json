@@ -31,8 +31,28 @@
             }
           },
           "created_at": "2026-04-02 01:51:00"
+        },
+        {
+          "id": 2186,
+          "trade_id": 432,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.68885,
+            "unrealized_pl": 0.0,
+            "unrealized_pips": 0.0,
+            "distance_sl_pips": 29.9,
+            "distance_tp_pips": 37.6
+          },
+          "created_at": "2026-04-02 03:44:58"
         }
-      ]
+      ],
+      "latest_snapshot": {
+        "current_price": 0.68885,
+        "unrealized_pl": 0.0,
+        "unrealized_pips": 0.0,
+        "distance_sl_pips": 29.9,
+        "distance_tp_pips": 37.6
+      }
     },
     {
       "id": 431,
@@ -40,15 +60,15 @@
       "instrument": "AUD_USD",
       "direction": "long",
       "entry_price": 0.6885600000000001,
-      "exit_price": null,
+      "exit_price": 0.68884,
       "stop_loss": 0.6858589285714287,
       "take_profit": 0.6926116071428571,
       "position_size": 321.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": 0.09,
+      "pnl_pips": 2.8,
+      "status": "closed_reconciled",
       "opened_at": "2026-04-02 01:50:49",
-      "closed_at": null,
+      "closed_at": "2026-04-02T03:44:49.665260+00:00",
       "broker_deal_id": "00001544-0055-311e-0000-000080db18bd",
       "events": [
         {
@@ -63,10 +83,207 @@
             "broker_deal_id": "00001544-0055-311e-0000-000080db18bd"
           },
           "created_at": "2026-04-02 01:50:49"
+        },
+        {
+          "id": 2176,
+          "trade_id": 431,
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.68884,
+            "pnl": 0.09,
+            "pnl_pips": 2.8,
+            "actual_close_time": null,
+            "detection_time": "2026-04-02T03:44:49.667671+00:00"
+          },
+          "created_at": "2026-04-02 03:44:49"
+        },
+        {
+          "id": 2181,
+          "trade_id": 431,
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-04-02T03:44:53.343754+00:00",
+            "market_price_at_detection": {
+              "bid": 0.68882,
+              "ask": 0.68888
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-04-01 18:00:00",
+                "o": 0.69317,
+                "h": 0.69322,
+                "l": 0.69129,
+                "c": 0.69164
+              },
+              {
+                "time": "2026-04-01 19:00:00",
+                "o": 0.69166,
+                "h": 0.6928,
+                "l": 0.69147,
+                "c": 0.6923
+              },
+              {
+                "time": "2026-04-01 20:00:00",
+                "o": 0.69231,
+                "h": 0.692975,
+                "l": 0.69228,
+                "c": 0.69286
+              },
+              {
+                "time": "2026-04-01 21:00:00",
+                "o": 0.69238,
+                "h": 0.69293,
+                "l": 0.69229,
+                "c": 0.69291
+              },
+              {
+                "time": "2026-04-01 22:00:00",
+                "o": 0.69303,
+                "h": 0.693075,
+                "l": 0.69223,
+                "c": 0.69249
+              },
+              {
+                "time": "2026-04-01 23:00:00",
+                "o": 0.69251,
+                "h": 0.69284,
+                "l": 0.69213,
+                "c": 0.69233
+              },
+              {
+                "time": "2026-04-02 00:00:00",
+                "o": 0.69234,
+                "h": 0.69349,
+                "l": 0.69197,
+                "c": 0.69309
+              },
+              {
+                "time": "2026-04-02 01:00:00",
+                "o": 0.69309,
+                "h": 0.69409,
+                "l": 0.687915,
+                "c": 0.68851
+              },
+              {
+                "time": "2026-04-02 02:00:00",
+                "o": 0.68851,
+                "h": 0.68956,
+                "l": 0.688105,
+                "c": 0.68875
+              },
+              {
+                "time": "2026-04-02 03:00:00",
+                "o": 0.68874,
+                "h": 0.68908,
+                "l": 0.68845,
+                "c": 0.6889
+              }
+            ],
+            "atr_14": 0.001585,
+            "active_signals_at_close": [
+              {
+                "stream": "strategy",
+                "instrument": "AUD_USD",
+                "direction": "long",
+                "confidence": 0.785,
+                "source": "mean_reversion"
+              }
+            ]
+          },
+          "created_at": "2026-04-02 03:44:54"
         }
       ],
       "reasoning": "mean_reversion: {'bb_upper': np.float64(0.69636), 'bb_lower': np.float64(0.69032), 'bb_mid': np.float64(0.69334), 'rsi': np.float64(21.67), 'pct_b': np.float64(-0.292)}",
-      "source": "mean_reversion"
+      "source": "mean_reversion",
+      "close_context": {
+        "detection_time": "2026-04-02T03:44:53.343754+00:00",
+        "market_price_at_detection": {
+          "bid": 0.68882,
+          "ask": 0.68888
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-04-01 18:00:00",
+            "o": 0.69317,
+            "h": 0.69322,
+            "l": 0.69129,
+            "c": 0.69164
+          },
+          {
+            "time": "2026-04-01 19:00:00",
+            "o": 0.69166,
+            "h": 0.6928,
+            "l": 0.69147,
+            "c": 0.6923
+          },
+          {
+            "time": "2026-04-01 20:00:00",
+            "o": 0.69231,
+            "h": 0.692975,
+            "l": 0.69228,
+            "c": 0.69286
+          },
+          {
+            "time": "2026-04-01 21:00:00",
+            "o": 0.69238,
+            "h": 0.69293,
+            "l": 0.69229,
+            "c": 0.69291
+          },
+          {
+            "time": "2026-04-01 22:00:00",
+            "o": 0.69303,
+            "h": 0.693075,
+            "l": 0.69223,
+            "c": 0.69249
+          },
+          {
+            "time": "2026-04-01 23:00:00",
+            "o": 0.69251,
+            "h": 0.69284,
+            "l": 0.69213,
+            "c": 0.69233
+          },
+          {
+            "time": "2026-04-02 00:00:00",
+            "o": 0.69234,
+            "h": 0.69349,
+            "l": 0.69197,
+            "c": 0.69309
+          },
+          {
+            "time": "2026-04-02 01:00:00",
+            "o": 0.69309,
+            "h": 0.69409,
+            "l": 0.687915,
+            "c": 0.68851
+          },
+          {
+            "time": "2026-04-02 02:00:00",
+            "o": 0.68851,
+            "h": 0.68956,
+            "l": 0.688105,
+            "c": 0.68875
+          },
+          {
+            "time": "2026-04-02 03:00:00",
+            "o": 0.68874,
+            "h": 0.68908,
+            "l": 0.68845,
+            "c": 0.6889
+          }
+        ],
+        "atr_14": 0.001585,
+        "active_signals_at_close": [
+          {
+            "stream": "strategy",
+            "instrument": "AUD_USD",
+            "direction": "long",
+            "confidence": 0.785,
+            "source": "mean_reversion"
+          }
+        ]
+      }
     },
     {
       "id": 430,
@@ -74,15 +291,15 @@
       "instrument": "USD_CHF",
       "direction": "long",
       "entry_price": 0.794,
-      "exit_price": null,
+      "exit_price": 0.7973600000000001,
       "stop_loss": 0.79192,
       "take_profit": 0.79694,
       "position_size": 400.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": 1.34,
+      "pnl_pips": 33.6,
+      "status": "closed_tp",
       "opened_at": "2026-04-01T23:32:58.678988+00:00",
-      "closed_at": null,
+      "closed_at": "2026-04-02T03:44:50.757863+00:00",
       "broker_deal_id": "000154c4-000c-819e-0000-000080c51215",
       "events": [
         {
@@ -125,8 +342,211 @@
             "distance_tp_pips": 36.2
           },
           "created_at": "2026-04-02 01:01:07"
+        },
+        {
+          "id": 2177,
+          "trade_id": 430,
+          "event_type": "closed_tp",
+          "data": {
+            "exit_price": 0.7973600000000001,
+            "pnl": 1.34,
+            "pnl_pips": 33.6,
+            "actual_close_time": null,
+            "detection_time": "2026-04-02T03:44:50.759206+00:00"
+          },
+          "created_at": "2026-04-02 03:44:50"
+        },
+        {
+          "id": 2182,
+          "trade_id": 430,
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-04-02T03:44:54.357079+00:00",
+            "market_price_at_detection": {
+              "bid": 0.79724,
+              "ask": 0.79739
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-04-01 18:00:00",
+                "o": 0.79344,
+                "h": 0.79474,
+                "l": 0.793345,
+                "c": 0.794715
+              },
+              {
+                "time": "2026-04-01 19:00:00",
+                "o": 0.794705,
+                "h": 0.795015,
+                "l": 0.79446,
+                "c": 0.794725
+              },
+              {
+                "time": "2026-04-01 20:00:00",
+                "o": 0.79473,
+                "h": 0.794795,
+                "l": 0.794105,
+                "c": 0.79432
+              },
+              {
+                "time": "2026-04-01 21:00:00",
+                "o": 0.79429,
+                "h": 0.79552,
+                "l": 0.79367,
+                "c": 0.794175
+              },
+              {
+                "time": "2026-04-01 22:00:00",
+                "o": 0.79425,
+                "h": 0.794515,
+                "l": 0.79373,
+                "c": 0.79406
+              },
+              {
+                "time": "2026-04-01 23:00:00",
+                "o": 0.79405,
+                "h": 0.794075,
+                "l": 0.793725,
+                "c": 0.794055
+              },
+              {
+                "time": "2026-04-02 00:00:00",
+                "o": 0.79409,
+                "h": 0.794245,
+                "l": 0.792955,
+                "c": 0.79316
+              },
+              {
+                "time": "2026-04-02 01:00:00",
+                "o": 0.793165,
+                "h": 0.796895,
+                "l": 0.79282,
+                "c": 0.796615
+              },
+              {
+                "time": "2026-04-02 02:00:00",
+                "o": 0.79661,
+                "h": 0.79747,
+                "l": 0.7963,
+                "c": 0.79737
+              },
+              {
+                "time": "2026-04-02 03:00:00",
+                "o": 0.79736,
+                "h": 0.797665,
+                "l": 0.797265,
+                "c": 0.79742
+              }
+            ],
+            "atr_14": 0.001348,
+            "active_signals_at_close": [
+              {
+                "stream": "strategy",
+                "instrument": "USD_CHF",
+                "direction": "short",
+                "confidence": 0.131,
+                "source": "mean_reversion"
+              }
+            ],
+            "trade_duration_hours": 4.2,
+            "max_favorable_pips": 0.0,
+            "max_adverse_pips": -6.9
+          },
+          "created_at": "2026-04-02 03:44:55"
         }
       ],
+      "close_context": {
+        "detection_time": "2026-04-02T03:44:54.357079+00:00",
+        "market_price_at_detection": {
+          "bid": 0.79724,
+          "ask": 0.79739
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-04-01 18:00:00",
+            "o": 0.79344,
+            "h": 0.79474,
+            "l": 0.793345,
+            "c": 0.794715
+          },
+          {
+            "time": "2026-04-01 19:00:00",
+            "o": 0.794705,
+            "h": 0.795015,
+            "l": 0.79446,
+            "c": 0.794725
+          },
+          {
+            "time": "2026-04-01 20:00:00",
+            "o": 0.79473,
+            "h": 0.794795,
+            "l": 0.794105,
+            "c": 0.79432
+          },
+          {
+            "time": "2026-04-01 21:00:00",
+            "o": 0.79429,
+            "h": 0.79552,
+            "l": 0.79367,
+            "c": 0.794175
+          },
+          {
+            "time": "2026-04-01 22:00:00",
+            "o": 0.79425,
+            "h": 0.794515,
+            "l": 0.79373,
+            "c": 0.79406
+          },
+          {
+            "time": "2026-04-01 23:00:00",
+            "o": 0.79405,
+            "h": 0.794075,
+            "l": 0.793725,
+            "c": 0.794055
+          },
+          {
+            "time": "2026-04-02 00:00:00",
+            "o": 0.79409,
+            "h": 0.794245,
+            "l": 0.792955,
+            "c": 0.79316
+          },
+          {
+            "time": "2026-04-02 01:00:00",
+            "o": 0.793165,
+            "h": 0.796895,
+            "l": 0.79282,
+            "c": 0.796615
+          },
+          {
+            "time": "2026-04-02 02:00:00",
+            "o": 0.79661,
+            "h": 0.79747,
+            "l": 0.7963,
+            "c": 0.79737
+          },
+          {
+            "time": "2026-04-02 03:00:00",
+            "o": 0.79736,
+            "h": 0.797665,
+            "l": 0.797265,
+            "c": 0.79742
+          }
+        ],
+        "atr_14": 0.001348,
+        "active_signals_at_close": [
+          {
+            "stream": "strategy",
+            "instrument": "USD_CHF",
+            "direction": "short",
+            "confidence": 0.131,
+            "source": "mean_reversion"
+          }
+        ],
+        "trade_duration_hours": 4.2,
+        "max_favorable_pips": 0.0,
+        "max_adverse_pips": -6.9
+      },
       "latest_snapshot": {
         "current_price": 0.793315,
         "unrealized_pl": -0.27,
@@ -141,15 +561,15 @@
       "instrument": "USD_CHF",
       "direction": "long",
       "entry_price": 0.79415,
-      "exit_price": null,
+      "exit_price": 0.7973600000000001,
       "stop_loss": 0.79194,
       "take_profit": 0.79719,
       "position_size": 400.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": 1.28,
+      "pnl_pips": 32.1,
+      "status": "closed_tp",
       "opened_at": "2026-04-01T22:33:20.499374+00:00",
-      "closed_at": null,
+      "closed_at": "2026-04-02T03:44:51.654000+00:00",
       "broker_deal_id": "000154c4-000c-819e-0000-000080c5120b",
       "events": [
         {
@@ -218,8 +638,211 @@
             "distance_tp_pips": 38.7
           },
           "created_at": "2026-04-02 01:01:07"
+        },
+        {
+          "id": 2178,
+          "trade_id": 428,
+          "event_type": "closed_tp",
+          "data": {
+            "exit_price": 0.7973600000000001,
+            "pnl": 1.28,
+            "pnl_pips": 32.1,
+            "actual_close_time": null,
+            "detection_time": "2026-04-02T03:44:51.655638+00:00"
+          },
+          "created_at": "2026-04-02 03:44:51"
+        },
+        {
+          "id": 2183,
+          "trade_id": 428,
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-04-02T03:44:55.304817+00:00",
+            "market_price_at_detection": {
+              "bid": 0.79725,
+              "ask": 0.79741
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-04-01 18:00:00",
+                "o": 0.79344,
+                "h": 0.79474,
+                "l": 0.793345,
+                "c": 0.794715
+              },
+              {
+                "time": "2026-04-01 19:00:00",
+                "o": 0.794705,
+                "h": 0.795015,
+                "l": 0.79446,
+                "c": 0.794725
+              },
+              {
+                "time": "2026-04-01 20:00:00",
+                "o": 0.79473,
+                "h": 0.794795,
+                "l": 0.794105,
+                "c": 0.79432
+              },
+              {
+                "time": "2026-04-01 21:00:00",
+                "o": 0.79429,
+                "h": 0.79552,
+                "l": 0.79367,
+                "c": 0.794175
+              },
+              {
+                "time": "2026-04-01 22:00:00",
+                "o": 0.79425,
+                "h": 0.794515,
+                "l": 0.79373,
+                "c": 0.79406
+              },
+              {
+                "time": "2026-04-01 23:00:00",
+                "o": 0.79405,
+                "h": 0.794075,
+                "l": 0.793725,
+                "c": 0.794055
+              },
+              {
+                "time": "2026-04-02 00:00:00",
+                "o": 0.79409,
+                "h": 0.794245,
+                "l": 0.792955,
+                "c": 0.79316
+              },
+              {
+                "time": "2026-04-02 01:00:00",
+                "o": 0.793165,
+                "h": 0.796895,
+                "l": 0.79282,
+                "c": 0.796615
+              },
+              {
+                "time": "2026-04-02 02:00:00",
+                "o": 0.79661,
+                "h": 0.79747,
+                "l": 0.7963,
+                "c": 0.79737
+              },
+              {
+                "time": "2026-04-02 03:00:00",
+                "o": 0.79736,
+                "h": 0.797665,
+                "l": 0.797265,
+                "c": 0.79742
+              }
+            ],
+            "atr_14": 0.001348,
+            "active_signals_at_close": [
+              {
+                "stream": "strategy",
+                "instrument": "USD_CHF",
+                "direction": "short",
+                "confidence": 0.131,
+                "source": "mean_reversion"
+              }
+            ],
+            "trade_duration_hours": 5.2,
+            "max_favorable_pips": 0.0,
+            "max_adverse_pips": -8.3
+          },
+          "created_at": "2026-04-02 03:44:56"
         }
       ],
+      "close_context": {
+        "detection_time": "2026-04-02T03:44:55.304817+00:00",
+        "market_price_at_detection": {
+          "bid": 0.79725,
+          "ask": 0.79741
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-04-01 18:00:00",
+            "o": 0.79344,
+            "h": 0.79474,
+            "l": 0.793345,
+            "c": 0.794715
+          },
+          {
+            "time": "2026-04-01 19:00:00",
+            "o": 0.794705,
+            "h": 0.795015,
+            "l": 0.79446,
+            "c": 0.794725
+          },
+          {
+            "time": "2026-04-01 20:00:00",
+            "o": 0.79473,
+            "h": 0.794795,
+            "l": 0.794105,
+            "c": 0.79432
+          },
+          {
+            "time": "2026-04-01 21:00:00",
+            "o": 0.79429,
+            "h": 0.79552,
+            "l": 0.79367,
+            "c": 0.794175
+          },
+          {
+            "time": "2026-04-01 22:00:00",
+            "o": 0.79425,
+            "h": 0.794515,
+            "l": 0.79373,
+            "c": 0.79406
+          },
+          {
+            "time": "2026-04-01 23:00:00",
+            "o": 0.79405,
+            "h": 0.794075,
+            "l": 0.793725,
+            "c": 0.794055
+          },
+          {
+            "time": "2026-04-02 00:00:00",
+            "o": 0.79409,
+            "h": 0.794245,
+            "l": 0.792955,
+            "c": 0.79316
+          },
+          {
+            "time": "2026-04-02 01:00:00",
+            "o": 0.793165,
+            "h": 0.796895,
+            "l": 0.79282,
+            "c": 0.796615
+          },
+          {
+            "time": "2026-04-02 02:00:00",
+            "o": 0.79661,
+            "h": 0.79747,
+            "l": 0.7963,
+            "c": 0.79737
+          },
+          {
+            "time": "2026-04-02 03:00:00",
+            "o": 0.79736,
+            "h": 0.797665,
+            "l": 0.797265,
+            "c": 0.79742
+          }
+        ],
+        "atr_14": 0.001348,
+        "active_signals_at_close": [
+          {
+            "stream": "strategy",
+            "instrument": "USD_CHF",
+            "direction": "short",
+            "confidence": 0.131,
+            "source": "mean_reversion"
+          }
+        ],
+        "trade_duration_hours": 5.2,
+        "max_favorable_pips": 0.0,
+        "max_adverse_pips": -8.3
+      },
       "latest_snapshot": {
         "current_price": 0.79332,
         "unrealized_pl": -0.33,
@@ -234,15 +857,15 @@
       "instrument": "USD_CHF",
       "direction": "long",
       "entry_price": 0.79484,
-      "exit_price": null,
+      "exit_price": 0.797355,
       "stop_loss": 0.79195,
       "take_profit": 0.79745,
       "position_size": 300.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": 0.75,
+      "pnl_pips": 25.2,
+      "status": "closed_reconciled",
       "opened_at": "2026-04-01T21:38:00.744613+00:00",
-      "closed_at": null,
+      "closed_at": "2026-04-02T03:44:52.504548+00:00",
       "broker_deal_id": "000154c4-000c-819e-0000-000080c511ff",
       "events": [
         {
@@ -324,185 +947,217 @@
             "distance_tp_pips": 41.1
           },
           "created_at": "2026-04-02 01:01:07"
+        },
+        {
+          "id": 2179,
+          "trade_id": 426,
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.797355,
+            "pnl": 0.75,
+            "pnl_pips": 25.2,
+            "actual_close_time": null,
+            "detection_time": "2026-04-02T03:44:52.506158+00:00"
+          },
+          "created_at": "2026-04-02 03:44:52"
+        },
+        {
+          "id": 2184,
+          "trade_id": 426,
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-04-02T03:44:56.201371+00:00",
+            "market_price_at_detection": {
+              "bid": 0.79725,
+              "ask": 0.79741
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-04-01 18:00:00",
+                "o": 0.79344,
+                "h": 0.79474,
+                "l": 0.793345,
+                "c": 0.794715
+              },
+              {
+                "time": "2026-04-01 19:00:00",
+                "o": 0.794705,
+                "h": 0.795015,
+                "l": 0.79446,
+                "c": 0.794725
+              },
+              {
+                "time": "2026-04-01 20:00:00",
+                "o": 0.79473,
+                "h": 0.794795,
+                "l": 0.794105,
+                "c": 0.79432
+              },
+              {
+                "time": "2026-04-01 21:00:00",
+                "o": 0.79429,
+                "h": 0.79552,
+                "l": 0.79367,
+                "c": 0.794175
+              },
+              {
+                "time": "2026-04-01 22:00:00",
+                "o": 0.79425,
+                "h": 0.794515,
+                "l": 0.79373,
+                "c": 0.79406
+              },
+              {
+                "time": "2026-04-01 23:00:00",
+                "o": 0.79405,
+                "h": 0.794075,
+                "l": 0.793725,
+                "c": 0.794055
+              },
+              {
+                "time": "2026-04-02 00:00:00",
+                "o": 0.79409,
+                "h": 0.794245,
+                "l": 0.792955,
+                "c": 0.79316
+              },
+              {
+                "time": "2026-04-02 01:00:00",
+                "o": 0.793165,
+                "h": 0.796895,
+                "l": 0.79282,
+                "c": 0.796615
+              },
+              {
+                "time": "2026-04-02 02:00:00",
+                "o": 0.79661,
+                "h": 0.79747,
+                "l": 0.7963,
+                "c": 0.79737
+              },
+              {
+                "time": "2026-04-02 03:00:00",
+                "o": 0.79736,
+                "h": 0.797665,
+                "l": 0.797265,
+                "c": 0.79742
+              }
+            ],
+            "atr_14": 0.001348,
+            "active_signals_at_close": [
+              {
+                "stream": "strategy",
+                "instrument": "USD_CHF",
+                "direction": "short",
+                "confidence": 0.131,
+                "source": "mean_reversion"
+              }
+            ],
+            "trade_duration_hours": 6.1,
+            "max_favorable_pips": 0.0,
+            "max_adverse_pips": -15.0
+          },
+          "created_at": "2026-04-02 03:44:57"
         }
       ],
+      "close_context": {
+        "detection_time": "2026-04-02T03:44:56.201371+00:00",
+        "market_price_at_detection": {
+          "bid": 0.79725,
+          "ask": 0.79741
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-04-01 18:00:00",
+            "o": 0.79344,
+            "h": 0.79474,
+            "l": 0.793345,
+            "c": 0.794715
+          },
+          {
+            "time": "2026-04-01 19:00:00",
+            "o": 0.794705,
+            "h": 0.795015,
+            "l": 0.79446,
+            "c": 0.794725
+          },
+          {
+            "time": "2026-04-01 20:00:00",
+            "o": 0.79473,
+            "h": 0.794795,
+            "l": 0.794105,
+            "c": 0.79432
+          },
+          {
+            "time": "2026-04-01 21:00:00",
+            "o": 0.79429,
+            "h": 0.79552,
+            "l": 0.79367,
+            "c": 0.794175
+          },
+          {
+            "time": "2026-04-01 22:00:00",
+            "o": 0.79425,
+            "h": 0.794515,
+            "l": 0.79373,
+            "c": 0.79406
+          },
+          {
+            "time": "2026-04-01 23:00:00",
+            "o": 0.79405,
+            "h": 0.794075,
+            "l": 0.793725,
+            "c": 0.794055
+          },
+          {
+            "time": "2026-04-02 00:00:00",
+            "o": 0.79409,
+            "h": 0.794245,
+            "l": 0.792955,
+            "c": 0.79316
+          },
+          {
+            "time": "2026-04-02 01:00:00",
+            "o": 0.793165,
+            "h": 0.796895,
+            "l": 0.79282,
+            "c": 0.796615
+          },
+          {
+            "time": "2026-04-02 02:00:00",
+            "o": 0.79661,
+            "h": 0.79747,
+            "l": 0.7963,
+            "c": 0.79737
+          },
+          {
+            "time": "2026-04-02 03:00:00",
+            "o": 0.79736,
+            "h": 0.797665,
+            "l": 0.797265,
+            "c": 0.79742
+          }
+        ],
+        "atr_14": 0.001348,
+        "active_signals_at_close": [
+          {
+            "stream": "strategy",
+            "instrument": "USD_CHF",
+            "direction": "short",
+            "confidence": 0.131,
+            "source": "mean_reversion"
+          }
+        ],
+        "trade_duration_hours": 6.1,
+        "max_favorable_pips": 0.0,
+        "max_adverse_pips": -15.0
+      },
       "latest_snapshot": {
         "current_price": 0.79334,
         "unrealized_pl": -0.45,
         "unrealized_pips": -15.0,
         "distance_sl_pips": 13.9,
         "distance_tp_pips": 41.1
-      }
-    },
-    {
-      "id": 416,
-      "stream": "broker",
-      "instrument": "NATGAS_USD",
-      "direction": "long",
-      "entry_price": 2.853,
-      "exit_price": null,
-      "stop_loss": 2.8115,
-      "take_profit": 2.9039,
-      "position_size": 23.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-04-01T17:46:32.397632+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00018387-0055-311e-0000-000081c93593",
-      "events": [
-        {
-          "id": 2104,
-          "trade_id": 416,
-          "event_type": "imported",
-          "data": {
-            "source": "broker_reconciliation",
-            "broker_data": {
-              "dealId": "00018387-0055-311e-0000-000081c93593",
-              "instrument": "NATGAS_USD",
-              "direction": "long",
-              "unrealizedPL": "-0.08"
-            }
-          },
-          "created_at": "2026-04-01 17:46:32"
-        },
-        {
-          "id": 2111,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8535,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 0.5,
-            "distance_sl_pips": 42.0,
-            "distance_tp_pips": 50.4
-          },
-          "created_at": "2026-04-01 18:01:44"
-        },
-        {
-          "id": 2121,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8535,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 0.5,
-            "distance_sl_pips": 42.0,
-            "distance_tp_pips": 50.4
-          },
-          "created_at": "2026-04-01 19:08:51"
-        },
-        {
-          "id": 2127,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8595,
-            "unrealized_pl": 0.15,
-            "unrealized_pips": 6.5,
-            "distance_sl_pips": 48.0,
-            "distance_tp_pips": 44.4
-          },
-          "created_at": "2026-04-01 20:01:17"
-        },
-        {
-          "id": 2138,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.854,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 1.0,
-            "distance_sl_pips": 42.5,
-            "distance_tp_pips": 49.9
-          },
-          "created_at": "2026-04-01 20:50:09"
-        },
-        {
-          "id": 2140,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8575,
-            "unrealized_pl": 0.1,
-            "unrealized_pips": 4.5,
-            "distance_sl_pips": 46.0,
-            "distance_tp_pips": 46.4
-          },
-          "created_at": "2026-04-01 21:29:22"
-        },
-        {
-          "id": 2151,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.857,
-            "unrealized_pl": 0.09,
-            "unrealized_pips": 4.0,
-            "distance_sl_pips": 45.5,
-            "distance_tp_pips": 46.9
-          },
-          "created_at": "2026-04-01 22:02:40"
-        },
-        {
-          "id": 2158,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8625,
-            "unrealized_pl": 0.22,
-            "unrealized_pips": 9.5,
-            "distance_sl_pips": 51.0,
-            "distance_tp_pips": 41.4
-          },
-          "created_at": "2026-04-01 22:48:05"
-        },
-        {
-          "id": 2161,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8625,
-            "unrealized_pl": 0.22,
-            "unrealized_pips": 9.5,
-            "distance_sl_pips": 51.0,
-            "distance_tp_pips": 41.4
-          },
-          "created_at": "2026-04-01 23:23:06"
-        },
-        {
-          "id": 2169,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8635,
-            "unrealized_pl": 0.24,
-            "unrealized_pips": 10.5,
-            "distance_sl_pips": 52.0,
-            "distance_tp_pips": 40.4
-          },
-          "created_at": "2026-04-01 23:53:05"
-        },
-        {
-          "id": 2173,
-          "trade_id": 416,
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 2.8705,
-            "unrealized_pl": 0.4,
-            "unrealized_pips": 17.5,
-            "distance_sl_pips": 59.0,
-            "distance_tp_pips": 33.4
-          },
-          "created_at": "2026-04-02 01:01:08"
-        }
-      ],
-      "latest_snapshot": {
-        "current_price": 2.8705,
-        "unrealized_pl": 0.4,
-        "unrealized_pips": 17.5,
-        "distance_sl_pips": 59.0,
-        "distance_tp_pips": 33.4
       }
     },
     {
@@ -1030,6 +1685,362 @@
         "unrealized_pips": -2.1,
         "distance_sl_pips": 22.7,
         "distance_tp_pips": 38.9
+      }
+    },
+    {
+      "id": 416,
+      "stream": "broker",
+      "instrument": "NATGAS_USD",
+      "direction": "long",
+      "entry_price": 2.853,
+      "exit_price": 2.9065,
+      "stop_loss": 2.8115,
+      "take_profit": 2.9039,
+      "position_size": 23.0,
+      "pnl": 1.23,
+      "pnl_pips": 53.5,
+      "status": "closed_tp",
+      "opened_at": "2026-04-01T17:46:32.397632+00:00",
+      "closed_at": "2026-04-02T03:44:53.341434+00:00",
+      "broker_deal_id": "00018387-0055-311e-0000-000081c93593",
+      "events": [
+        {
+          "id": 2104,
+          "trade_id": 416,
+          "event_type": "imported",
+          "data": {
+            "source": "broker_reconciliation",
+            "broker_data": {
+              "dealId": "00018387-0055-311e-0000-000081c93593",
+              "instrument": "NATGAS_USD",
+              "direction": "long",
+              "unrealizedPL": "-0.08"
+            }
+          },
+          "created_at": "2026-04-01 17:46:32"
+        },
+        {
+          "id": 2111,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8535,
+            "unrealized_pl": 0.01,
+            "unrealized_pips": 0.5,
+            "distance_sl_pips": 42.0,
+            "distance_tp_pips": 50.4
+          },
+          "created_at": "2026-04-01 18:01:44"
+        },
+        {
+          "id": 2121,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8535,
+            "unrealized_pl": 0.01,
+            "unrealized_pips": 0.5,
+            "distance_sl_pips": 42.0,
+            "distance_tp_pips": 50.4
+          },
+          "created_at": "2026-04-01 19:08:51"
+        },
+        {
+          "id": 2127,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8595,
+            "unrealized_pl": 0.15,
+            "unrealized_pips": 6.5,
+            "distance_sl_pips": 48.0,
+            "distance_tp_pips": 44.4
+          },
+          "created_at": "2026-04-01 20:01:17"
+        },
+        {
+          "id": 2138,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.854,
+            "unrealized_pl": 0.02,
+            "unrealized_pips": 1.0,
+            "distance_sl_pips": 42.5,
+            "distance_tp_pips": 49.9
+          },
+          "created_at": "2026-04-01 20:50:09"
+        },
+        {
+          "id": 2140,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8575,
+            "unrealized_pl": 0.1,
+            "unrealized_pips": 4.5,
+            "distance_sl_pips": 46.0,
+            "distance_tp_pips": 46.4
+          },
+          "created_at": "2026-04-01 21:29:22"
+        },
+        {
+          "id": 2151,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.857,
+            "unrealized_pl": 0.09,
+            "unrealized_pips": 4.0,
+            "distance_sl_pips": 45.5,
+            "distance_tp_pips": 46.9
+          },
+          "created_at": "2026-04-01 22:02:40"
+        },
+        {
+          "id": 2158,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8625,
+            "unrealized_pl": 0.22,
+            "unrealized_pips": 9.5,
+            "distance_sl_pips": 51.0,
+            "distance_tp_pips": 41.4
+          },
+          "created_at": "2026-04-01 22:48:05"
+        },
+        {
+          "id": 2161,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8625,
+            "unrealized_pl": 0.22,
+            "unrealized_pips": 9.5,
+            "distance_sl_pips": 51.0,
+            "distance_tp_pips": 41.4
+          },
+          "created_at": "2026-04-01 23:23:06"
+        },
+        {
+          "id": 2169,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8635,
+            "unrealized_pl": 0.24,
+            "unrealized_pips": 10.5,
+            "distance_sl_pips": 52.0,
+            "distance_tp_pips": 40.4
+          },
+          "created_at": "2026-04-01 23:53:05"
+        },
+        {
+          "id": 2173,
+          "trade_id": 416,
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 2.8705,
+            "unrealized_pl": 0.4,
+            "unrealized_pips": 17.5,
+            "distance_sl_pips": 59.0,
+            "distance_tp_pips": 33.4
+          },
+          "created_at": "2026-04-02 01:01:08"
+        },
+        {
+          "id": 2180,
+          "trade_id": 416,
+          "event_type": "closed_tp",
+          "data": {
+            "exit_price": 2.9065,
+            "pnl": 1.23,
+            "pnl_pips": 53.5,
+            "actual_close_time": null,
+            "detection_time": "2026-04-02T03:44:53.342546+00:00"
+          },
+          "created_at": "2026-04-02 03:44:53"
+        },
+        {
+          "id": 2185,
+          "trade_id": 416,
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-04-02T03:44:57.069945+00:00",
+            "market_price_at_detection": {
+              "bid": 2.904,
+              "ask": 2.909
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-04-01 17:00:00",
+                "o": 2.8555,
+                "h": 2.8595,
+                "l": 2.828,
+                "c": 2.856
+              },
+              {
+                "time": "2026-04-01 18:00:00",
+                "o": 2.8565,
+                "h": 2.8665,
+                "l": 2.8475,
+                "c": 2.8525
+              },
+              {
+                "time": "2026-04-01 19:00:00",
+                "o": 2.852,
+                "h": 2.8615,
+                "l": 2.8505,
+                "c": 2.857
+              },
+              {
+                "time": "2026-04-01 20:00:00",
+                "o": 2.8565,
+                "h": 2.8615,
+                "l": 2.8515,
+                "c": 2.8575
+              },
+              {
+                "time": "2026-04-01 22:00:00",
+                "o": 2.859,
+                "h": 2.8645,
+                "l": 2.856,
+                "c": 2.8645
+              },
+              {
+                "time": "2026-04-01 23:00:00",
+                "o": 2.8655,
+                "h": 2.8655,
+                "l": 2.8585,
+                "c": 2.8645
+              },
+              {
+                "time": "2026-04-02 00:00:00",
+                "o": 2.865,
+                "h": 2.868,
+                "l": 2.8575,
+                "c": 2.867
+              },
+              {
+                "time": "2026-04-02 01:00:00",
+                "o": 2.8665,
+                "h": 2.9335,
+                "l": 2.864,
+                "c": 2.904
+              },
+              {
+                "time": "2026-04-02 02:00:00",
+                "o": 2.9055,
+                "h": 2.913,
+                "l": 2.8915,
+                "c": 2.9105
+              },
+              {
+                "time": "2026-04-02 03:00:00",
+                "o": 2.9115,
+                "h": 2.9145,
+                "l": 2.9005,
+                "c": 2.903
+              }
+            ],
+            "atr_14": 0.020808,
+            "trade_duration_hours": 10.0,
+            "max_favorable_pips": 17.5,
+            "max_adverse_pips": 0.0
+          },
+          "created_at": "2026-04-02 03:44:57"
+        }
+      ],
+      "close_context": {
+        "detection_time": "2026-04-02T03:44:57.069945+00:00",
+        "market_price_at_detection": {
+          "bid": 2.904,
+          "ask": 2.909
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-04-01 17:00:00",
+            "o": 2.8555,
+            "h": 2.8595,
+            "l": 2.828,
+            "c": 2.856
+          },
+          {
+            "time": "2026-04-01 18:00:00",
+            "o": 2.8565,
+            "h": 2.8665,
+            "l": 2.8475,
+            "c": 2.8525
+          },
+          {
+            "time": "2026-04-01 19:00:00",
+            "o": 2.852,
+            "h": 2.8615,
+            "l": 2.8505,
+            "c": 2.857
+          },
+          {
+            "time": "2026-04-01 20:00:00",
+            "o": 2.8565,
+            "h": 2.8615,
+            "l": 2.8515,
+            "c": 2.8575
+          },
+          {
+            "time": "2026-04-01 22:00:00",
+            "o": 2.859,
+            "h": 2.8645,
+            "l": 2.856,
+            "c": 2.8645
+          },
+          {
+            "time": "2026-04-01 23:00:00",
+            "o": 2.8655,
+            "h": 2.8655,
+            "l": 2.8585,
+            "c": 2.8645
+          },
+          {
+            "time": "2026-04-02 00:00:00",
+            "o": 2.865,
+            "h": 2.868,
+            "l": 2.8575,
+            "c": 2.867
+          },
+          {
+            "time": "2026-04-02 01:00:00",
+            "o": 2.8665,
+            "h": 2.9335,
+            "l": 2.864,
+            "c": 2.904
+          },
+          {
+            "time": "2026-04-02 02:00:00",
+            "o": 2.9055,
+            "h": 2.913,
+            "l": 2.8915,
+            "c": 2.9105
+          },
+          {
+            "time": "2026-04-02 03:00:00",
+            "o": 2.9115,
+            "h": 2.9145,
+            "l": 2.9005,
+            "c": 2.903
+          }
+        ],
+        "atr_14": 0.020808,
+        "trade_duration_hours": 10.0,
+        "max_favorable_pips": 17.5,
+        "max_adverse_pips": 0.0
+      },
+      "latest_snapshot": {
+        "current_price": 2.8705,
+        "unrealized_pl": 0.4,
+        "unrealized_pips": 17.5,
+        "distance_sl_pips": 59.0,
+        "distance_tp_pips": 33.4
       }
     },
     {
