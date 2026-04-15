@@ -138,6 +138,12 @@ class CapitalComClient:
                 with urllib.request.urlopen(req, timeout=15) as resp:
                     raw = resp.read()
                     return json.loads(raw) if raw else {}
+            # Log response body for non-401 errors
+            try:
+                err_body = e.read().decode()
+                logger.error(f"Capital.com API {e.code} {method} {path}: {err_body}")
+            except Exception:
+                pass
             raise
 
     def _to_epic(self, instrument: str) -> str:
@@ -253,12 +259,13 @@ class CapitalComClient:
         }
 
         # Place the order — if this succeeds, the position is live on the broker
+        logger.info(f"Placing order: {body}")
         try:
             result = self._request("POST", "/api/v1/positions", body)
             deal_ref = result.get("dealReference", "")
             logger.info(f"Order placed: {side} {abs(units)} {instrument} dealRef={deal_ref}")
         except Exception as e:
-            logger.error(f"Order failed for {instrument}: {e}")
+            logger.error(f"Order failed for {instrument}: {e} | payload={body}")
             return {"id": "", "status": "REJECTED", "error": str(e)}
 
         # Confirm the deal — if this fails, we still return ACCEPTED since
