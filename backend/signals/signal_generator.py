@@ -61,12 +61,12 @@ def _compute_trend(candles: list[dict]) -> str:
 def _format_relevant_news(headlines: list[dict]) -> str:
     """Format relevant headlines into a numbered list for the prompt."""
     items = []
-    for i, h in enumerate(headlines, 1):
-        summary = h.get("summary") or "N/A"
+    for i, h in enumerate(headlines[:10], 1):  # Cap at 10 per instrument
+        summary = (h.get("summary") or "N/A")[:200]
         content = h.get("content") or ""
         source = h.get("source", "unknown")
         published = h.get("published_at", "N/A")
-        reasoning = h.get("relevance_reasoning") or "N/A"
+        reasoning = (h.get("relevance_reasoning") or "N/A")[:200]
 
         entry = (
             f"[{i}] Headline: {h['headline']}\n"
@@ -75,7 +75,7 @@ def _format_relevant_news(headlines: list[dict]) -> str:
             f"Why relevant: {reasoning}"
         )
         if content:
-            entry += f"\nContent: {content[:500]}"
+            entry += f"\nContent: {content[:200]}"
         items.append(entry)
     return "\n\n".join(items)
 

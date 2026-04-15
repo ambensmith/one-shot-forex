@@ -46,7 +46,7 @@ def _format_news_items(headlines: list[dict]) -> str:
     """Format headlines into a numbered list for the prompt."""
     items = []
     for i, h in enumerate(headlines, 1):
-        summary = h.get("summary") or "N/A"
+        summary = (h.get("summary") or "N/A")[:200]
         source = h.get("source", "unknown")
         published = h.get("published_at", "N/A")
         items.append(
@@ -104,11 +104,7 @@ def run_relevance(db, config) -> dict[str, Any]:
     template = prompt_row["template"]
     prompt_version = f"{prompt_row['name']}/{prompt_row['version']}"
 
-    # 3. Format and fill prompt
-    news_formatted = _format_news_items(headlines)
-    filled_prompt = template.replace("{news_items_formatted}", news_formatted)
-
-    # 4. Build LLM clients
+    # 3. Build LLM clients
     llm_config = config.get("streams", {}).get("news_stream", {}).get("llm", {})
     primary_model = llm_config.get("primary_model", "groq/llama-3.3-70b")
     primary = UnifiedLLMClient.from_model_key(primary_model)
@@ -120,50 +116,64 @@ def run_relevance(db, config) -> dict[str, Any]:
         except ValueError as e:
             logger.warning(f"Skipping fallback model {model_key}: {e}")
 
-    # 5. Call LLM
-    logger.info(f"Calling LLM ({primary_model}) with {len(headlines)} headlines")
-    raw_response, model_used = primary.analyze_json_with_fallback(
-        filled_prompt, fallbacks, max_tokens=2000,
-    )
-    logger.info(f"LLM response received from {model_used}")
-
-    # 6. Parse response
-    data = _extract_json(raw_response)
-    output = RelevanceOutput.model_validate(data)
-    logger.info(f"Parsed {len(output.assessments)} relevance items from LLM")
-
-    # 7. Build headline ID lookup for validation
+    # 4. Process headlines in batches to stay within LLM token limits
+    BATCH_SIZE = 15
     headline_ids = {h["id"] for h in headlines}
-
-    # 8. Store assessments
     stored = 0
-    for item in output.assessments:
-        # Validate headline_id exists
-        if item.headline_id not in headline_ids:
-            logger.warning(f"LLM returned unknown headline_id: {item.headline_id}")
+    model_used = None
+
+    for batch_start in range(0, len(headlines), BATCH_SIZE):
+        batch = headlines[batch_start:batch_start + BATCH_SIZE]
+        batch_num = batch_start // BATCH_SIZE + 1
+        total_batches = (len(headlines) + BATCH_SIZE - 1) // BATCH_SIZE
+
+        news_formatted = _format_news_items(batch)
+        filled_prompt = template.replace("{news_items_formatted}", news_formatted)
+
+        logger.info(f"Calling LLM ({primary_model}) — batch {batch_num}/{total_batches} ({len(batch)} headlines)")
+        try:
+            raw_response, model_used = primary.analyze_json_with_fallback(
+                filled_prompt, fallbacks, max_tokens=2000,
+            )
+        except Exception as e:
+            logger.error(f"LLM call failed for batch {batch_num}: {e}")
             continue
 
-        # Skip if no relevant instruments
-        if not item.relevant_instruments:
+        # Parse response
+        try:
+            data = _extract_json(raw_response)
+            output = RelevanceOutput.model_validate(data)
+            logger.info(f"Batch {batch_num}: parsed {len(output.assessments)} relevance items")
+        except Exception as e:
+            logger.error(f"Failed to parse LLM response for batch {batch_num}: {e}")
             continue
 
-        for raw_instrument in item.relevant_instruments:
-            instrument = _normalize_instrument(raw_instrument)
-            if not instrument:
-                logger.warning(f"LLM returned invalid instrument: {raw_instrument}")
+        # Store assessments
+        for item in output.assessments:
+            if item.headline_id not in headline_ids:
+                logger.warning(f"LLM returned unknown headline_id: {item.headline_id}")
                 continue
 
-            assessment = RelevanceAssessment(
-                headline_id=item.headline_id,
-                instrument=instrument,
-                relevance_reasoning=item.relevance_reasoning,
-                prompt_version=prompt_version,
-                model=model_used,
-            )
-            db.insert_relevance(assessment)
-            stored += 1
+            if not item.relevant_instruments:
+                continue
 
-    logger.info(f"Stored {stored} relevance assessments")
+            for raw_instrument in item.relevant_instruments:
+                instrument = _normalize_instrument(raw_instrument)
+                if not instrument:
+                    logger.warning(f"LLM returned invalid instrument: {raw_instrument}")
+                    continue
+
+                assessment = RelevanceAssessment(
+                    headline_id=item.headline_id,
+                    instrument=instrument,
+                    relevance_reasoning=item.relevance_reasoning,
+                    prompt_version=prompt_version,
+                    model=model_used,
+                )
+                db.insert_relevance(assessment)
+                stored += 1
+
+    logger.info(f"Stored {stored} relevance assessments across {total_batches} batches")
     return {
         "headlines_processed": len(headlines),
         "assessments_stored": stored,
