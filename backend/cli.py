@@ -264,7 +264,7 @@ def _candles_to_dataframe(candle_rows: list[dict]):
         "open": "Open", "high": "High", "low": "Low",
         "close": "Close", "volume": "Volume",
     })
-    df.index = pd.DatetimeIndex(pd.to_datetime(df["timestamp"]))
+    df.index = pd.DatetimeIndex(pd.to_datetime(df["timestamp"], utc=True, format="mixed"))
     return df[["Open", "High", "Low", "Close", "Volume"]]
 
 
