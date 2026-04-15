@@ -1,58 +1,87 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { STREAM_COLORS } from '../lib/constants'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useEquity } from '../hooks/useDashboardData'
 
-export default function EquityCurve({ curves, height = 300 }) {
-  // Merge all curves into a single dataset
-  const allTimes = new Set()
-  const streamIds = Object.keys(curves)
+export default function EquityCurve() {
+  const { data, loading } = useEquity()
 
-  streamIds.forEach(sid => {
-    curves[sid]?.forEach(pt => allTimes.add(pt.time))
-  })
+  if (loading) {
+    return <EquityWrapper><p className="text-sm italic text-tertiary">Loading equity data...</p></EquityWrapper>
+  }
 
-  const sortedTimes = [...allTimes].sort()
-  const data = sortedTimes.map(time => {
-    const point = { time: new Date(time).toLocaleDateString() }
-    streamIds.forEach(sid => {
-      const match = curves[sid]?.find(p => p.time === time)
-      if (match) point[sid] = match.equity
-    })
-    return point
-  })
-
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
-        No equity data yet. Run a trading cycle to generate data.
-      </div>
+      <EquityWrapper>
+        <p className="text-sm italic text-tertiary">
+          Equity data will appear after the first trade closes.
+        </p>
+      </EquityWrapper>
     )
   }
 
-  const colors = ['#4c6ef5', '#37b24d', '#f59f00', '#f03e3e', '#ae3ec9']
+  // Format data for Recharts
+  const chartData = data.map(d => ({
+    timestamp: d.timestamp,
+    equity: d.equity,
+    label: new Date(d.timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+  }))
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-        <XAxis dataKey="time" tick={{ fill: '#888', fontSize: 11 }} />
-        <YAxis tick={{ fill: '#888', fontSize: 11 }} />
-        <Tooltip
-          contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #333', borderRadius: 8 }}
-          labelStyle={{ color: '#aaa' }}
-        />
-        <Legend />
-        {streamIds.map((sid, i) => (
-          <Line
-            key={sid}
-            type="monotone"
-            dataKey={sid}
-            stroke={colors[i % colors.length]}
-            strokeWidth={2}
-            dot={false}
-            name={sid}
+    <EquityWrapper>
+      <ResponsiveContainer width="100%" height={240}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
+          <defs>
+            <linearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(79, 70, 229, 0.06)" />
+              <stop offset="100%" stopColor="rgba(79, 70, 229, 0.01)" />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="#F5F5F4" strokeDasharray="" vertical={false} />
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 11, fill: '#A8A29E', fontFamily: 'Inter' }}
+            axisLine={{ stroke: '#E7E5E4' }}
+            tickLine={false}
           />
-        ))}
-      </LineChart>
-    </ResponsiveContainer>
+          <YAxis
+            tick={{ fontSize: 11, fill: '#A8A29E', fontFamily: 'Inter' }}
+            axisLine={false}
+            tickLine={false}
+            width={60}
+            tickFormatter={v => `\u00a3${v.toLocaleString()}`}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="equity"
+            stroke="#4F46E5"
+            strokeWidth={2}
+            fill="url(#equityFill)"
+            dot={false}
+            activeDot={{ r: 4, fill: '#4F46E5', stroke: '#FFFFFF', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </EquityWrapper>
+  )
+}
+
+function EquityWrapper({ children }) {
+  return (
+    <div className="bg-surface border border-border rounded-card p-6 shadow-whisper">
+      {children}
+    </div>
+  )
+}
+
+function CustomTooltip({ active, payload }) {
+  if (!active || !payload?.[0]) return null
+  const data = payload[0].payload
+  return (
+    <div className="bg-surface border border-border rounded-button px-3 py-2 shadow-lifted">
+      <p className="text-xs text-tertiary">{data.label}</p>
+      <p className="text-sm font-medium text-primary font-tabular">
+        &pound;{data.equity?.toLocaleString('en-GB', { minimumFractionDigits: 2 })}
+      </p>
+    </div>
   )
 }

@@ -31,6 +31,10 @@ def export_all(db_path: str = "data/sentinel.db"):
     export_hybrids(db)
     export_config(config)
     export_run_reviews(db)
+    export_bias(db)
+    export_llm_activity(db)
+    export_strategies_detail(db)
+    export_prompts(db)
 
     db.close()
     logger.info(f"Dashboard JSON exported to {OUTPUT_DIR}")
@@ -173,14 +177,14 @@ def export_trades(db):
 
         trade_entry = {
             "id": t["id"],
-            "stream": t["stream"],
+            "stream": t.get("stream") or t.get("source"),
             "instrument": t["instrument"],
             "direction": t["direction"],
             "entry_price": t["entry_price"],
             "exit_price": t.get("exit_price"),
             "stop_loss": t["stop_loss"],
             "take_profit": t["take_profit"],
-            "position_size": t["position_size"],
+            "position_size": t.get("position_size") or t.get("size"),
             "pnl": t.get("pnl"),
             "pnl_pips": t.get("pnl_pips"),
             "status": t["status"],
@@ -253,7 +257,7 @@ def export_signals(db):
 
         signal_list.append({
             "id": s["id"],
-            "stream": s["stream"],
+            "stream": s.get("stream") or s.get("source"),
             "source": s["source"],
             "instrument": s["instrument"],
             "direction": s["direction"],
@@ -368,6 +372,150 @@ def export_run_reviews(db):
     _write_json("run_reviews.json", {"runs": run_logs})
 
 
+def export_bias(db):
+    """Export current directional bias per instrument. Matches /api/bias shape."""
+    states = db.get_bias_state()
+    for s in states:
+        val = s.get("contributing_signals")
+        if isinstance(val, str):
+            try:
+                s["contributing_signals"] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
+    _write_json("bias.json", {"bias": states})
+
+
+def export_llm_activity(db):
+    """Export LLM pipeline activity. Matches /api/llm/activity shape."""
+    # Headlines grouped by source (last 24h for static export)
+    headlines = db.get_recent_headlines(hours=24)
+    for h in headlines:
+        val = h.get("source_metadata")
+        if isinstance(val, str):
+            try:
+                h["source_metadata"] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
+    headlines_by_source: dict[str, list] = {}
+    for h in headlines:
+        src = h.get("source", "unknown")
+        headlines_by_source.setdefault(src, []).append(h)
+
+    # Relevance assessments with headline text
+    assessments = db.get_relevance_with_headlines(hours=24, limit=200)
+
+    # LLM signals
+    signals = db.get_signals(source="llm", limit=100)
+    json_cols = [
+        "key_factors", "risk_factors", "headlines_used", "price_context",
+        "challenge_output", "bias_check", "risk_check", "metadata",
+    ]
+    for s in signals:
+        for col in json_cols:
+            val = s.get(col)
+            if isinstance(val, str):
+                try:
+                    s[col] = json.loads(val)
+                except (json.JSONDecodeError, TypeError):
+                    pass
+
+    _write_json("llm_activity.json", {
+        "headlines_by_source": headlines_by_source,
+        "relevance_assessments": assessments,
+        "signals": signals,
+        "summary": {
+            "headlines_count": len(headlines),
+            "assessments_count": len(assessments),
+            "signals_count": len(signals),
+            "hours_lookback": 24,
+        },
+    })
+
+
+def export_strategies_detail(db):
+    """Export strategy definitions + signals + trade stats. Matches /api/strategies shape."""
+    json_cols = [
+        "key_factors", "risk_factors", "headlines_used", "price_context",
+        "challenge_output", "bias_check", "risk_check", "metadata",
+    ]
+
+    # Try to load strategy classes for descriptions/parameters.
+    # Falls back to DB-only approach if dependencies (e.g. pandas) are missing.
+    strategy_info = {}
+    try:
+        from backend.strategies.registry import discover_strategies
+        for name, cls in discover_strategies().items():
+            instance = cls()
+            strategy_info[name] = {
+                "name": instance.name,
+                "description": instance.description,
+                "parameters": instance.get_parameters(),
+            }
+    except ImportError:
+        logger.warning("Strategy classes unavailable (missing deps), using DB-only export")
+
+    # Discover strategy names from signals if registry failed
+    if not strategy_info:
+        rows = db.execute(
+            "SELECT DISTINCT source FROM signals WHERE source LIKE 'strategy:%'"
+        ).fetchall()
+        for r in rows:
+            name = dict(r)["source"].replace("strategy:", "")
+            strategy_info[name] = {"name": name, "description": "", "parameters": {}}
+
+    result = []
+    for name, info in strategy_info.items():
+        source_key = f"strategy:{name}"
+
+        recent_signals = db.get_signals(source=source_key, limit=10)
+        for s in recent_signals:
+            for col in json_cols:
+                val = s.get(col)
+                if isinstance(val, str):
+                    try:
+                        s[col] = json.loads(val)
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+
+        all_trades = db.query(
+            "SELECT * FROM trades WHERE source = ? ORDER BY opened_at DESC",
+            (source_key,),
+        )
+        closed = [t for t in all_trades if t.get("pnl") is not None]
+        wins = sum(1 for t in closed if t["pnl"] > 0)
+        total_pnl = sum(t["pnl"] for t in closed)
+
+        result.append({
+            "name": info["name"],
+            "description": info["description"],
+            "parameters": info["parameters"],
+            "recent_signals": [
+                {
+                    "instrument": s["instrument"],
+                    "direction": s["direction"],
+                    "confidence": s["confidence"],
+                    "created_at": s["created_at"],
+                }
+                for s in recent_signals
+            ],
+            "trade_stats": {
+                "total": len(all_trades),
+                "won": wins,
+                "lost": len(closed) - wins,
+                "net_pnl": round(total_pnl, 2),
+                "win_rate": round(wins / len(closed), 3) if closed else 0,
+            },
+        })
+
+    _write_json("strategies.json", {"strategies": result})
+
+
+def export_prompts(db):
+    """Export current prompts with versions. Matches /api/prompts shape."""
+    prompts = db.get_all_prompts()
+    _write_json("prompts.json", {"prompts": prompts})
+
+
 def _get_strategy_breakdown(db) -> list[dict]:
     """Get per-strategy performance metrics."""
     strategies = ["momentum", "carry", "breakout", "mean_reversion", "volatility_breakout"]
@@ -375,8 +523,8 @@ def _get_strategy_breakdown(db) -> list[dict]:
 
     for strat_name in strategies:
         signals = db.execute(
-            "SELECT * FROM signals WHERE stream = 'strategy' AND source = ?",
-            (strat_name,),
+            "SELECT * FROM signals WHERE source = ?",
+            (f"strategy:{strat_name}",),
         ).fetchall()
 
         traded_signal_ids = [dict(s)["trade_id"] for s in signals if dict(s).get("was_traded")]

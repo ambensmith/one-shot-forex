@@ -21,9 +21,14 @@ logging.basicConfig(
 logger = logging.getLogger("forex_sentinel")
 
 
+_force_market_open = False
+
+
 def is_market_open() -> bool:
     """Returns True if forex market is currently open.
     Open: Sunday 22:00 UTC through Friday 22:00 UTC."""
+    if _force_market_open:
+        return True
     now = datetime.now(timezone.utc)
     weekday = now.weekday()  # 0=Mon, 6=Sun
     hour = now.hour

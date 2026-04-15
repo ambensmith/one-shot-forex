@@ -1,12 +1,12 @@
-"""FastAPI server — exposes endpoints to trigger trading streams from the frontend."""
+"""FastAPI server — exposes endpoints to trigger trading streams and serve data to the frontend."""
 
 from __future__ import annotations
 
-import asyncio
+import json
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
-
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -424,5 +424,344 @@ async def get_status():
             }
 
         return JSONResponse({"status": "ok", "streams": streams})
+    finally:
+        db.close()
+
+
+# ── Helpers for data endpoints ─────────────────────────────────
+
+
+_SIGNAL_JSON_COLS = [
+    "key_factors", "risk_factors", "headlines_used", "price_context",
+    "challenge_output", "bias_check", "risk_check", "metadata",
+]
+_BIAS_JSON_COLS = ["contributing_signals"]
+
+
+def _parse_json_fields(row: dict, columns: list[str]) -> dict:
+    """Parse JSON-string columns back to Python objects in place."""
+    for col in columns:
+        val = row.get(col)
+        if isinstance(val, str):
+            try:
+                row[col] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
+    return row
+
+
+def _duration_seconds(start: str | None, end: str | None = None) -> int | None:
+    """Compute duration in seconds between two ISO timestamps. If end is None, use now."""
+    if not start:
+        return None
+    try:
+        t0 = datetime.fromisoformat(start)
+        if t0.tzinfo is None:
+            t0 = t0.replace(tzinfo=timezone.utc)
+        t1 = datetime.now(timezone.utc)
+        if end:
+            t1 = datetime.fromisoformat(end)
+            if t1.tzinfo is None:
+                t1 = t1.replace(tzinfo=timezone.utc)
+        return max(0, int((t1 - t0).total_seconds()))
+    except (ValueError, TypeError):
+        return None
+
+
+def _get_db():
+    """Shorthand for creating a Database connection."""
+    from backend.core.database import Database
+    return Database("data/sentinel.db")
+
+
+# ── Session 10: Data-serving endpoints ─────────────────────────
+
+
+@app.get("/api/trades/open")
+async def api_trades_open():
+    """Open trades enriched with current prices and unrealized P&L."""
+    from backend.data.provider import pip_value
+
+    db = _get_db()
+    try:
+        trades = db.get_open_trades()
+        prices = db.get_latest_prices()
+
+        result = []
+        for t in trades:
+            price_info = prices.get(t["instrument"])
+            current_price = price_info["mid"] if price_info else None
+
+            unrealized_pnl = None
+            unrealized_pnl_pips = None
+            if current_price and t.get("entry_price"):
+                diff = current_price - t["entry_price"]
+                if t["direction"] == "short":
+                    diff = -diff
+                pip_val = pip_value(t["instrument"])
+                unrealized_pnl_pips = round(diff / pip_val, 1)
+                size = t.get("size") or 1
+                unrealized_pnl = round(diff * size, 4)
+
+            result.append({
+                **t,
+                "current_price": current_price,
+                "unrealized_pnl": unrealized_pnl,
+                "unrealized_pnl_pips": unrealized_pnl_pips,
+                "duration_seconds": _duration_seconds(t.get("opened_at")),
+            })
+
+        return JSONResponse({"trades": result})
+    finally:
+        db.close()
+
+
+@app.get("/api/trades/closed")
+async def api_trades_closed(
+    filter: str | None = None,
+    instrument: str | None = None,
+    source: str | None = None,
+    days: int | None = None,
+    limit: int = 20,
+):
+    """Closed trades with optional filters for outcome, instrument, source, recency."""
+    db = _get_db()
+    try:
+        trades = db.get_closed_trades(
+            outcome=filter, instrument=instrument, source=source,
+            days=days, limit=limit,
+        )
+        for t in trades:
+            t["duration_seconds"] = _duration_seconds(t.get("opened_at"), t.get("closed_at"))
+        return JSONResponse({"trades": trades, "count": len(trades)})
+    finally:
+        db.close()
+
+
+@app.get("/api/trades/{trade_id}")
+async def api_trade_detail(trade_id: str):
+    """Full trade record for the narrative timeline drill-down."""
+    db = _get_db()
+    try:
+        record = db.get_trade_record(trade_id)
+        if record:
+            # Ensure all DESIGN.md Section 8 chapter keys are present
+            chapter_keys = [
+                "headlines_analysed", "signal", "challenge",
+                "price_context_at_signal", "bias_at_trade",
+                "risk_decision", "entry", "exit",
+            ]
+            rec = record.get("record", {})
+            for key in chapter_keys:
+                if key not in rec:
+                    rec[key] = None
+            record["record"] = rec
+            return JSONResponse({"trade": record})
+
+        # Fallback: construct basic record from trades + signals tables
+        rows = db.query("SELECT * FROM trades WHERE id = ? LIMIT 1", (trade_id,))
+        if not rows:
+            return JSONResponse({"error": "Trade not found"}, status_code=404)
+
+        trade = rows[0]
+        signal_data = None
+        if trade.get("signal_id"):
+            sig_rows = db.query(
+                "SELECT * FROM signals WHERE id = ? LIMIT 1", (trade["signal_id"],)
+            )
+            if sig_rows:
+                signal_data = _parse_json_fields(sig_rows[0], _SIGNAL_JSON_COLS)
+
+        fallback_record = {
+            "headlines_analysed": None,
+            "signal": signal_data,
+            "challenge": signal_data.get("challenge_output") if signal_data else None,
+            "price_context_at_signal": signal_data.get("price_context") if signal_data else None,
+            "bias_at_trade": signal_data.get("bias_check") if signal_data else None,
+            "risk_decision": signal_data.get("risk_check") if signal_data else None,
+            "entry": {
+                "price": trade.get("entry_price"),
+                "time": trade.get("opened_at"),
+                "broker_deal_id": trade.get("broker_deal_id"),
+            },
+            "exit": {
+                "price": trade.get("exit_price"),
+                "time": trade.get("closed_at"),
+                "pnl": trade.get("pnl"),
+                "pnl_pips": trade.get("pnl_pips"),
+                "close_reason": trade.get("close_reason"),
+            } if trade.get("status") != "open" else None,
+        }
+        return JSONResponse({
+            "trade": {
+                "trade_id": trade["id"],
+                "record": fallback_record,
+                "created_at": trade.get("opened_at"),
+            }
+        })
+    finally:
+        db.close()
+
+
+@app.get("/api/signals/recent")
+async def api_signals_recent(limit: int = 50, source: str | None = None):
+    """Recent signals from both streams, optionally filtered by source."""
+    db = _get_db()
+    try:
+        signals = db.get_signals(source=source, limit=limit)
+        for s in signals:
+            _parse_json_fields(s, _SIGNAL_JSON_COLS)
+        return JSONResponse({"signals": signals})
+    finally:
+        db.close()
+
+
+@app.get("/api/llm/activity")
+async def api_llm_activity(hours: int = 4):
+    """LLM pipeline activity: headlines grouped by source, relevance assessments, signals."""
+    db = _get_db()
+    try:
+        # Headlines grouped by source
+        headlines = db.get_recent_headlines(hours=hours)
+        for h in headlines:
+            _parse_json_fields(h, ["source_metadata"])
+        headlines_by_source: dict[str, list] = {}
+        for h in headlines:
+            src = h.get("source", "unknown")
+            headlines_by_source.setdefault(src, []).append(h)
+
+        # Relevance assessments with headline text
+        assessments = db.get_relevance_with_headlines(hours=hours, limit=200)
+
+        # LLM signals
+        signals = db.get_signals(source="llm", limit=100)
+        for s in signals:
+            _parse_json_fields(s, _SIGNAL_JSON_COLS)
+
+        return JSONResponse({
+            "headlines_by_source": headlines_by_source,
+            "relevance_assessments": assessments,
+            "signals": signals,
+            "summary": {
+                "headlines_count": len(headlines),
+                "assessments_count": len(assessments),
+                "signals_count": len(signals),
+                "hours_lookback": hours,
+            },
+        })
+    finally:
+        db.close()
+
+
+@app.get("/api/strategies")
+async def api_strategies():
+    """Strategy definitions with recent signals and trade stats."""
+    from backend.strategies.registry import discover_strategies
+
+    db = _get_db()
+    try:
+        strategy_classes = discover_strategies()
+        result = []
+
+        for name, cls in strategy_classes.items():
+            instance = cls()
+            source_key = f"strategy:{name}"
+
+            # Recent signals for this strategy
+            recent_signals = db.get_signals(source=source_key, limit=10)
+            for s in recent_signals:
+                _parse_json_fields(s, _SIGNAL_JSON_COLS)
+
+            # Trade stats: query trades with this source
+            all_trades = db.query(
+                "SELECT * FROM trades WHERE source = ? ORDER BY opened_at DESC",
+                (source_key,),
+            )
+            closed = [t for t in all_trades if t.get("pnl") is not None]
+            wins = sum(1 for t in closed if t["pnl"] > 0)
+            total_pnl = sum(t["pnl"] for t in closed)
+
+            result.append({
+                "name": instance.name,
+                "description": instance.description,
+                "parameters": instance.get_parameters(),
+                "recent_signals": [
+                    {
+                        "instrument": s["instrument"],
+                        "direction": s["direction"],
+                        "confidence": s["confidence"],
+                        "created_at": s["created_at"],
+                    }
+                    for s in recent_signals
+                ],
+                "trade_stats": {
+                    "total": len(all_trades),
+                    "won": wins,
+                    "lost": len(closed) - wins,
+                    "net_pnl": round(total_pnl, 2),
+                    "win_rate": round(wins / len(closed), 3) if closed else 0,
+                },
+            })
+
+        return JSONResponse({"strategies": result})
+    finally:
+        db.close()
+
+
+@app.get("/api/prompts")
+async def api_prompts():
+    """All prompts with versions."""
+    db = _get_db()
+    try:
+        prompts = db.get_all_prompts()
+        return JSONResponse({"prompts": prompts})
+    finally:
+        db.close()
+
+
+@app.put("/api/prompts/{name}")
+async def api_update_prompt(name: str, request: Request):
+    """Update a prompt's template and version."""
+    db = _get_db()
+    try:
+        existing = db.get_active_prompt(name)
+        if not existing:
+            return JSONResponse({"error": f"Prompt '{name}' not found"}, status_code=404)
+
+        body = await request.json()
+        template = body.get("template")
+        version = body.get("version")
+        if not template or not version:
+            return JSONResponse(
+                {"error": "Both 'template' and 'version' are required"},
+                status_code=400,
+            )
+
+        db.update_prompt(name, template, version)
+        return JSONResponse({"status": "ok", "name": name, "version": version})
+    finally:
+        db.close()
+
+
+@app.get("/api/bias")
+async def api_bias():
+    """Current directional bias per instrument."""
+    db = _get_db()
+    try:
+        states = db.get_bias_state()
+        for s in states:
+            _parse_json_fields(s, _BIAS_JSON_COLS)
+        return JSONResponse({"bias": states})
+    finally:
+        db.close()
+
+
+@app.get("/api/equity")
+async def api_equity(stream: str | None = None):
+    """Equity snapshots over time, optionally filtered by stream."""
+    db = _get_db()
+    try:
+        history = db.get_equity_history(stream=stream)
+        return JSONResponse({"equity": history, "count": len(history)})
     finally:
         db.close()

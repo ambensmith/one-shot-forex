@@ -2,17 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #FAFAF9;
+    color: #1C1917;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
+/* Semantic shadow CSS custom properties — used in inline styles for dynamic composition */
+:root {
+  --shadow-profitable: 0 4px 24px rgba(34, 197, 94, 0.15), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-profitable-hover: 0 8px 32px rgba(34, 197, 94, 0.22), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tint-profitable: rgba(34, 197, 94, 0.04);
+  --border-profitable: rgba(34, 197, 94, 0.20);
+
+  --shadow-loss: 0 4px 24px rgba(239, 68, 68, 0.15), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-loss-hover: 0 8px 32px rgba(239, 68, 68, 0.22), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tint-loss: rgba(239, 68, 68, 0.04);
+  --border-loss: rgba(239, 68, 68, 0.20);
+
+  --shadow-pending: 0 4px 24px rgba(245, 158, 11, 0.15), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-pending-hover: 0 8px 32px rgba(245, 158, 11, 0.22), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tint-pending: rgba(245, 158, 11, 0.04);
+  --border-pending: rgba(245, 158, 11, 0.20);
+
+  --shadow-info: 0 4px 24px rgba(99, 102, 241, 0.15), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-info-hover: 0 8px 32px rgba(99, 102, 241, 0.22), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tint-info: rgba(99, 102, 241, 0.04);
+  --border-info: rgba(99, 102, 241, 0.20);
+
+  --shadow-cooldown: 0 4px 24px rgba(148, 163, 184, 0.15), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-cooldown-hover: 0 8px 32px rgba(148, 163, 184, 0.22), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --tint-cooldown: rgba(148, 163, 184, 0.04);
+  --border-cooldown: rgba(148, 163, 184, 0.20);
+}
+
+/* Utility classes */
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Subtle global scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: #FAFAF9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #4a4a6a;
+  background: #D6D3D1;
   border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A8A29E;
 }

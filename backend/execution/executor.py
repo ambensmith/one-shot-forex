@@ -9,7 +9,7 @@ from typing import Any
 logger = logging.getLogger("forex_sentinel.executor")
 
 # Only these statuses from place_order() mean the order actually went through
-CONFIRMED_STATUSES = {"ACCEPTED", "OPEN", "AMENDED"}
+CONFIRMED_STATUSES = {"ACCEPTED", "OPEN", "AMENDED", "simulated"}
 
 
 class Executor:
@@ -60,26 +60,20 @@ class Executor:
             return None
 
         # Record in database with broker_deal_id for later reconciliation
-        trade_id = self.db.insert_trade(
-            stream=stream_id,
+        from backend.core.models import Trade
+        trade = Trade(
             instrument=instrument,
             direction=direction,
+            size=position_size,
             entry_price=entry_price,
             stop_loss=stop_loss,
             take_profit=take_profit,
-            position_size=position_size,
-            signal_ids=signal_ids or [],
+            source=stream_id,
+            signal_id=signal_ids[0] if signal_ids else None,
             broker_deal_id=broker_deal_id,
+            status="open",
         )
-
-        # Update signals with trade_id
-        if signal_ids:
-            for sid in signal_ids:
-                self.db.execute(
-                    "UPDATE signals SET was_traded = 1, trade_id = ? WHERE id = ?",
-                    (trade_id, sid),
-                )
-            self.db.commit()
+        trade_id = self.db.insert_trade(trade)
 
         # Record trade open event
         self.db.insert_trade_event(trade_id, "opened", {
@@ -118,23 +112,13 @@ class Executor:
         newly_closed = []
 
         # ── DB→Broker: find local trades missing from broker ──
-        local_open = self.db.get_open_trades(stream_id)
+        local_open = self.db.get_open_trades_by_source(stream_id)
         for trade in local_open:
             broker_deal_id = trade.get("broker_deal_id") or ""
 
             if not broker_deal_id or broker_deal_id.startswith("offline-"):
-                # Phantom trade — never actually executed on broker
-                logger.info(
-                    f"Reconciliation: trade {trade['id']} ({trade['instrument']} "
-                    f"{trade['direction']}) has no broker_deal_id — marking as failed"
-                )
-                self.db.update_trade(
-                    trade["id"],
-                    status="failed",
-                    pnl=0.0,
-                    pnl_pips=0.0,
-                    closed_at=datetime.now(timezone.utc).isoformat(),
-                )
+                # Offline/simulated trade — skip reconciliation, not a real broker position
+                continue
             elif broker_deal_id not in broker_deal_ids:
                 # Real trade closed by broker (SL/TP hit between runs)
                 exit_info = self._fetch_exit_details(trade)
@@ -168,7 +152,7 @@ class Executor:
 
         # ── Broker→DB: detect unknown broker positions ──
         all_local_deal_ids = set()
-        all_open = self.db.get_open_trades()
+        all_open = self.db.get_open_trades_by_source()
         for t in all_open:
             did = t.get("broker_deal_id") or ""
             if did:
@@ -184,18 +168,19 @@ class Executor:
                         f"Reconciliation: importing untracked broker position deal_id={deal_id} "
                         f"{pos.get('instrument')} {pos.get('direction')}"
                     )
-                    trade_id = self.db.insert_trade(
-                        stream="broker",
+                    from backend.core.models import Trade
+                    imported_trade = Trade(
                         instrument=pos.get("instrument", ""),
                         direction=pos.get("direction", ""),
-                        entry_price=pos.get("entry_price"),
+                        size=float(pos.get("currentUnits", 0)),
+                        entry_price=pos.get("entry_price", 0),
                         stop_loss=pos.get("stop_loss"),
                         take_profit=pos.get("take_profit"),
-                        position_size=float(pos.get("currentUnits", 0)),
-                        status="open",
-                        opened_at=datetime.now(timezone.utc).isoformat(),
+                        source="broker",
                         broker_deal_id=deal_id,
+                        status="open",
                     )
+                    trade_id = self.db.insert_trade(imported_trade)
                     self.db.insert_trade_event(trade_id, "imported", {
                         "source": "broker_reconciliation",
                         "broker_data": {
@@ -247,9 +232,9 @@ class Executor:
         broker_size = broker_pos.get("currentUnits")
         if broker_size is not None:
             broker_size_f = abs(float(broker_size))
-            if broker_size_f > 0 and abs(broker_size_f - trade["position_size"]) > 0.01:
-                old_size = trade["position_size"]
-                changes["position_size"] = broker_size_f
+            if broker_size_f > 0 and abs(broker_size_f - trade["size"]) > 0.01:
+                old_size = trade["size"]
+                changes["size"] = broker_size_f
                 self.db.insert_trade_event(trade["id"], "size_adjusted", {
                     "old_value": old_size,
                     "new_value": broker_size_f,
@@ -355,13 +340,13 @@ class Executor:
             pnl_pips = (exit_price - entry) / pip_val
         else:
             pnl_pips = (entry - exit_price) / pip_val
-        pnl = pnl_pips * pip_val * trade["position_size"]
+        pnl = pnl_pips * pip_val * trade["size"]
         return {"exit_price": exit_price, "pnl": round(pnl, 2), "pnl_pips": round(pnl_pips, 1)}
 
     def check_and_close_trades(self, stream_id: str):
         """Check open trades for SL/TP hits and close them."""
         self.reconcile_positions(stream_id=stream_id)
-        open_trades = self.db.get_open_trades(stream_id)
+        open_trades = self.db.get_open_trades_by_source(stream_id)
         for trade in open_trades:
             try:
                 price_data = self.broker.get_current_price(trade["instrument"])
@@ -398,7 +383,7 @@ class Executor:
                 pnl_pips = (current_price - entry) / pip_val
             else:
                 pnl_pips = (entry - current_price) / pip_val
-            pnl = pnl_pips * pip_val * trade["position_size"]
+            pnl = pnl_pips * pip_val * trade["size"]
 
             self.db.update_trade(
                 trade["id"],

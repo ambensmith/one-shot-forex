@@ -6,10 +6,7 @@ export default defineConfig({
   base: './',
   server: {
     proxy: {
-      '/api/run-stream': 'http://localhost:8000',
-      '/api/run-all': 'http://localhost:8000',
-      '/api/reset': 'http://localhost:8000',
-      '/api/status': 'http://localhost:8000',
+      '/api': 'http://localhost:8000',
     },
   },
 })

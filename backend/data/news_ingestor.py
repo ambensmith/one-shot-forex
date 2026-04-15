@@ -1,13 +1,38 @@
-"""News ingestor — fetches from RSS, GDELT, and economic calendar."""
+"""News ingestor — fetches from Finnhub, RSS feeds, and economic calendar."""
 
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 logger = logging.getLogger("forex_sentinel.news")
+
+# Words that indicate market direction — headlines differing in these
+# must NOT be deduplicated even if token overlap is high.
+DIRECTIONAL_WORDS = frozenset({
+    "raise", "raises", "raised", "raising",
+    "cut", "cuts", "cutting",
+    "hike", "hikes", "hiking",
+    "ease", "eases", "easing",
+    "hawkish", "dovish",
+    "tighten", "tightens", "tightening",
+    "loosen", "loosens", "loosening",
+    "surge", "surges", "surging",
+    "plunge", "plunges", "plunging",
+    "rally", "rallies", "rallying",
+    "crash", "crashes", "crashing",
+    "rise", "rises", "rising",
+    "fall", "falls", "falling",
+    "drop", "drops", "dropping",
+    "jump", "jumps", "jumping",
+    "climb", "climbs", "climbing",
+    "slide", "slides", "sliding",
+    "increase", "increases", "increasing",
+    "decrease", "decreases", "decreasing",
+})
 
 
 @dataclass
@@ -16,7 +41,12 @@ class RawNewsItem:
     source: str
     url: str | None = None
     summary: str | None = None
+    content: str | None = None
     published_at: datetime | None = None
+    category: str | None = None
+    image_url: str | None = None
+    sentiment_score: float | None = None
+    source_metadata: dict[str, Any] | None = None
     source_count: int = 1
     sources: list[str] = field(default_factory=list)
 
@@ -32,6 +62,14 @@ class NewsIngestor:
         self.config = config
         self.stream_cfg = config.get("streams", {}).get("news_stream", {})
         self.sources = self.stream_cfg.get("news_sources", [])
+        self.lookback_hours = self.stream_cfg.get("news_lookback_hours", 4)
+        self.dedup_threshold = self.stream_cfg.get("dedup_threshold", 0.80)
+
+        # Finnhub config
+        finnhub_cfg = config.get("finnhub", {})
+        self._finnhub_base_url = finnhub_cfg.get("base_url", "https://finnhub.io/api/v1")
+        api_key_env = finnhub_cfg.get("api_key_env", "FINNHUB_API_KEY")
+        self._finnhub_api_key = os.environ.get(api_key_env, "")
 
     async def fetch_all(self) -> list[RawNewsItem]:
         """Fetch news from all configured sources."""
@@ -39,19 +77,146 @@ class NewsIngestor:
 
         for source in self.sources:
             source_type = source.get("type", "")
+            if not source.get("enabled", True):
+                continue
             try:
                 if source_type == "rss":
                     items.extend(await self._fetch_rss(source))
-                elif source_type == "gdelt":
-                    if source.get("enabled", True):
-                        items.extend(await self._fetch_gdelt())
-                elif source_type == "economic_calendar":
-                    items.extend(await self._fetch_calendar(source))
+                elif source_type == "finnhub":
+                    items.extend(await self._fetch_finnhub_news(source))
+                elif source_type == "finnhub_calendar":
+                    items.extend(await self._fetch_finnhub_calendar(source))
             except Exception as e:
                 logger.warning(f"Failed to fetch from {source_type}/{source.get('name', 'unknown')}: {e}")
 
         logger.info(f"Fetched {len(items)} total news items from {len(self.sources)} sources")
         return items
+
+    # ── Finnhub ────────────────────────────────────────────────
+
+    async def _fetch_finnhub_news(self, source: dict) -> list[RawNewsItem]:
+        """Fetch general/forex news from Finnhub API."""
+        import aiohttp
+
+        if not self._finnhub_api_key:
+            logger.warning("FINNHUB_API_KEY not set, skipping Finnhub news")
+            return []
+
+        name = source.get("name", "Finnhub News")
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=self.lookback_hours)
+        items: list[RawNewsItem] = []
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                url = f"{self._finnhub_base_url}/news?category=forex&token={self._finnhub_api_key}"
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    if resp.status != 200:
+                        body = await resp.text()
+                        logger.warning(f"Finnhub news returned status {resp.status}: {body[:200]}")
+                        return []
+                    data = await resp.json(content_type=None)
+        except Exception as e:
+            logger.warning(f"Finnhub news fetch failed: {type(e).__name__}: {e}")
+            return []
+
+        if not isinstance(data, list):
+            logger.warning(f"Finnhub news returned unexpected format: {type(data)}")
+            return []
+
+        for article in data:
+            published = None
+            ts = article.get("datetime")
+            if ts:
+                try:
+                    published = datetime.fromtimestamp(ts, tz=timezone.utc)
+                except (ValueError, OSError):
+                    pass
+
+            # Skip items older than lookback window
+            if published and published < cutoff:
+                continue
+
+            headline_text = article.get("headline", "").strip()
+            if not headline_text:
+                continue
+
+            items.append(RawNewsItem(
+                headline=headline_text,
+                source=name,
+                url=article.get("url"),
+                summary=article.get("summary", "")[:500] or None,
+                image_url=article.get("image") or None,
+                published_at=published,
+                category=article.get("category"),
+                source_metadata=article,
+            ))
+
+        logger.info(f"Finnhub news: {len(items)} items")
+        return items
+
+    async def _fetch_finnhub_calendar(self, source: dict) -> list[RawNewsItem]:
+        """Fetch economic calendar from Finnhub API."""
+        import aiohttp
+
+        if not self._finnhub_api_key:
+            logger.warning("FINNHUB_API_KEY not set, skipping Finnhub calendar")
+            return []
+
+        name = source.get("name", "Finnhub Calendar")
+        items: list[RawNewsItem] = []
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                url = f"{self._finnhub_base_url}/calendar/economic?token={self._finnhub_api_key}"
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    if resp.status != 200:
+                        body = await resp.text()
+                        logger.warning(f"Finnhub calendar returned status {resp.status}: {body[:200]}")
+                        return []
+                    data = await resp.json(content_type=None)
+        except Exception as e:
+            logger.warning(f"Finnhub calendar fetch failed: {type(e).__name__}: {e}")
+            return []
+
+        events = data.get("economicCalendar", []) if isinstance(data, dict) else []
+
+        for event in events:
+            impact = event.get("impact", "")
+            if impact not in ("high", "medium", 3, 2):
+                continue
+
+            country = event.get("country", "")
+            title = event.get("event", "")
+            actual = event.get("actual", "")
+            estimate = event.get("estimate", "")
+            prev = event.get("prev", "")
+
+            impact_label = "HIGH IMPACT" if impact in ("high", 3) else "MEDIUM IMPACT"
+            headline_text = f"[{impact_label}] {country} {title}"
+            if actual not in (None, ""):
+                headline_text += f" — Actual: {actual}"
+                parts = []
+                if estimate not in (None, ""):
+                    parts.append(f"Forecast: {estimate}")
+                if prev not in (None, ""):
+                    parts.append(f"Previous: {prev}")
+                if parts:
+                    headline_text += f" ({', '.join(parts)})"
+
+            summary = f"Impact: {impact_label}. {country} economic event."
+
+            items.append(RawNewsItem(
+                headline=headline_text,
+                source=name,
+                summary=summary,
+                category="economic_calendar",
+                source_metadata=event,
+            ))
+
+        logger.info(f"Finnhub calendar: {len(items)} high/medium impact events")
+        return items
+
+    # ── RSS ────────────────────────────────────────────────────
 
     async def _fetch_rss(self, source: dict) -> list[RawNewsItem]:
         """Fetch and parse RSS feed."""
@@ -59,9 +224,12 @@ class NewsIngestor:
 
         url = source.get("url", "")
         name = source.get("name", "RSS")
+        category = source.get("category")
+
+        headers = {"User-Agent": "ForexSentinel/1.0 (news aggregator)"}
 
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(headers=headers) as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                     if resp.status != 200:
                         body = await resp.text()
@@ -79,6 +247,7 @@ class NewsIngestor:
         except ImportError:
             entries = self._parse_rss_xml(content)
 
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=self.lookback_hours)
         items = []
         for entry in entries:
             published = None
@@ -87,16 +256,41 @@ class NewsIngestor:
                     published = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
                 except Exception:
                     pass
+
+            # Skip items definitively older than lookback window
+            if published and published < cutoff:
+                continue
+
             title = entry.get("title", "").strip() if isinstance(entry, dict) else getattr(entry, "title", "").strip()
             link = entry.get("link") if isinstance(entry, dict) else getattr(entry, "link", None)
             summary = entry.get("summary", "") if isinstance(entry, dict) else getattr(entry, "summary", "")
+            entry_content = entry.get("content", "") if isinstance(entry, dict) else getattr(entry, "content", "")
+
+            if not title:
+                continue
+
+            # feedparser content is a list of dicts with 'value' key
+            content_text = None
+            if isinstance(entry_content, list) and entry_content:
+                content_text = entry_content[0].get("value", "")[:2000] or None
+            elif isinstance(entry_content, str) and entry_content:
+                content_text = entry_content[:2000]
+
+            # Build source_metadata from the raw entry
+            if isinstance(entry, dict):
+                metadata = entry
+            else:
+                metadata = {k: v for k, v in entry.items() if isinstance(v, (str, int, float, bool, list))}
 
             items.append(RawNewsItem(
                 headline=title,
                 source=name,
                 url=link,
                 summary=summary[:500] if summary else None,
+                content=content_text,
                 published_at=published,
+                category=category,
+                source_metadata=metadata,
             ))
 
         logger.info(f"RSS {name}: {len(items)} items")
@@ -122,117 +316,20 @@ class NewsIngestor:
             pass
         return items[:20]
 
-    async def _fetch_gdelt(self, attempt: int = 0) -> list[RawNewsItem]:
-        """Fetch from GDELT Project API with retry on rate-limit."""
-        import aiohttp
-        import asyncio
-        import json
 
-        url = (
-            "https://api.gdeltproject.org/api/v2/doc/doc"
-            "?query=forex+OR+%22central+bank%22+OR+%22interest+rate%22"
-            "&mode=artlist&maxrecords=15&format=json"
-        )
-
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
-                    if resp.status == 429 and attempt < 2:
-                        wait = (attempt + 1) * 6
-                        logger.warning(f"GDELT rate-limited, retrying in {wait}s...")
-                        await asyncio.sleep(wait)
-                        return await self._fetch_gdelt(attempt + 1)
-                    if resp.status != 200:
-                        body = await resp.text()
-                        logger.warning(f"GDELT returned status {resp.status}: {body[:200]}")
-                        return []
-                    text = await resp.text()
-                    # GDELT sometimes returns rate-limit message as 200
-                    if text.startswith("Please limit"):
-                        if attempt < 2:
-                            wait = (attempt + 1) * 6
-                            logger.warning(f"GDELT soft rate-limit, retrying in {wait}s...")
-                            await asyncio.sleep(wait)
-                            return await self._fetch_gdelt(attempt + 1)
-                        logger.warning("GDELT rate-limited after retries")
-                        return []
-                    data = json.loads(text)
-        except Exception as e:
-            logger.warning(f"GDELT fetch failed: {type(e).__name__}: {e}")
-            return []
-
-        items = []
-        articles = data.get("articles", [])
-        for article in articles[:20]:
-            published = None
-            if article.get("seendate"):
-                try:
-                    published = datetime.strptime(
-                        article["seendate"][:14], "%Y%m%dT%H%M%S"
-                    ).replace(tzinfo=timezone.utc)
-                except Exception:
-                    pass
-
-            items.append(RawNewsItem(
-                headline=article.get("title", "").strip(),
-                source="GDELT",
-                url=article.get("url"),
-                published_at=published,
-            ))
-
-        logger.info(f"GDELT: {len(items)} items")
-        return items
-
-    async def _fetch_calendar(self, source: dict) -> list[RawNewsItem]:
-        """Fetch economic calendar from ForexFactory."""
-        import aiohttp
-
-        url = source.get("url", "https://nfs.faireconomy.media/ff_calendar_thisweek.json")
-
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                    if resp.status != 200:
-                        body = await resp.text()
-                        logger.warning(f"Calendar returned status {resp.status}: {body[:200]}")
-                        return []
-                    data = await resp.json(content_type=None)
-        except Exception as e:
-            logger.warning(f"Calendar fetch failed: {type(e).__name__}: {e}")
-            return []
-
-        items = []
-        if not isinstance(data, list):
-            return items
-
-        for event in data[:30]:
-            title = event.get("title", "")
-            country = event.get("country", "")
-            impact = event.get("impact", "")
-            actual = event.get("actual", "")
-            forecast = event.get("forecast", "")
-
-            if impact not in ("High", "Medium"):
-                continue
-
-            headline = f"[{country}] {title}"
-            if actual:
-                headline += f" Actual: {actual}"
-                if forecast:
-                    headline += f" (Forecast: {forecast})"
-
-            items.append(RawNewsItem(
-                headline=headline,
-                source="Economic Calendar",
-                summary=f"Impact: {impact}. {country} economic event.",
-            ))
-
-        logger.info(f"Calendar: {len(items)} high/medium impact events")
-        return items
+# ── Deduplication ──────────────────────────────────────────
 
 
-def deduplicate_headlines(items: list[RawNewsItem]) -> list[RawNewsItem]:
-    """Deduplicate headlines, merging source info for cross-referencing."""
+def deduplicate_headlines(
+    items: list[RawNewsItem],
+    threshold: float = 0.80,
+) -> list[RawNewsItem]:
+    """Deduplicate headlines using token overlap with directional word protection.
+
+    Two headlines are merged if their token overlap exceeds `threshold`,
+    UNLESS they differ in directional words (e.g. "raise" vs "cut"),
+    which would indicate opposite market signals.
+    """
     if not items:
         return items
 
@@ -242,14 +339,21 @@ def deduplicate_headlines(items: list[RawNewsItem]) -> list[RawNewsItem]:
     for item in items:
         normalized = item.headline.lower().strip()
         tokens = frozenset(normalized.split())
+        directional = tokens & DIRECTIONAL_WORDS
+
         merged_index = -1
         for i, seen in enumerate(seen_token_sets):
             overlap = len(tokens & seen) / max(len(tokens | seen), 1)
-            if overlap > 0.7:
+            if overlap > threshold:
+                # Check directional word protection
+                seen_directional = seen & DIRECTIONAL_WORDS
+                if directional != seen_directional:
+                    # Different directional words — do not merge
+                    continue
                 merged_index = i
                 break
+
         if merged_index >= 0:
-            # Merge: track that multiple sources reported this story
             if item.source not in unique[merged_index].sources:
                 unique[merged_index].sources.append(item.source)
                 unique[merged_index].source_count = len(unique[merged_index].sources)
@@ -262,3 +366,61 @@ def deduplicate_headlines(items: list[RawNewsItem]) -> list[RawNewsItem]:
     if merged > 0:
         logger.info(f"Dedup merged {merged} duplicates. {multi_source} headlines confirmed by multiple sources.")
     return unique
+
+
+# ── Conversion ─────────────────────────────────────────────
+
+
+def to_headline(item: RawNewsItem):
+    """Convert a RawNewsItem to a Headline model for DB insertion."""
+    from backend.core.models import Headline
+
+    return Headline(
+        headline=item.headline,
+        summary=item.summary,
+        content=item.content,
+        source=item.source,
+        source_url=item.url,
+        image_url=item.image_url,
+        category=item.category,
+        published_at=item.published_at,
+        sentiment_score=item.sentiment_score,
+        source_metadata=item.source_metadata,
+    )
+
+
+# ── Pipeline orchestrator ──────────────────────────────────
+
+
+async def ingest_pipeline(config: dict, db) -> dict:
+    """Full ingest pipeline: fetch all sources, dedup, convert, store.
+
+    Returns summary dict with counts.
+    """
+    ingestor = NewsIngestor(config)
+    raw_items = await ingestor.fetch_all()
+    fetched = len(raw_items)
+
+    deduped = deduplicate_headlines(raw_items, threshold=ingestor.dedup_threshold)
+    after_dedup = len(deduped)
+
+    new_inserted = 0
+    skipped_existing = 0
+
+    for item in deduped:
+        if db.headline_exists(item.headline):
+            skipped_existing += 1
+            continue
+
+        headline = to_headline(item)
+        db.insert_headline(headline)
+        new_inserted += 1
+
+    summary = {
+        "fetched": fetched,
+        "after_dedup": after_dedup,
+        "new_inserted": new_inserted,
+        "skipped_existing": skipped_existing,
+    }
+    logger.info(f"Ingest pipeline complete: {summary}")
+    return summary

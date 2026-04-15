@@ -41,6 +41,7 @@ class RiskManager:
         self.atr_multiplier = risk_cfg.get("atr_multiplier", 1.5)
         self.atr_period = risk_cfg.get("atr_period", 14)
         self.leverage = risk_cfg.get("leverage", 1)
+        self.fixed_position_size = risk_cfg.get("fixed_position_size", 0)
 
     def check_trade(self, stream_id: str, instrument: str,
                     direction: str, entry_price: float,
@@ -57,13 +58,21 @@ class RiskManager:
 
         # Daily loss limit check
         equity = self.db.get_stream_equity(stream_id)
+        if equity <= 0:
+            try:
+                summary = self.broker.get_account_summary()
+                equity = summary.get("balance", 0)
+            except Exception:
+                pass
+        if equity <= 0:
+            return RiskCheck(approved=False, rejection_reason="No equity data available")
         daily_pnl = self.db.get_daily_pnl(stream_id)
         if daily_pnl < -(equity * self.max_daily_loss):
             return RiskCheck(approved=False,
                              rejection_reason=f"Daily loss limit ({self.max_daily_loss*100}%) exceeded")
 
         # Correlation check
-        open_trades = self.db.get_open_trades(stream_id)
+        open_trades = self.db.get_open_trades_by_source(stream_id)
         open_instruments = {t["instrument"] for t in open_trades}
         for group in CORRELATION_GROUPS:
             if instrument in group:
@@ -75,9 +84,12 @@ class RiskManager:
                     )
 
         # Calculate position size
-        position_size = self.calculate_position_size(
-            equity, self.max_risk_per_trade, entry_price, stop_loss, instrument
-        )
+        if self.fixed_position_size > 0:
+            position_size = self.fixed_position_size
+        else:
+            position_size = self.calculate_position_size(
+                equity, self.max_risk_per_trade, entry_price, stop_loss, instrument
+            )
 
         if position_size <= 0:
             return RiskCheck(approved=False, rejection_reason="Position size too small")

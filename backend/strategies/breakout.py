@@ -54,14 +54,22 @@ class BreakoutStrategy(Strategy):
         current_price = df["Close"].iloc[-1]
 
         # Check for breakout
+        # Blend breakout strength with range quality — tight ranges are less reliable
+        min_range = 15 * pip_val
+        range_quality = min(asian_range / min_range, 1.0)
+
         if current_price > asian_high + buffer:
             direction = "long"
             distance_from_range = current_price - asian_high
-            confidence = min(distance_from_range / (asian_range + 1e-10), 1.0)
+            breakout_strength = min(distance_from_range / (asian_range + 1e-10), 1.5) / 1.5
+            confidence = breakout_strength * 0.6 + range_quality * 0.4
+            confidence = min(confidence, 0.95)
         elif current_price < asian_low - buffer:
             direction = "short"
             distance_from_range = asian_low - current_price
-            confidence = min(distance_from_range / (asian_range + 1e-10), 1.0)
+            breakout_strength = min(distance_from_range / (asian_range + 1e-10), 1.5) / 1.5
+            confidence = breakout_strength * 0.6 + range_quality * 0.4
+            confidence = min(confidence, 0.95)
         else:
             direction = "neutral"
             confidence = 0.0

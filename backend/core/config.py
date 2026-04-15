@@ -94,6 +94,28 @@ def save_config_overrides(overrides: dict, db=None):
         db.close()
 
 
+def load_prompt(name: str, db=None) -> str:
+    """Load an active prompt template from the database by name."""
+    if db is None:
+        from backend.core.database import Database
+        db = Database("data/sentinel.db")
+        should_close = True
+    else:
+        should_close = False
+
+    row = db.execute(
+        "SELECT template FROM prompts WHERE name = ? AND is_active = 1",
+        (name,),
+    ).fetchone()
+
+    if should_close:
+        db.close()
+
+    if row is None:
+        raise ValueError(f"No active prompt found with name '{name}'")
+    return row["template"]
+
+
 def load_instruments() -> dict:
     return load_yaml("instruments.yaml")
 

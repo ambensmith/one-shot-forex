@@ -63,18 +63,23 @@ class MeanReversionStrategy(Strategy):
         confidence = 0.0
 
         # Long signal: price at/below lower band + RSI oversold
+        # Confidence is highest at the band, decreases with further overshoot
         if current_price <= bb_lower and current_rsi <= self._rsi_oversold:
             direction = "long"
-            bb_signal = max(0, 1 - pct_b)
-            rsi_signal = max(0, (self._rsi_oversold - current_rsi) / self._rsi_oversold)
-            confidence = (bb_signal * 0.5 + rsi_signal * 0.5)
+            overshoot = (bb_lower - current_price) / (bb_width + 1e-10)
+            bb_signal = max(0.1, 1.0 - overshoot * 2)
+            rsi_depth = self._rsi_oversold - current_rsi
+            rsi_signal = max(0.1, 1.0 - rsi_depth / 30)
+            confidence = bb_signal * 0.5 + rsi_signal * 0.5
 
         # Short signal: price at/above upper band + RSI overbought
         elif current_price >= bb_upper and current_rsi >= self._rsi_overbought:
             direction = "short"
-            bb_signal = max(0, pct_b - 1)
-            rsi_signal = max(0, (current_rsi - self._rsi_overbought) / (100 - self._rsi_overbought))
-            confidence = (bb_signal * 0.5 + rsi_signal * 0.5)
+            overshoot = (current_price - bb_upper) / (bb_width + 1e-10)
+            bb_signal = max(0.1, 1.0 - overshoot * 2)
+            rsi_depth = current_rsi - self._rsi_overbought
+            rsi_signal = max(0.1, 1.0 - rsi_depth / 30)
+            confidence = bb_signal * 0.5 + rsi_signal * 0.5
 
         confidence = round(max(0.0, min(confidence, 1.0)), 3)
 

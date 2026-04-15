@@ -1,26 +1,17 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
-import Guide from './screens/Guide'
-import NewsStream from './screens/NewsStream'
-import StrategyStream from './screens/StrategyStream'
-import HybridBuilder from './screens/HybridBuilder'
 import Dashboard from './screens/Dashboard'
-import ModelComparison from './screens/ModelComparison'
-import RunHistory from './screens/RunHistory'
+import LLMAnalysis from './screens/LLMAnalysis'
+import Strategies from './screens/Strategies'
 import Settings from './screens/Settings'
 
 export default function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<Navigate to="/guide" replace />} />
-        <Route path="/guide" element={<Guide />} />
-        <Route path="/news" element={<NewsStream />} />
-        <Route path="/strategies" element={<StrategyStream />} />
-        <Route path="/hybrid" element={<HybridBuilder />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/runs" element={<RunHistory />} />
-        <Route path="/models" element={<ModelComparison />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/llm" element={<LLMAnalysis />} />
+        <Route path="/strategies" element={<Strategies />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </Layout>

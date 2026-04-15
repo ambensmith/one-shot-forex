@@ -42,8 +42,8 @@ class MomentumStrategy(Strategy):
         # Combined signal: weight longer-term more
         combined = returns * 0.6 + short_returns * 0.4
 
-        # Confidence based on magnitude (capped at 1.0)
-        confidence = min(abs(combined) * 10, 1.0)
+        # Confidence based on magnitude — 2.5% combined return → 0.50, cap at 0.95
+        confidence = min(abs(combined) / 0.05, 0.95)
 
         if combined > 0.001:
             direction = "long"

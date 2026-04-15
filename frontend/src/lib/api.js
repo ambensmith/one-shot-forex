@@ -1,193 +1,172 @@
-const BASE_PATH = './data'
-
-async function fetchJSON(filename) {
-  try {
-    const resp = await fetch(`${BASE_PATH}/${filename}`)
-    if (!resp.ok) return null
-    return await resp.json()
-  } catch {
-    return null
-  }
-}
-
-export async function loadDashboard() {
-  return fetchJSON('dashboard.json')
-}
-
-export async function loadTrades() {
-  const data = await fetchJSON('trades.json')
-  return data?.trades || []
-}
-
-export async function loadEquity() {
-  const data = await fetchJSON('equity.json')
-  return data?.curves || {}
-}
-
-export async function loadSignals() {
-  const data = await fetchJSON('signals.json')
-  return data?.signals || []
-}
-
-export async function loadModels() {
-  // Check for live model comparison data saved by the last news fetch
-  try {
-    const cached = localStorage.getItem('model_comparison')
-    if (cached) {
-      const live = JSON.parse(cached)
-      const staticData = await fetchJSON('models.json')
-      const staticModels = staticData?.models || []
-      return live.map(m => {
-        const meta = staticModels.find(s => s.key === m.key) || {}
-        return { ...meta, ...m }
-      })
-    }
-  } catch {
-    // Fall through to static data
-  }
-  const data = await fetchJSON('models.json')
-  return data?.models || []
-}
-
-export async function loadReview() {
-  return fetchJSON('review.json')
-}
-
-export async function loadHybrids() {
-  const data = await fetchJSON('hybrids.json')
-  return data?.hybrids || []
-}
-
-export async function loadConfig() {
-  const data = await fetchJSON('config.json')
-  return data?.config || null
-}
-
-export async function loadRunReviews() {
-  const data = await fetchJSON('run_reviews.json')
-  return data?.runs || []
-}
-
 /**
- * Save config overrides using smart routing:
- * - Simple config changes (toggles, sliders) → fast direct commit (~5s)
- * - Falls back to workflow dispatch if direct save fails
+ * Dual-mode API layer.
+ * - Dev (Vite): proxies to FastAPI at /api/*
+ * - Production (Vercel): reads static JSON from /data/*.json
  */
-export async function saveConfig(overrides) {
-  // Try the fast direct save first
-  try {
-    const directResp = await fetch('/api/config-direct', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ overrides }),
-    })
-    if (directResp.ok) {
-      const result = await directResp.json()
-      // Return a synthetic result that Settings.jsx can handle
-      return { status: 'ok', message: result.message }
-    }
-  } catch {
-    // Direct save not available, fall through to workflow
-  }
 
-  // Fallback: workflow-based save
-  const resp = await fetch('/api/config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ overrides }),
-  })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
-  }
+const IS_DEV = import.meta.env.DEV
+
+// ── Helpers ──────────────────────────────────────────────────
+
+async function fetchLiveJSON(path, options) {
+  const resp = await fetch(`/api${path}`, options)
+  if (!resp.ok) return null
   return resp.json()
 }
 
-export function saveModelComparison(modelComparison) {
-  if (modelComparison && modelComparison.length > 0) {
-    localStorage.setItem('model_comparison', JSON.stringify(modelComparison))
-  }
+async function fetchStaticJSON(filename) {
+  const resp = await fetch(`/data/${filename}`)
+  if (!resp.ok) return null
+  return resp.json()
 }
 
-// ── Live Positions ────────────────────────────────────────
-
-export async function loadLivePositions() {
-  try {
-    const resp = await fetch('/api/live-positions')
-    if (!resp.ok) return null
-    return await resp.json()
-  } catch {
-    return null
-  }
-}
-
-// ── Hybrid Management ────────────────────────────────────
-
-async function hybridManage(body) {
-  const resp = await fetch('/api/hybrid-manage', {
-    method: 'POST',
+async function putJSON(path, body) {
+  if (!IS_DEV) return null  // writes not supported in static mode
+  const resp = await fetch(`/api${path}`, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
-  }
+  if (!resp.ok) return null
   return resp.json()
 }
 
-export function toggleHybrid(configId, isActive) {
-  return hybridManage({ action: 'toggle', id: configId, is_active: isActive })
-}
+// ── Cache for static JSON (avoid re-fetching same file) ─────
 
-export function deleteHybrid(configId) {
-  return hybridManage({ action: 'delete', id: configId })
-}
-
-export function toggleAllHybrids(isActive) {
-  return hybridManage({ action: 'toggle-all', is_active: isActive })
-}
-
-// ── Workflow Trigger Helpers ──────────────────────────────
-
-/**
- * Trigger a GitHub Actions workflow via the Vercel API.
- * @param {Object} params - { mode, stream?, hybrid?, period? }
- * @returns {{ run_id, status, message }}
- */
-export async function triggerStream({ mode = 'tick', stream = 'all', hybrid, period = '7d' }) {
-  const resp = await fetch('/api/trigger-stream', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, stream, hybrid, period }),
-  })
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-    throw new Error(err.error || `HTTP ${resp.status}`)
+const _staticCache = {}
+async function cachedStatic(filename) {
+  if (!_staticCache[filename]) {
+    _staticCache[filename] = fetchStaticJSON(filename)
   }
-  return resp.json()
+  return _staticCache[filename]
 }
 
-/**
- * Poll a GitHub Actions workflow run until complete.
- * @param {number} runId
- * @param {function} onProgress - called with status string on each poll
- * @param {number} maxAttempts - max poll attempts (default 60 = ~5 min)
- * @returns {{ status, conclusion }}
- */
-export async function pollWorkflow(runId, onProgress, maxAttempts = 60) {
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(r => setTimeout(r, 5000))
-    try {
-      const resp = await fetch(`/api/workflow-status?run_id=${runId}`)
-      if (!resp.ok) continue
-      const data = await resp.json()
-      onProgress?.(data.status)
-      if (data.status === 'completed') return data
-      if (data.conclusion === 'failure' || data.conclusion === 'cancelled') return data
-    } catch {
-      // Network error, keep polling
+// ── Public API ──────────────────────────────────────────────
+
+export async function fetchOpenTrades() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/trades/open')
+    return data?.trades || []
+  }
+  const data = await cachedStatic('trades.json')
+  const trades = data?.trades || []
+  return trades.filter(t => t.status === 'open')
+}
+
+export async function fetchClosedTrades({ filter, instrument, source, days, limit } = {}) {
+  if (IS_DEV) {
+    const params = new URLSearchParams()
+    if (filter) params.set('filter', filter)
+    if (instrument) params.set('instrument', instrument)
+    if (source) params.set('source', source)
+    if (days) params.set('days', String(days))
+    if (limit) params.set('limit', String(limit))
+    const qs = params.toString()
+    const data = await fetchLiveJSON(`/trades/closed${qs ? `?${qs}` : ''}`)
+    return { trades: data?.trades || [], count: data?.count || 0 }
+  }
+  const data = await cachedStatic('trades.json')
+  let trades = (data?.trades || []).filter(t => t.status !== 'open')
+  // Client-side filters
+  if (filter === 'won') trades = trades.filter(t => t.pnl > 0)
+  if (filter === 'lost') trades = trades.filter(t => t.pnl != null && t.pnl <= 0)
+  if (instrument) trades = trades.filter(t => t.instrument === instrument)
+  if (source) trades = trades.filter(t => (t.stream || t.source || '').includes(source))
+  if (days) {
+    const cutoff = Date.now() - days * 86400000
+    trades = trades.filter(t => t.closed_at && new Date(t.closed_at).getTime() >= cutoff)
+  }
+  if (limit) trades = trades.slice(0, limit)
+  return { trades, count: trades.length }
+}
+
+export async function fetchTradeDetail(tradeId) {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON(`/trades/${tradeId}`)
+    return data?.trade || null
+  }
+  const data = await cachedStatic('trades.json')
+  const trade = (data?.trades || []).find(t => t.id === tradeId)
+  return trade || null
+}
+
+export async function fetchBias() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/bias')
+    return data?.bias || []
+  }
+  const data = await fetchStaticJSON('bias.json')
+  return data?.bias || []
+}
+
+export async function fetchEquity(stream) {
+  if (IS_DEV) {
+    const params = stream ? `?stream=${stream}` : ''
+    const data = await fetchLiveJSON(`/equity${params}`)
+    return (data?.equity || []).map(d => ({
+      ...d,
+      timestamp: d.timestamp || d.recorded_at || d.time,
+    }))
+  }
+  // Static equity.json has shape: { curves: { streamId: [{time, equity, positions}] } }
+  const data = await fetchStaticJSON('equity.json')
+  const curves = data?.curves || {}
+  if (stream && curves[stream]) {
+    return curves[stream].map(d => ({
+      ...d,
+      timestamp: d.time || d.recorded_at,
+    }))
+  }
+  // Merge all streams, sorted by time
+  const all = []
+  for (const entries of Object.values(curves)) {
+    for (const d of entries) {
+      all.push({ ...d, timestamp: d.time || d.recorded_at })
     }
   }
-  return { status: 'timeout', conclusion: 'timeout' }
+  all.sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''))
+  return all
+}
+
+export async function fetchLLMActivity(hours = 12) {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON(`/llm/activity?hours=${hours}`)
+    return data || { headlines_by_source: {}, relevance_assessments: [], signals: [], summary: {} }
+  }
+  const data = await fetchStaticJSON('llm_activity.json')
+  return data || { headlines_by_source: {}, relevance_assessments: [], signals: [], summary: {} }
+}
+
+export async function fetchStrategies() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/strategies')
+    return data?.strategies || []
+  }
+  const data = await fetchStaticJSON('strategies.json')
+  return data?.strategies || []
+}
+
+export async function fetchPrompts() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/prompts')
+    return data?.prompts || []
+  }
+  const data = await fetchStaticJSON('prompts.json')
+  return data?.prompts || []
+}
+
+export async function updatePrompt(name, template, currentVersion) {
+  if (!IS_DEV) return null  // read-only in production
+  const num = currentVersion ? parseInt(currentVersion.replace(/[^0-9]/g, '') || '0', 10) + 1 : 1
+  const version = `v${num}`
+  return putJSON(`/prompts/${name}`, { template, version })
+}
+
+export async function fetchStatus() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/status')
+    return data || {}
+  }
+  const data = await fetchStaticJSON('dashboard.json')
+  return data ? { status: 'ok', generated_at: data.generated_at, streams: data.streams } : {}
 }

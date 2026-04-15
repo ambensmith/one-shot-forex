@@ -1,0 +1,31 @@
+{
+  "prompts": [
+    {
+      "id": 3,
+      "name": "challenge_v1",
+      "template": "You are a senior risk analyst reviewing a proposed trade. Your job is to argue\nagainst this position and find weaknesses in the reasoning.\n\nProposed trade: {direction} {instrument}\nSignal reasoning: {reasoning}\nKey factors cited: {key_factors}\nRisk factors already identified: {risk_factors}\n\nMarket context:\n- Current price: {current_price}\n- 24h change: {daily_change_pct}%\n- Recent trend: {trend_description}\n\nChallenge this trade:\n1. What is the strongest argument against this direction?\n2. Are there alternative interpretations of the same news?\n3. What market conditions could make this trade fail quickly?\n4. How convincing is the original reasoning on a scale of 0.0-1.0?\n\nRespond with:\n- counter_argument: your strongest case against the trade\n- alternative_interpretation: a different reading of the same evidence\n- conviction_after_challenge: 0.0-1.0 (how strong does the original signal look after scrutiny?)\n- recommendation: \"proceed\" | \"reduce_size\" | \"reject\"\n\n[Respond in valid JSON format]",
+      "version": "v1",
+      "is_active": 1,
+      "created_at": "2026-04-14 20:57:14",
+      "updated_at": "2026-04-14 20:57:14"
+    },
+    {
+      "id": 1,
+      "name": "relevance_v1",
+      "template": "You are a forex market analyst. Given these recent headlines, identify which\nof our instruments each headline is relevant to, and why.\n\nInstruments: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, EUR/GBP, XAU/USD\n\nNews items (headline + summary/content where available):\n{news_items_formatted}\n\nFor each item, respond with:\n- relevant_instruments: list of instrument codes\n- relevance_reasoning: why this affects each instrument\n- Skip items that are not relevant to any instrument.\n\n[Respond in valid JSON format as an object with key \"assessments\" containing an array]",
+      "version": "v1",
+      "is_active": 1,
+      "created_at": "2026-04-14 20:57:14",
+      "updated_at": "2026-04-14 20:57:14"
+    },
+    {
+      "id": 2,
+      "name": "signal_v1",
+      "template": "You are a forex trading analyst. Based on the following recent news and market\ncontext for {instrument}, provide a trading signal.\n\nRecent relevant news (headlines, summaries, and content where available):\n{relevant_news_with_reasoning}\n\nMarket context:\n- Current price: {current_price}\n- 24h change: {daily_change_pct}%\n- Recent trend: {trend_description}\n\nReason through:\n1. What fundamental factors are these headlines affecting?\n2. What is the likely directional impact on {instrument}?\n3. How strong is the evidence (multiple confirming sources, or single ambiguous headline)?\n4. What could go wrong with this view?\n\nRespond with:\n- direction: \"long\" | \"short\" | \"neutral\"\n- confidence: 0.0-1.0 (how strong is the evidence, not how certain you are)\n- reasoning: your full analysis\n- key_factors: list of the main drivers\n- risk_factors: what could invalidate this signal\n\n[Respond in valid JSON format]",
+      "version": "v1",
+      "is_active": 1,
+      "created_at": "2026-04-14 20:57:14",
+      "updated_at": "2026-04-14 20:57:14"
+    }
+  ]
+}

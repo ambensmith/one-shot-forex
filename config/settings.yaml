@@ -7,11 +7,12 @@ risk:
   max_open_positions_per_stream: 5
   max_daily_loss_per_stream: 0.03
   max_correlated_positions: 2
-  default_rr_ratio: 1.5
+  default_rr_ratio: 2.0          # 2:1 reward-to-risk ratio
   stop_loss_method: "atr"
   atr_multiplier: 1.5
   atr_period: 14
-  leverage: 1
+  leverage: 0                     # no leverage — demo/testing mode
+  fixed_position_size: 1          # fixed 1-unit orders for data collection, bypasses sizing formula
 
 execution:
   mode: "practice"
@@ -21,6 +22,14 @@ data:
   candle_granularity: "H1"
   lookback_periods: 200
   secondary_granularity: "D"
+
+finnhub:
+  api_key_env: "FINNHUB_API_KEY"
+  base_url: "https://finnhub.io/api/v1"
+
+bias:
+  decay_hours: 12          # drop contributing signals older than this
+  cooldown_hours: 2        # hours to wait after bias flip before trading new direction
 
 reviews:
   auto_generate: true

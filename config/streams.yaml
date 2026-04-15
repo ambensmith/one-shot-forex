@@ -7,20 +7,57 @@ news_stream:
     - EUR_USD
     - GBP_USD
     - USD_JPY
+    - USD_CHF
+    - AUD_USD
+    - USD_CAD
+    - EUR_GBP
     - XAU_USD
-    - BCO_USD
   news_sources:
+    # Primary API source
+    - type: "finnhub"
+      name: "Finnhub News"
+      enabled: true
+    - type: "finnhub_calendar"
+      name: "Finnhub Calendar"
+      enabled: true
+    # Major business news RSS
     - type: "rss"
       url: "https://feeds.bbci.co.uk/news/business/rss.xml"
       name: "BBC Business"
     - type: "rss"
       url: "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"
       name: "CNBC Business"
-    - type: "gdelt"
-      enabled: true
-    - type: "economic_calendar"
-      url: "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+    # Central bank RSS feeds
+    - type: "rss"
+      url: "https://www.ecb.europa.eu/rss/press.html"
+      name: "ECB"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.federalreserve.gov/feeds/press_all.xml"
+      name: "Fed"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.bankofengland.co.uk/rss/publications"
+      name: "BoE"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.boj.or.jp/en/rss/whatsnew.xml"
+      name: "BoJ"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.snb.ch/public/en/rss/pressrel"
+      name: "SNB"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.rba.gov.au/rss/rss-cb-media-releases.xml"
+      name: "RBA"
+      category: "central_bank"
+    - type: "rss"
+      url: "https://www.bankofcanada.ca/feed/"
+      name: "BoC"
+      category: "central_bank"
   news_lookback_hours: 4
+  dedup_threshold: 0.80
   min_confidence: 0.60
   llm:
     primary_model: "groq/llama-3.3-70b"
@@ -41,6 +78,8 @@ strategy_stream:
     - USD_JPY
     - USD_CHF
     - AUD_USD
+    - USD_CAD
+    - EUR_GBP
     - XAU_USD
   strategies:
     - name: "momentum"

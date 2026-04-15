@@ -39,6 +39,17 @@ class UnifiedLLMClient:
         )
         return response.choices[0].message.content
 
+    def analyze_json(self, prompt: str, max_tokens: int = 2000) -> str:
+        """Call LLM with JSON mode enabled. Returns raw JSON string."""
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            max_tokens=max_tokens,
+            response_format={"type": "json_object"},
+        )
+        return response.choices[0].message.content
+
     def analyze_with_fallback(self, prompt: str,
                                fallback_clients: list[UnifiedLLMClient]) -> tuple[str, str]:
         """Try primary, fall back on failure. Returns (response, model_used)."""
@@ -49,6 +60,21 @@ class UnifiedLLMClient:
             for fb in fallback_clients:
                 try:
                     return fb.analyze(prompt), f"{fb.provider}/{fb.model}"
+                except Exception as e2:
+                    logger.warning(f"Fallback LLM failed ({fb.provider}): {e2}")
+            raise RuntimeError("All LLM providers failed")
+
+    def analyze_json_with_fallback(self, prompt: str,
+                                    fallback_clients: list[UnifiedLLMClient],
+                                    max_tokens: int = 2000) -> tuple[str, str]:
+        """Try primary with JSON mode, fall back on failure. Returns (response, model_used)."""
+        try:
+            return self.analyze_json(prompt, max_tokens), f"{self.provider}/{self.model}"
+        except Exception as e:
+            logger.warning(f"Primary LLM failed ({self.provider}): {e}")
+            for fb in fallback_clients:
+                try:
+                    return fb.analyze_json(prompt, max_tokens), f"{fb.provider}/{fb.model}"
                 except Exception as e2:
                     logger.warning(f"Fallback LLM failed ({fb.provider}): {e2}")
             raise RuntimeError("All LLM providers failed")
