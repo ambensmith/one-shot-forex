@@ -45,18 +45,18 @@ def _normalize_instrument(raw: str) -> str | None:
 def _format_news_items(headlines: list[dict]) -> str:
     """Format headlines into a numbered list for the prompt."""
     items = []
-    for i, h in enumerate(headlines, 1):
+    for h in headlines:
         summary = (h.get("summary") or "N/A")[:200]
         source = h.get("source", "unknown")
         published = h.get("published_at", "N/A")
         items.append(
-            f"[{i}] id={h['id']}\n"
+            f"headline_id: \"{h['id']}\"\n"
             f"Headline: {h['headline']}\n"
             f"Summary: {summary}\n"
             f"Source: {source}\n"
             f"Published: {published}"
         )
-    return "\n\n".join(items)
+    return "\n---\n".join(items)
 
 
 def _extract_json(text: str) -> dict[str, Any]:
