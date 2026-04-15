@@ -25,14 +25,14 @@ export default function AccountPanel({ expanded }) {
 
   return (
     <div
-      className="fixed left-1/2 -translate-x-1/2 z-40 max-w-[480px] w-full px-6 py-4 pb-5 transition-all"
+      className="fixed left-1/2 z-40 max-w-[520px] w-full px-6 py-4 pb-5"
       style={{
-        bottom: '20px',
+        bottom: '72px',
         background: '#292524',
         borderRadius: '14px 14px 16px 16px',
         transform: expanded
-          ? 'translateX(-50%) translateY(-8px)'
-          : 'translateX(-50%) translateY(100%)',
+          ? 'translateX(-50%) translateY(0)'
+          : 'translateX(-50%) translateY(calc(100% + 16px))',
         opacity: expanded ? 1 : 0,
         transitionProperty: 'transform, opacity',
         transitionDuration: '300ms, 200ms',
