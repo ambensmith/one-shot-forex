@@ -15,7 +15,7 @@ Both streams pass through a directional bias tracker (prevents whipsaw trading),
 
 **Instruments:** EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, EUR/GBP, XAU/USD (gold).
 
-**Stack:** Python 3.12 / FastAPI backend, React 18 + Tailwind + Vite frontend, SQLite (WAL mode), GitHub Actions automation, Capital.com broker API, Groq LLM API. Frontend design system defined in DESIGN.md (light editorial theme, Playfair Display + Inter, semantic colored shadows, bottom pill nav).
+**Stack:** Python 3.12 / FastAPI backend, React 18 + Tailwind + Vite frontend, SQLite (WAL mode), GitHub Actions automation, Capital.com broker API, Groq LLM API. Frontend design system defined in DESIGN.md (light editorial theme, Fraunces + Outfit, semantic colored shadows, bottom pill nav).
 
 ## Key Architecture Documents
 
@@ -23,7 +23,7 @@ Read these before starting any work:
 
 - `docs/PROJECT_OVERVIEW.md` — what the project is, workstreams, scope, success criteria
 - `docs/DATA_FLOW.md` — the complete end-to-end data flow spec. Every stage defines what it consumes and produces. This is the contract.
-- `DESIGN.md` — the frontend design system. Light editorial theme, Playfair Display + Inter typography, semantic colored shadows, bottom floating pill nav, narrative timeline drill-downs. **Read this before any frontend work.**
+- `DESIGN.md` — the frontend design system. Light editorial theme, Fraunces + Outfit typography, semantic colored shadows, bottom floating pill nav, narrative timeline drill-downs. **Read this before any frontend work.**
 - `docs/RESEARCH.md` — collected research on free APIs, open source projects, best practices, academic references. Used for report content.
 - `docs/SESSIONS.md` — session-by-session build guide. Each session is a self-contained unit of work with clear inputs, outputs, and verification steps.
 - `docs/CHECKS.md` — post-development checklist. Gotchas, ambiguities, and things to reconcile after all dev sessions are complete. Review before submission.
@@ -63,7 +63,7 @@ These have been thought through and decided. Do not revisit:
 6. **Structured JSON output** at every pipeline stage. No free-form parsing.
 7. **Full trade recording.** Every input to a trade stored and renderable as markdown in the dashboard drill-down.
 8. **Finnhub as primary news source.** Plus BBC/CNBC RSS and central bank RSS feeds. GDELT dropped.
-9. **Editorial light-theme frontend.** Playfair Display + Inter typography, semantic colored shadows (not block colors), bottom floating pill nav, narrative timeline trade drill-downs. Full spec in DESIGN.md.
+9. **Editorial light-theme frontend.** Fraunces + Outfit typography, semantic colored shadows (not block colors), bottom floating pill nav, narrative timeline trade drill-downs. Full spec in DESIGN.md.
 10. **All risk parameters in config, not code.** Correlation groups, thresholds, limits, position minimums.
 
 ## Code Style

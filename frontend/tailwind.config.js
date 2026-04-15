@@ -44,8 +44,8 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Playfair Display', 'Georgia', 'Times New Roman', 'serif'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'Times New Roman', 'serif'],
+        sans: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
       },
       boxShadow: {
