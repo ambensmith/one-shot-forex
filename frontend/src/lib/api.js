@@ -87,7 +87,9 @@ export async function fetchTradeDetail(tradeId) {
   }
   const data = await cachedStatic('trades.json')
   const trade = (data?.trades || []).find(t => t.id === tradeId)
-  return trade || null
+  if (!trade) return null
+  // Wrap to match the shape the server returns: { record: {...} }
+  return { trade_id: trade.id, record: trade.record || {}, created_at: trade.opened_at }
 }
 
 export async function fetchBias() {

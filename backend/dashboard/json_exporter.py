@@ -194,22 +194,60 @@ def export_trades(db):
             "events": events,
         }
 
-        # Attach signal reasoning and source
-        raw_signal_ids = t.get("signal_ids")
-        if isinstance(raw_signal_ids, str):
-            try:
-                raw_signal_ids = json.loads(raw_signal_ids)
-            except (json.JSONDecodeError, TypeError):
-                raw_signal_ids = None
-        if raw_signal_ids:
-            sig = db.execute(
-                "SELECT reasoning, source FROM signals WHERE id = ?",
-                (raw_signal_ids[0],),
+        # Build narrative record for the drill-down timeline
+        signal_id = t.get("signal_id")
+        signal_data = None
+        if signal_id:
+            sig_row = db.execute(
+                "SELECT * FROM signals WHERE id = ? LIMIT 1", (signal_id,)
             ).fetchone()
-            if sig:
-                sig_dict = dict(sig)
-                trade_entry["reasoning"] = sig_dict.get("reasoning")
-                trade_entry["source"] = sig_dict.get("source")
+            if sig_row:
+                signal_data = dict(sig_row)
+                _parse_signal_json(signal_data)
+                trade_entry["reasoning"] = signal_data.get("reasoning")
+                trade_entry["source"] = signal_data.get("source")
+
+        # Try trade_records table first, then build from signal data
+        stored_record = db.get_trade_record(t["id"])
+        if stored_record:
+            rec = stored_record.get("record", {})
+        elif signal_data:
+            rec = {
+                "signal": {
+                    "direction": signal_data.get("direction"),
+                    "confidence": signal_data.get("confidence"),
+                    "reasoning": signal_data.get("reasoning"),
+                    "key_factors": signal_data.get("key_factors"),
+                    "risk_factors": signal_data.get("risk_factors"),
+                    "parameters": signal_data.get("metadata", {}).get("parameters") if isinstance(signal_data.get("metadata"), dict) else None,
+                },
+                "headlines_analysed": signal_data.get("headlines_used"),
+                "challenge": signal_data.get("challenge_output"),
+                "price_context_at_signal": signal_data.get("price_context"),
+                "bias_at_trade": signal_data.get("bias_check"),
+                "risk_decision": signal_data.get("risk_check"),
+            }
+        else:
+            rec = {}
+
+        # Always attach entry info
+        rec["entry"] = {
+            "price": t.get("entry_price"),
+            "time": t.get("opened_at"),
+            "broker_deal_id": t.get("broker_deal_id"),
+        }
+
+        # Attach exit info if closed
+        if t.get("status") != "open":
+            rec["exit"] = {
+                "price": t.get("exit_price"),
+                "time": t.get("closed_at"),
+                "pnl": t.get("pnl"),
+                "pnl_pips": t.get("pnl_pips"),
+                "close_reason": t.get("close_reason"),
+            }
+
+        trade_entry["record"] = rec
 
         if close_context:
             trade_entry["close_context"] = close_context
@@ -592,6 +630,23 @@ def _compute_max_drawdown(equity_history: list[dict]) -> float:
             if dd < max_dd:
                 max_dd = dd
     return max_dd
+
+
+_SIGNAL_JSON_COLS = [
+    "key_factors", "risk_factors", "headlines_used", "price_context",
+    "challenge_output", "bias_check", "risk_check", "metadata",
+]
+
+
+def _parse_signal_json(row: dict):
+    """Parse JSON-string columns on a signal row in place."""
+    for col in _SIGNAL_JSON_COLS:
+        val = row.get(col)
+        if isinstance(val, str):
+            try:
+                row[col] = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                pass
 
 
 def _write_json(filename: str, data: dict):

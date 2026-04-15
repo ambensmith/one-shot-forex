@@ -14,8 +14,13 @@ export default function NarrativeTimeline({ tradeId, trade }) {
 
   const rec = record.record || {}
   const semantic = semanticStatus(trade)
-  const isLLM = !trade?.source?.startsWith('strategy:')
+  const isBrokerImport = trade?.source === 'broker' || (!trade?.source && !rec.signal)
 
+  if (isBrokerImport) {
+    return <BrokerImportTimeline rec={rec} trade={trade} semantic={semantic} />
+  }
+
+  const isLLM = !trade?.source?.startsWith('strategy:')
   if (isLLM) {
     return <LLMTimeline rec={rec} trade={trade} semantic={semantic} />
   }
@@ -165,6 +170,42 @@ function StrategyTimeline({ rec, trade, semantic }) {
     biasChapter(bias),
     riskChapter(risk),
     entryChapter(entry),
+    outcomeChapter(exit, trade),
+  ]
+
+  return renderTimeline(chapters, semantic)
+}
+
+function BrokerImportTimeline({ rec, trade, semantic }) {
+  const entry = rec.entry
+  const exit = rec.exit
+
+  const chapters = [
+    {
+      title: 'Source',
+      status: 'completed',
+      content: (
+        <p className="text-sm text-secondary">
+          Imported from broker — this position was not opened by the trading pipeline.
+        </p>
+      ),
+    },
+    entryChapter(entry || {
+      price: trade?.entry_price,
+      time: trade?.opened_at,
+      broker_deal_id: trade?.broker_deal_id,
+    }),
+    {
+      title: 'Risk Levels',
+      status: trade?.stop_loss || trade?.take_profit ? 'completed' : 'pending',
+      content: trade?.stop_loss || trade?.take_profit ? (
+        <div className="flex flex-wrap gap-4 text-sm font-tabular">
+          {trade.stop_loss != null && <span>SL: <strong className="text-primary">{trade.stop_loss}</strong></span>}
+          {trade.take_profit != null && <span>TP: <strong className="text-primary">{trade.take_profit}</strong></span>}
+          {trade.position_size != null && <span>Size: <strong className="text-primary">{trade.position_size} units</strong></span>}
+        </div>
+      ) : 'No risk levels set.',
+    },
     outcomeChapter(exit, trade),
   ]
 
