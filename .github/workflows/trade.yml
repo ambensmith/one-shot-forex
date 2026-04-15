@@ -82,13 +82,13 @@ jobs:
           PERIOD="${{ github.event.inputs.review_period || '7d' }}"
 
           if [ "$MODE" = "tick" ]; then
-            CMD="python -m backend.main --mode tick --stream $STREAM"
+            CMD="python -m backend tick"
             if [ "$FORCE" = "true" ]; then
               CMD="$CMD --force-market-open"
             fi
             $CMD
           elif [ "$MODE" = "reset" ]; then
-            python -m backend.main --mode reset
+            python -m backend init-db --fresh
           elif [ "$MODE" = "review" ]; then
             python -m backend.main --mode review --period "$PERIOD"
           elif [ "$MODE" = "save-hybrid" ]; then

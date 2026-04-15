@@ -637,6 +637,33 @@ def cmd_tick(force_market_open: bool = False):
             logger.error(f"Stage '{name}' failed: {e}")
             results[name] = {"status": "error", "error": str(e)}
 
+    # Record equity snapshots and export dashboard JSON
+    try:
+        from backend.core.config import load_config
+        from backend.core.database import Database
+
+        config = load_config()
+        db = Database("data/sentinel.db")
+
+        # Equity snapshots for each stream
+        streams_cfg = config.get("streams", {})
+        for stream_id, cfg_key in [("news", "news_stream"), ("strategy", "strategy_stream")]:
+            capital = streams_cfg.get(cfg_key, {}).get("capital_allocation", 100)
+            trades = db.get_trades(stream_id, limit=10000)
+            realized_pnl = sum(t["pnl"] for t in trades if t.get("pnl") is not None)
+            equity = capital + realized_pnl
+            open_count = db.count_open_positions(stream_id)
+            db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
+
+        # Export dashboard JSON
+        from backend.dashboard.json_exporter import export_all
+        export_all(db_path="data/sentinel.db")
+
+        db.close()
+        logger.info("Equity snapshots recorded and dashboard JSON exported")
+    except Exception as e:
+        logger.error(f"Post-tick export failed: {e}")
+
     print(json.dumps({"status": "ok", "command": "tick", "stages": results}))
 
 
