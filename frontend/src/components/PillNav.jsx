@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Settings, ChevronUp, Play, Loader } from 'lucide-react'
+import { Settings, ChevronUp, Play, Loader, RefreshCw } from 'lucide-react'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard' },
@@ -8,40 +8,47 @@ const NAV_ITEMS = [
   { to: '/strategies', label: 'Strategies' },
 ]
 
-export default function PillNav({ expanded, onToggleExpand }) {
-  const [runState, setRunState] = useState('idle') // idle | running | done | error
+function useWorkflowTrigger(endpoint, body) {
+  const [state, setState] = useState('idle') // idle | running | done | error
   const [runId, setRunId] = useState(null)
 
-  const triggerRun = useCallback(async () => {
-    if (runState === 'running') return
-    setRunState('running')
+  const trigger = useCallback(async () => {
+    if (state === 'running') return
+    setState('running')
     try {
-      const resp = await fetch('/api/trigger-stream', {
+      const resp = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'tick' }),
+        ...(body ? { body: JSON.stringify(body) } : {}),
       })
       const data = await resp.json()
-      if (!resp.ok || data.error) { setRunState('error'); return }
+      if (!resp.ok || data.error) { setState('error'); return }
       setRunId(data.run_id)
-    } catch { setRunState('error') }
-  }, [runState])
+    } catch { setState('error') }
+  }, [state, endpoint, body])
 
   useEffect(() => {
-    if (runState !== 'running') return
+    if (state !== 'running') return
     const poll = setInterval(async () => {
       try {
         const url = runId ? `/api/workflow-status?run_id=${runId}` : '/api/workflow-status'
         const data = await (await fetch(url)).json()
         if (data.status === 'completed') {
-          setRunState(data.conclusion === 'success' ? 'done' : 'error')
+          setState(data.conclusion === 'success' ? 'done' : 'error')
           clearInterval(poll)
-          setTimeout(() => setRunState('idle'), 3000)
+          setTimeout(() => setState('idle'), 3000)
         }
       } catch { /* keep polling */ }
     }, 5000)
     return () => clearInterval(poll)
-  }, [runState, runId])
+  }, [state, runId])
+
+  return [state, trigger]
+}
+
+export default function PillNav({ expanded, onToggleExpand }) {
+  const [runState, triggerRun] = useWorkflowTrigger('/api/trigger-stream', { mode: 'tick' })
+  const [syncState, triggerSync] = useWorkflowTrigger('/api/trigger-sync')
 
   return (
     <nav
@@ -68,6 +75,23 @@ export default function PillNav({ expanded, onToggleExpand }) {
         aria-label="Run pipeline"
       >
         {runState === 'running' ? <Loader size={18} className="animate-spin" /> : <Play size={18} />}
+      </button>
+
+      <button
+        onClick={triggerSync}
+        disabled={syncState === 'running'}
+        className={`p-2.5 transition-colors duration-150 rounded-[10px] ${
+          syncState === 'running'
+            ? 'text-[rgba(250,250,249,0.8)]'
+            : syncState === 'done'
+            ? 'text-emerald-400'
+            : syncState === 'error'
+            ? 'text-red-400'
+            : 'text-[rgba(250,250,249,0.5)] hover:text-[rgba(250,250,249,0.75)]'
+        }`}
+        aria-label="Sync positions"
+      >
+        <RefreshCw size={18} className={syncState === 'running' ? 'animate-spin' : ''} />
       </button>
 
       {NAV_ITEMS.map(({ to, label }) => (
