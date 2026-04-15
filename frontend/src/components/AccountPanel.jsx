@@ -45,7 +45,7 @@ export default function AccountPanel({ expanded }) {
             Account
           </p>
           <p className="text-lg font-semibold text-[#FAFAF9] font-tabular">
-            {equity != null ? `\u00a3${equity.toLocaleString('en-GB', { minimumFractionDigits: 2 })}` : '\u2014'}
+            {equity != null ? `€${equity.toLocaleString('en-IE', { minimumFractionDigits: 2 })}` : '\u2014'}
           </p>
         </div>
         <div className="text-right">

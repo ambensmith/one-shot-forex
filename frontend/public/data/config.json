@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-15T13:14:02.173569+00:00",
+  "generated_at": "2026-04-15T14:00:05.731199+00:00",
   "config": {
     "scheduler": {
       "interval": "1h",
@@ -10,16 +10,25 @@
       "max_open_positions_per_stream": 3,
       "max_daily_loss_per_stream": 0.03,
       "max_correlated_positions": 1,
-      "default_rr_ratio": 1.5,
+      "default_rr_ratio": 2.0,
       "stop_loss_method": "atr",
       "atr_multiplier": 1.5,
       "atr_period": 14,
-      "leverage": 1
+      "leverage": 0,
+      "fixed_position_size": 1
     },
     "data": {
       "candle_granularity": "H1",
       "lookback_periods": 200,
       "secondary_granularity": "D"
+    },
+    "finnhub": {
+      "api_key_env": "FINNHUB_API_KEY",
+      "base_url": "https://finnhub.io/api/v1"
+    },
+    "bias": {
+      "decay_hours": 12,
+      "cooldown_hours": 2
     },
     "reviews": {
       "auto_generate": true,
@@ -39,20 +48,23 @@
           "EUR_USD",
           "GBP_USD",
           "USD_JPY",
-          "XAU_USD",
-          "BCO_USD",
           "USD_CHF",
           "AUD_USD",
           "USD_CAD",
-          "NZD_USD",
-          "XAG_USD",
-          "WTICO_USD",
           "EUR_GBP",
-          "NATGAS_USD",
-          "EUR_JPY",
-          "GBP_JPY"
+          "XAU_USD"
         ],
         "news_sources": [
+          {
+            "type": "finnhub",
+            "name": "Finnhub News",
+            "enabled": true
+          },
+          {
+            "type": "finnhub_calendar",
+            "name": "Finnhub Calendar",
+            "enabled": true
+          },
           {
             "type": "rss",
             "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
@@ -64,15 +76,50 @@
             "name": "CNBC Business"
           },
           {
-            "type": "gdelt",
-            "enabled": true
+            "type": "rss",
+            "url": "https://www.ecb.europa.eu/rss/press.html",
+            "name": "ECB",
+            "category": "central_bank"
           },
           {
-            "type": "economic_calendar",
-            "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+            "type": "rss",
+            "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+            "name": "Fed",
+            "category": "central_bank"
+          },
+          {
+            "type": "rss",
+            "url": "https://www.bankofengland.co.uk/rss/publications",
+            "name": "BoE",
+            "category": "central_bank"
+          },
+          {
+            "type": "rss",
+            "url": "https://www.boj.or.jp/en/rss/whatsnew.xml",
+            "name": "BoJ",
+            "category": "central_bank"
+          },
+          {
+            "type": "rss",
+            "url": "https://www.snb.ch/public/en/rss/pressrel",
+            "name": "SNB",
+            "category": "central_bank"
+          },
+          {
+            "type": "rss",
+            "url": "https://www.rba.gov.au/rss/rss-cb-media-releases.xml",
+            "name": "RBA",
+            "category": "central_bank"
+          },
+          {
+            "type": "rss",
+            "url": "https://www.bankofcanada.ca/feed/",
+            "name": "BoC",
+            "category": "central_bank"
           }
         ],
         "news_lookback_hours": 12,
+        "dedup_threshold": 0.8,
         "min_confidence": 0.6,
         "llm": {
           "primary_model": "groq/llama-3.3-70b",
@@ -95,16 +142,9 @@
           "USD_JPY",
           "USD_CHF",
           "AUD_USD",
-          "XAU_USD",
           "USD_CAD",
-          "NZD_USD",
-          "XAG_USD",
-          "BCO_USD",
-          "WTICO_USD",
-          "NATGAS_USD",
           "EUR_GBP",
-          "EUR_JPY",
-          "GBP_JPY"
+          "XAU_USD"
         ],
         "strategies": [
           {

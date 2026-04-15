@@ -47,7 +47,7 @@ export default function EquityCurve() {
             axisLine={false}
             tickLine={false}
             width={60}
-            tickFormatter={v => `\u00a3${v.toLocaleString()}`}
+            tickFormatter={v => `€${v.toLocaleString()}`}
           />
           <Tooltip content={<CustomTooltip />} />
           <Area
@@ -80,7 +80,7 @@ function CustomTooltip({ active, payload }) {
     <div className="bg-surface border border-border rounded-button px-3 py-2 shadow-lifted">
       <p className="text-xs text-tertiary">{data.label}</p>
       <p className="text-sm font-medium text-primary font-tabular">
-        &pound;{data.equity?.toLocaleString('en-GB', { minimumFractionDigits: 2 })}
+        €{data.equity?.toLocaleString('en-IE', { minimumFractionDigits: 2 })}
       </p>
     </div>
   )

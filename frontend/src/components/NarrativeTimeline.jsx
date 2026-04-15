@@ -204,7 +204,7 @@ function riskChapter(risk) {
         <div className="flex flex-wrap gap-4 text-sm mb-1">
           <span>{risk.approved ? 'Approved' : 'Rejected'}</span>
           {risk.position_size != null && <span>Size: <strong className="text-primary font-tabular">{risk.position_size} units</strong></span>}
-          {risk.risk_amount != null && <span>Risk: <strong className="text-primary font-tabular">&pound;{risk.risk_amount.toFixed(2)}</strong></span>}
+          {risk.risk_amount != null && <span>Risk: <strong className="text-primary font-tabular">€{risk.risk_amount.toFixed(2)}</strong></span>}
         </div>
         {risk.stop_loss != null && risk.take_profit != null && (
           <p className="text-xs text-tertiary font-tabular">
@@ -254,7 +254,7 @@ function outcomeChapter(exit, trade) {
         <div className="flex flex-wrap gap-4 text-sm">
           {exit.pnl != null && (
             <span className={exit.pnl >= 0 ? 'text-profitable-text font-tabular' : 'text-loss-text font-tabular'}>
-              {exit.pnl >= 0 ? '+' : ''}&pound;{Math.abs(exit.pnl).toFixed(2)}
+              {exit.pnl >= 0 ? '+' : ''}€{Math.abs(exit.pnl).toFixed(2)}
               {exit.pnl_pips != null && ` (${exit.pnl_pips >= 0 ? '+' : ''}${exit.pnl_pips} pips)`}
             </span>
           )}
