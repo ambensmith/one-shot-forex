@@ -3,6 +3,15 @@
 from __future__ import annotations
 
 MODELS = {
+    "groq/llama-4-scout": {
+        "provider": "groq",
+        "base_url": "https://api.groq.com/openai/v1",
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "env_key": "GROQ_API_KEY",
+        "cost_per_1m_tokens": 0,
+        "rate_limit": "30 RPM, 1K RPD, 30K TPM, 500K TPD",
+        "notes": "Signal generation. 109B total (17B active) MoE, 128K context.",
+    },
     "groq/llama-3.3-70b": {
         "provider": "groq",
         "base_url": "https://api.groq.com/openai/v1",

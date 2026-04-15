@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 def _utcnow() -> datetime:
@@ -175,6 +175,14 @@ class RelevanceItem(BaseModel):
     relevance_reasoning: str = ""
 
     model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator("relevance_reasoning", mode="before")
+    @classmethod
+    def _coerce_reasoning(cls, v):
+        """Handle 8B model returning reasoning as a dict per instrument."""
+        if isinstance(v, dict):
+            return "; ".join(f"{k}: {r}" for k, r in v.items() if r)
+        return v
 
     def __init__(self, **data):
         # Accept 'id' as alias for 'headline_id' from LLM responses

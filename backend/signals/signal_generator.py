@@ -62,11 +62,11 @@ def _format_relevant_news(headlines: list[dict]) -> str:
     """Format relevant headlines into a numbered list for the prompt."""
     items = []
     for i, h in enumerate(headlines[:10], 1):  # Cap at 10 per instrument
-        summary = (h.get("summary") or "N/A")[:200]
+        summary = h.get("summary") or "N/A"
         content = h.get("content") or ""
         source = h.get("source", "unknown")
         published = h.get("published_at", "N/A")
-        reasoning = (h.get("relevance_reasoning") or "N/A")[:200]
+        reasoning = h.get("relevance_reasoning") or "N/A"
 
         entry = (
             f"[{i}] Headline: {h['headline']}\n"
@@ -75,7 +75,7 @@ def _format_relevant_news(headlines: list[dict]) -> str:
             f"Why relevant: {reasoning}"
         )
         if content:
-            entry += f"\nContent: {content[:200]}"
+            entry += f"\nContent: {content}"
         items.append(entry)
     return "\n\n".join(items)
 
@@ -121,7 +121,7 @@ def run_signals(db, config) -> dict[str, Any]:
 
     # 3. Build LLM clients
     llm_config = config.get("streams", {}).get("news_stream", {}).get("llm", {})
-    primary_model = llm_config.get("primary_model", "groq/llama-3.3-70b")
+    primary_model = llm_config.get("signal_model", "groq/llama-4-scout")
     primary = UnifiedLLMClient.from_model_key(primary_model)
 
     fallbacks = []

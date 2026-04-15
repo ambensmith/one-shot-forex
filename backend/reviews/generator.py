@@ -127,7 +127,8 @@ class ReviewGenerator:
             lines.append(f"- **Capital:** {news_cfg.get('capital_allocation', 0)}")
             lines.append(f"- **Instruments:** {', '.join(news_cfg.get('instruments', []))}")
             llm = news_cfg.get("llm", {})
-            lines.append(f"- **Primary Model:** {llm.get('primary_model', 'N/A')}")
+            lines.append(f"- **Relevance Model:** {llm.get('relevance_model', 'N/A')}")
+            lines.append(f"- **Signal Model:** {llm.get('signal_model', 'N/A')}")
             lines.append(f"- **Min Confidence:** {news_cfg.get('min_confidence', 0)}")
             lines.append("")
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from typing import Any
 
 logger = logging.getLogger("forex_sentinel.llm")
@@ -30,8 +31,25 @@ class UnifiedLLMClient:
                 raise RuntimeError("openai package required. pip install openai")
         return self._client
 
+    def _call_with_retry(self, **kwargs):
+        """Call LLM API with retry on 429 rate limit."""
+        for attempt in range(3):
+            try:
+                return self.client.chat.completions.create(**kwargs)
+            except Exception as e:
+                if "rate_limit" in type(e).__name__.lower() or "429" in str(e):
+                    wait = min(float(getattr(e, "retry_after", 10)), 60)
+                    logger.warning(
+                        f"Rate limited ({self.provider}/{self.model}), "
+                        f"retry {attempt + 1}/3 after {wait:.0f}s"
+                    )
+                    time.sleep(wait)
+                else:
+                    raise
+        raise RuntimeError(f"Rate limit exceeded after 3 retries: {self.provider}/{self.model}")
+
     def analyze(self, prompt: str) -> str:
-        response = self.client.chat.completions.create(
+        response = self._call_with_retry(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,
@@ -41,7 +59,7 @@ class UnifiedLLMClient:
 
     def analyze_json(self, prompt: str, max_tokens: int = 2000) -> str:
         """Call LLM with JSON mode enabled. Returns raw JSON string."""
-        response = self.client.chat.completions.create(
+        response = self._call_with_retry(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1,

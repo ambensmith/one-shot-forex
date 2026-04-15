@@ -63,7 +63,7 @@ class NewsStream(BaseStream):
 
         # 5. Create LLM client
         llm_cfg = self.stream_config.get("llm", {})
-        primary_model = llm_cfg.get("primary_model", "groq/llama-3.3-70b")
+        primary_model = llm_cfg.get("signal_model", "groq/llama-4-scout")
         min_confidence = self.stream_config.get("min_confidence", 0.60)
 
         try:
@@ -132,26 +132,6 @@ class NewsStream(BaseStream):
                 )
                 signals.append(stream_signal)
                 signal_id = self.record_signal(stream_signal, source=primary_model)
-
-                # Run comparison models if enabled
-                if llm_cfg.get("comparison_enabled", False):
-                    for comp_model_key in llm_cfg.get("comparison_models", []):
-                        try:
-                            comp_client = UnifiedLLMClient.from_model_key(comp_model_key)
-                            comp_response = comp_client.analyze(prompt)
-                            comp_data = parse_llm_signal(comp_response)
-                            comp_signal = StreamSignal(
-                                stream_id=self.stream_id,
-                                instrument=instrument,
-                                direction=comp_data["direction"],
-                                confidence=comp_data["confidence"],
-                                sources=[comp_model_key],
-                                reasoning=comp_data.get("reasoning", ""),
-                                metadata={"model": comp_model_key},
-                            )
-                            self.record_signal(comp_signal, source=comp_model_key, is_comparison=True)
-                        except Exception as e:
-                            logger.warning(f"Comparison model {comp_model_key} failed: {e}")
 
                 # Trade decision
                 if signal_data["direction"] == "neutral":

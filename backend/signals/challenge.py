@@ -52,7 +52,7 @@ def run_challenge(db, config) -> dict[str, Any]:
 
     # 3. Build LLM client (same config path as signal generation)
     llm_config = config.get("streams", {}).get("news_stream", {}).get("llm", {})
-    primary_model = llm_config.get("primary_model", "groq/llama-3.3-70b")
+    primary_model = llm_config.get("signal_model", "groq/llama-4-scout")
     primary = UnifiedLLMClient.from_model_key(primary_model)
 
     fallbacks = []

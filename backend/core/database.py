@@ -214,6 +214,29 @@ SEED_PROMPTS = [
         ),
     },
     {
+        "name": "relevance_v2",
+        "version": "v2",
+        "template": (
+            "You are a forex market analyst. Classify which instruments each headline is relevant to.\n"
+            "\n"
+            "ONLY use instruments from this list — do not invent other pairs:\n"
+            "EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, EUR/GBP, XAU/USD\n"
+            "\n"
+            "News items:\n"
+            "{news_items_formatted}\n"
+            "\n"
+            "For each relevant item, respond with:\n"
+            "- headline_id: the exact headline_id from above\n"
+            "- relevant_instruments: list of instrument codes FROM THE LIST ABOVE ONLY\n"
+            "- relevance_reasoning: a single string explaining why (not a dict/object)\n"
+            "\n"
+            "Skip items not relevant to any listed instrument.\n"
+            "\n"
+            "Respond in JSON: {\"assessments\": [{\"headline_id\": \"...\", "
+            "\"relevant_instruments\": [\"EUR/USD\"], \"relevance_reasoning\": \"...\"}]}"
+        ),
+    },
+    {
         "name": "signal_v1",
         "version": "v1",
         "template": (

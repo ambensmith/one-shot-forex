@@ -46,7 +46,7 @@ def _format_news_items(headlines: list[dict]) -> str:
     """Format headlines into a numbered list for the prompt."""
     items = []
     for h in headlines:
-        summary = (h.get("summary") or "N/A")[:200]
+        summary = (h.get("summary") or "N/A")[:500]
         source = h.get("source", "unknown")
         published = h.get("published_at", "N/A")
         items.append(
@@ -98,15 +98,15 @@ def run_relevance(db, config) -> dict[str, Any]:
     logger.info(f"Loaded {len(headlines)} headlines from last {lookback_hours}h")
 
     # 2. Load prompt template
-    prompt_row = db.get_active_prompt("relevance_v1")
+    prompt_row = db.get_active_prompt("relevance_v2") or db.get_active_prompt("relevance_v1")
     if not prompt_row:
-        raise RuntimeError("No active 'relevance_v1' prompt found in database")
+        raise RuntimeError("No active relevance prompt found in database")
     template = prompt_row["template"]
     prompt_version = f"{prompt_row['name']}/{prompt_row['version']}"
 
     # 3. Build LLM clients
     llm_config = config.get("streams", {}).get("news_stream", {}).get("llm", {})
-    primary_model = llm_config.get("primary_model", "groq/llama-3.3-70b")
+    primary_model = llm_config.get("relevance_model", "groq/llama-3.1-8b")
     primary = UnifiedLLMClient.from_model_key(primary_model)
 
     fallbacks = []
