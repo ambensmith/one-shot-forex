@@ -2,18 +2,18 @@
   "trades": [
     {
       "id": "4e78fe1580c4447684246d310e1c1c93",
-      "stream": "broker",
+      "stream": "strategy:volatility_breakout",
       "instrument": "USD_CAD",
       "direction": "short",
       "entry_price": 1.37396,
       "exit_price": null,
-      "stop_loss": 1.3756,
-      "take_profit": 1.37094,
+      "stop_loss": 1.3756025,
+      "take_profit": 1.3709449999999999,
       "position_size": 1000.0,
       "pnl": null,
       "pnl_pips": null,
       "status": "open",
-      "opened_at": "2026-04-15T15:36:53.329002+00:00",
+      "opened_at": "2026-04-15T15:36:49.738194+00:00",
       "closed_at": null,
       "broker_deal_id": "000154c4-000c-111e-0000-000080ef293e",
       "events": [
@@ -33,81 +33,32 @@
           "created_at": "2026-04-15 15:36:53"
         }
       ],
-      "record": {
-        "entry": {
-          "price": 1.37396,
-          "time": "2026-04-15T15:36:53.329002+00:00",
-          "broker_deal_id": "000154c4-000c-111e-0000-000080ef293e"
-        }
-      }
-    },
-    {
-      "id": "b5264d80c9b8468dabc52d3991c3b05d",
-      "stream": "strategy:volatility_breakout",
-      "instrument": "USD_CAD",
-      "direction": "short",
-      "entry_price": 1.37405,
-      "exit_price": 1.37406,
-      "stop_loss": 1.3756025,
-      "take_profit": 1.3709449999999999,
-      "position_size": 1000.0,
-      "pnl": -0.01,
-      "pnl_pips": -0.1,
-      "status": "closed_reconciled",
-      "opened_at": "2026-04-15T15:36:49.738194+00:00",
-      "closed_at": "2026-04-15T15:36:53.325785+00:00",
-      "broker_deal_id": "000154c4-000c-111e-0000-000080ef293d",
-      "events": [
-        {
-          "id": 3350,
-          "trade_id": "b5264d80c9b8468dabc52d3991c3b05d",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.37405,
-            "stop_loss": 1.3756025,
-            "take_profit": 1.3709449999999999,
-            "position_size": 1000,
-            "broker_deal_id": "000154c4-000c-111e-0000-000080ef293d"
-          },
-          "created_at": "2026-04-15 15:36:49"
-        },
-        {
-          "id": 3351,
-          "trade_id": "b5264d80c9b8468dabc52d3991c3b05d",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 1.37406,
-            "pnl": -0.01,
-            "pnl_pips": -0.1,
-            "actual_close_time": null,
-            "detection_time": "2026-04-15T15:36:53.327890+00:00"
-          },
-          "created_at": "2026-04-15 15:36:53"
-        }
-      ],
       "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00111, avg_atr=0.01409, atr_ratio=0.079, recent_high=1.37885, recent_low=1.3736, contracted=True",
       "source": "strategy:volatility_breakout",
       "record": {
-        "trade_id": "b5264d80c9b8468dabc52d3991c3b05d",
-        "signal_id": "15369ac5d57e45689a4c871c0584494b",
-        "instrument": "USD_CAD",
-        "direction": "short",
-        "source": "strategy:volatility_breakout",
         "signal": {
+          "direction": "short",
           "confidence": 0.539,
           "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00111, avg_atr=0.01409, atr_ratio=0.079, recent_high=1.37885, recent_low=1.3736, contracted=True",
           "key_factors": null,
           "risk_factors": null,
-          "prompt_version": null,
-          "model": null
+          "parameters": {
+            "atr_period": 14,
+            "atr_contraction_threshold": 0.7,
+            "breakout_atr_multiplier": 1.0
+          }
         },
+        "headlines_analysed": null,
         "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
+        "price_context_at_signal": null,
         "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.9665,
-          "bias_since": "2026-04-15T11:06:55.460199+00:00"
+          "signal_direction": "short",
+          "bias_direction": "bearish",
+          "bias_strength": 0.9665,
+          "bias_aligned": true,
+          "has_conflicting_position": false,
+          "in_cooldown": false,
+          "approved_by_bias": true
         },
         "risk_decision": {
           "approved": true,
@@ -117,33 +68,10 @@
           "stop_loss": 1.3756025,
           "take_profit": 1.3709449999999999
         },
-        "metadata": {
-          "parameters": {
-            "atr_period": 14,
-            "atr_contraction_threshold": 0.7,
-            "breakout_atr_multiplier": 1.0
-          },
-          "indicators": {
-            "atr": 0.00111,
-            "avg_atr": 0.01409,
-            "atr_ratio": 0.079,
-            "recent_high": 1.37885,
-            "recent_low": 1.3736,
-            "contracted": true
-          },
-          "entry_price": 1.37392
-        },
         "entry": {
-          "price": 1.37405,
+          "price": 1.37396,
           "time": "2026-04-15T15:36:49.738194+00:00",
-          "broker_deal_id": "000154c4-000c-111e-0000-000080ef293d"
-        },
-        "exit": {
-          "price": 1.37406,
-          "time": "2026-04-15T15:36:53.325785+00:00",
-          "pnl": -0.01,
-          "pnl_pips": -0.1,
-          "close_reason": null
+          "broker_deal_id": "000154c4-000c-111e-0000-000080ef293e"
         }
       }
     }

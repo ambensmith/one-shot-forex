@@ -273,8 +273,15 @@ class CapitalComClient:
         if deal_ref:
             try:
                 confirm = self._request("GET", f"/api/v1/confirms/{deal_ref}")
+                # Capital.com returns the order's dealId in confirm, but the
+                # position's dealId (used by /positions) is in affectedDeals.
+                # We need the position dealId for reconciliation to work.
+                deal_id = confirm.get("dealId", deal_ref)
+                affected = confirm.get("affectedDeals", [])
+                if affected:
+                    deal_id = affected[0].get("dealId", deal_id)
                 return {
-                    "id": confirm.get("dealId", deal_ref),
+                    "id": deal_id,
                     "status": confirm.get("dealStatus", "UNKNOWN"),
                     "dealReference": deal_ref,
                 }

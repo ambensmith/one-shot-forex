@@ -30,7 +30,7 @@ def capture_position_snapshot(trade: dict, broker) -> dict:
     else:
         unrealized_pips = (entry - current_price) / pip_val
 
-    unrealized_pl = unrealized_pips * pip_val * trade["position_size"]
+    unrealized_pl = unrealized_pips * pip_val * trade["size"]
 
     sl = trade.get("stop_loss", 0)
     tp = trade.get("take_profit", 0)
