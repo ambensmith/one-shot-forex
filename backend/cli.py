@@ -655,6 +655,18 @@ def cmd_tick(force_market_open: bool = False):
             open_count = db.count_open_positions(stream_id)
             db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
 
+        # Account-level equity from live broker balance
+        try:
+            from backend.data.capitalcom_client import CapitalComClient
+            broker = CapitalComClient(config)
+            if broker.is_connected:
+                summary = broker.get_account_summary()
+                account_equity = summary.get("balance", 0) + summary.get("unrealizedPL", 0)
+                total_open = sum(db.count_open_positions(s) for s in ["news", "strategy"])
+                db.insert_equity_snapshot("account", round(account_equity, 2), total_open)
+        except Exception as e:
+            logger.warning(f"Failed to record account equity: {e}")
+
         # Export dashboard JSON
         from backend.dashboard.json_exporter import export_all
         export_all(db_path="data/sentinel.db")

@@ -1,7 +1,7 @@
 import { useEquity } from '../hooks/useDashboardData'
 
 export default function AccountPanel({ expanded }) {
-  const { data } = useEquity()
+  const { data } = useEquity('account')
 
   // Derive latest equity and P&L % from equity history
   let equity = null

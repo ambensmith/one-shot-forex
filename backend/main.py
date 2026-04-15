@@ -241,6 +241,16 @@ def _record_all_equity(db, broker, config):
         open_count = db.count_open_positions(stream_id)
         db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
 
+    # Account-level equity from live broker balance
+    try:
+        if broker and broker.is_connected:
+            summary = broker.get_account_summary()
+            account_equity = summary.get("balance", 0) + summary.get("unrealizedPL", 0)
+            total_open = sum(db.count_open_positions(s) for s, _ in stream_list)
+            db.insert_equity_snapshot("account", round(account_equity, 2), total_open)
+    except Exception as e:
+        logging.getLogger(__name__).warning(f"Failed to record account equity: {e}")
+
 
 def run_close_all():
     """Close all open positions on Capital.com.

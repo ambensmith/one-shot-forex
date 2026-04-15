@@ -79,6 +79,16 @@ def run_sync():
     if untracked:
         logger.warning(f"Found {len(untracked)} untracked broker positions")
 
+    # Record account-level equity from live broker balance
+    try:
+        summary = broker.get_account_summary()
+        account_equity = summary.get("balance", 0) + summary.get("unrealizedPL", 0)
+        total_open = len(open_trades)
+        db.insert_equity_snapshot("account", round(account_equity, 2), total_open)
+        logger.info(f"Account equity recorded: €{account_equity:.2f}")
+    except Exception as e:
+        logger.warning(f"Failed to record account equity: {e}")
+
     logger.info(
         f"Sync complete: {len(newly_closed)} closed, "
         f"{snapshot_count} snapshots, {len(untracked)} untracked"

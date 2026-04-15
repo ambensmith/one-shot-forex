@@ -263,7 +263,7 @@ def export_trades(db):
 def export_equity(db):
     """Export equity curves for all streams."""
     curves = {}
-    for stream_id in ["news", "strategy"]:
+    for stream_id in ["news", "strategy", "account"]:
         history = db.get_equity_history(stream_id)
         curves[stream_id] = [
             {"time": h["recorded_at"], "equity": h["equity"], "positions": h["open_positions"]}

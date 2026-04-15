@@ -78,17 +78,17 @@ export function useBias() {
   return { instruments, loading, error }
 }
 
-export function useEquity() {
+export function useEquity(stream) {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetchEquity()
+    fetchEquity(stream)
       .then(d => { setData(d); setError(null) })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [stream])
 
   return { data, loading, error }
 }
