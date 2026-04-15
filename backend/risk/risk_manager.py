@@ -41,6 +41,7 @@ class RiskManager:
         self.atr_multiplier = risk_cfg.get("atr_multiplier", 1.5)
         self.atr_period = risk_cfg.get("atr_period", 14)
         self.leverage = risk_cfg.get("leverage", 1)
+        self.target_notional_eur = risk_cfg.get("target_notional_eur", 0)
         self.fixed_position_size = risk_cfg.get("fixed_position_size", 0)
 
     def check_trade(self, stream_id: str, instrument: str,
@@ -86,6 +87,8 @@ class RiskManager:
         # Calculate position size
         if self.fixed_position_size > 0:
             position_size = self.fixed_position_size
+        elif self.target_notional_eur > 0:
+            position_size = self._convert_eur_to_units(instrument, self.target_notional_eur)
         else:
             position_size = self.calculate_position_size(
                 equity, self.max_risk_per_trade, entry_price, stop_loss, instrument
@@ -114,6 +117,64 @@ class RiskManager:
         units = risk_amount / stop_distance
         units *= self.leverage
         return round(units)
+
+    # Capital.com minimum deal sizes per base currency
+    MIN_SIZES = {"XAU": 0.1, "XAG": 1.0}
+    MIN_SIZE_DEFAULT = 100  # forex pairs: 100 units minimum
+
+    def _convert_eur_to_units(self, instrument: str, target_eur: float) -> float:
+        """Convert a target EUR notional amount to Capital.com position units.
+
+        Capital.com 'size' = units of the base currency of the pair.
+        E.g. for USD/CAD, size=1080 means 1080 USD notional exposure.
+        Clamps to broker minimums automatically.
+        """
+        base = instrument.split("_")[0]
+
+        if base == "EUR":
+            units = target_eur
+        else:
+            eur_per_base = self._get_eur_per_base(base)
+            units = target_eur / eur_per_base
+
+        # Round: XAU to 2 decimals (fractional ounces), forex to integers
+        if base == "XAU":
+            units = round(units, 2)
+        else:
+            units = round(units)
+
+        # Clamp to Capital.com minimum deal sizes
+        min_size = self.MIN_SIZES.get(base, self.MIN_SIZE_DEFAULT)
+        if units < min_size:
+            logger.info(
+                "EUR sizing: %.2f units for %s below minimum %s, clamping",
+                units, instrument, min_size,
+            )
+            units = min_size
+
+        logger.info(
+            "EUR sizing: €%.0f → %.2f units for %s",
+            target_eur, units, instrument,
+        )
+        return units
+
+    def _get_eur_per_base(self, base: str) -> float:
+        """Return the value of 1 unit of base currency in EUR."""
+        try:
+            if base == "USD":
+                eurusd = self.broker.get_current_price("EUR_USD")["mid"]
+                return 1.0 / eurusd
+            elif base == "GBP":
+                eurgbp = self.broker.get_current_price("EUR_GBP")["mid"]
+                return 1.0 / eurgbp
+            else:
+                # Cross via USD for AUD, XAU, NZD, etc.
+                base_usd = self.broker.get_current_price(f"{base}_USD")["mid"]
+                eurusd = self.broker.get_current_price("EUR_USD")["mid"]
+                return base_usd / eurusd
+        except Exception as e:
+            logger.warning("Could not get EUR rate for %s, defaulting to 1.0: %s", base, e)
+            return 1.0
 
     def calculate_stop_loss(self, instrument: str, entry_price: float,
                             direction: str, df=None) -> float:
