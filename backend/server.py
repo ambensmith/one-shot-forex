@@ -657,6 +657,7 @@ async def api_llm_activity(hours: int = 4):
 async def api_strategies():
     """Strategy definitions with recent signals and trade stats."""
     from backend.strategies.registry import discover_strategies
+    from backend.analytics import pnl as _pnl
 
     db = _get_db()
     try:
@@ -667,19 +668,14 @@ async def api_strategies():
             instance = cls()
             source_key = f"strategy:{name}"
 
-            # Recent signals for this strategy
             recent_signals = db.get_signals(source=source_key, limit=10)
             for s in recent_signals:
                 _parse_json_fields(s, _SIGNAL_JSON_COLS)
 
-            # Trade stats: query trades with this source
-            all_trades = db.query(
-                "SELECT * FROM trades WHERE source = ? ORDER BY opened_at DESC",
-                (source_key,),
-            )
-            closed = [t for t in all_trades if t.get("pnl") is not None]
-            wins = sum(1 for t in closed if t["pnl"] > 0)
-            total_pnl = sum(t["pnl"] for t in closed)
+            agg = _pnl.aggregate_pnl(db, source=source_key)
+            total_trade_count = db.execute(
+                "SELECT COUNT(*) AS c FROM trades WHERE source = ?", (source_key,),
+            ).fetchone()
 
             result.append({
                 "name": instance.name,
@@ -695,11 +691,11 @@ async def api_strategies():
                     for s in recent_signals
                 ],
                 "trade_stats": {
-                    "total": len(all_trades),
-                    "won": wins,
-                    "lost": len(closed) - wins,
-                    "net_pnl": round(total_pnl, 2),
-                    "win_rate": round(wins / len(closed), 3) if closed else 0,
+                    "total": int(total_trade_count["c"] or 0) if total_trade_count else 0,
+                    "won": agg.wins,
+                    "lost": agg.losses,
+                    "net_pnl": round(agg.total_pnl, 2),
+                    "win_rate": round(agg.win_rate, 3),
                 },
             })
 
@@ -745,23 +741,87 @@ async def api_update_prompt(name: str, request: Request):
 
 @app.get("/api/bias")
 async def api_bias():
-    """Current directional bias per instrument."""
+    """Current directional bias per instrument, enriched with realized PnL.
+
+    Returns rows shaped for the frontend: ``direction``/``strength`` are the
+    display-facing names (DB columns ``current_bias``/``bias_strength`` are
+    also included for back-compat). ``total_pnl`` and ``trade_count`` come
+    from closed trades via the unified analytics module.
+    """
+    from backend.analytics import pnl as _pnl
+
     db = _get_db()
     try:
         states = db.get_bias_state()
+        pnl_rows = _pnl.per_instrument_breakdown(db)
+        pnl_by_inst = {r["instrument"]: r for r in pnl_rows}
+        bias_by_inst: dict[str, dict] = {}
         for s in states:
             _parse_json_fields(s, _BIAS_JSON_COLS)
-        return JSONResponse({"bias": states})
+            bias_by_inst[s.get("instrument")] = s
+        all_instruments = set(bias_by_inst) | set(pnl_by_inst)
+        enriched: list[dict] = []
+        for inst in all_instruments:
+            s = bias_by_inst.get(inst, {})
+            p = pnl_by_inst.get(inst, {})
+            enriched.append({
+                **s,
+                "instrument": inst,
+                "direction": s.get("current_bias") or "neutral",
+                "strength": s.get("bias_strength") or 0.0,
+                "total_pnl": p.get("total_pnl", 0.0),
+                "trade_count": p.get("trade_count", 0),
+            })
+        return JSONResponse({"bias": enriched})
     finally:
         db.close()
 
 
 @app.get("/api/equity")
 async def api_equity(stream: str | None = None):
-    """Equity snapshots over time, optionally filtered by stream."""
+    """Equity curve.
+
+    For stream-level queries (news / strategy / hybrid:*), the curve is a
+    step function derived from closed trades — every point is bound to an
+    immutable trade-close event, so the chart can't drift from the ledger.
+
+    For ``stream=account``, returns broker-balance snapshots (the only data
+    source that captures unrealized PnL and broker-side changes).
+
+    When ``stream`` is omitted, returns the combined realized-PnL curve across
+    all configured streams — the "whole account" view.
+    """
+    from backend.analytics import pnl as _pnl
+    from backend.core.config import load_config
+
     db = _get_db()
     try:
-        history = db.get_equity_history(stream=stream)
-        return JSONResponse({"equity": history, "count": len(history)})
+        if stream == "account":
+            history = db.get_equity_history(stream="account")
+            normalized = [
+                {"timestamp": h.get("recorded_at"), "equity": h.get("equity"),
+                 "trade_id": None, "delta_pnl": None}
+                for h in history
+            ]
+            return JSONResponse({"equity": normalized, "count": len(normalized)})
+
+        config = load_config(db=db)
+        starting = _combined_capital(db, config) if not stream else _pnl.stream_capital(config, stream)
+        curve = _pnl.equity_curve(db, stream=stream, starting_capital=starting)
+        return JSONResponse({"equity": curve, "count": len(curve)})
     finally:
         db.close()
+
+
+def _combined_capital(db, config: dict) -> float:
+    """Sum of capital allocations across news, strategy, and active hybrids."""
+    streams_cfg = (config or {}).get("streams", {})
+    total = 0.0
+    total += float(streams_cfg.get("news_stream", {}).get("capital_allocation", 100) or 100)
+    total += float(streams_cfg.get("strategy_stream", {}).get("capital_allocation", 100) or 100)
+    try:
+        for h in db.get_active_hybrids() or []:
+            total += float(h.get("capital_allocation", 100) or 100)
+    except Exception:
+        pass
+    return total

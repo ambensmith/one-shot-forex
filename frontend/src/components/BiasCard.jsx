@@ -1,4 +1,4 @@
-import { INSTRUMENT_META, biasToSemantic, semanticStyle } from '../lib/constants'
+import { INSTRUMENT_META, biasToSemantic, semanticStyle, formatPnlCurrency } from '../lib/constants'
 
 function directionArrow(direction) {
   if (direction === 'bullish') return '\u25b2'
@@ -12,7 +12,12 @@ function directionLabel(direction) {
   return 'Neutral'
 }
 
-export default function BiasCard({ instrument, direction, strength }) {
+function pnlColor(pnl) {
+  if (pnl == null || pnl === 0) return '#94A3B8'
+  return pnl > 0 ? '#15803D' : '#DC2626'
+}
+
+export default function BiasCard({ instrument, direction, strength, totalPnl, tradeCount }) {
   const meta = INSTRUMENT_META[instrument]
   const semantic = biasToSemantic(direction)
   const style = semanticStyle(semantic)
@@ -29,9 +34,11 @@ export default function BiasCard({ instrument, direction, strength }) {
       ? '#DC2626'
       : '#64748B'
 
+  const hasTrades = (tradeCount || 0) > 0
+
   return (
     <div
-      className="flex-shrink-0 w-[140px] h-[80px] bg-surface rounded-card border p-3 flex flex-col justify-between transition-shadow duration-200"
+      className="flex-shrink-0 w-[150px] h-[104px] bg-surface rounded-card border p-3 flex flex-col justify-between transition-shadow duration-200"
       style={{
         ...style,
         borderWidth: '1px',
@@ -59,6 +66,17 @@ export default function BiasCard({ instrument, direction, strength }) {
             }}
           />
         </div>
+      </div>
+      <div className="flex items-baseline justify-between pt-1 border-t border-border">
+        <span
+          className="text-[11px] font-semibold font-tabular"
+          style={{ color: pnlColor(totalPnl) }}
+        >
+          {hasTrades ? formatPnlCurrency(totalPnl) : '\u2014'}
+        </span>
+        <span className="text-[10px] text-tertiary font-tabular">
+          {hasTrades ? `${tradeCount} ${tradeCount === 1 ? 'trade' : 'trades'}` : 'no trades'}
+        </span>
       </div>
     </div>
   )

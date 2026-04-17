@@ -1026,16 +1026,17 @@ class Database:
     # ── Helpers ─────────────────────────────────────────────
 
     def get_daily_pnl(self, source: str | None = None) -> float:
-        if source:
-            row = self.execute(
-                "SELECT COALESCE(SUM(pnl), 0) as total FROM trades WHERE closed_at >= date('now') AND source = ?",
-                (source,),
-            ).fetchone()
-        else:
-            row = self.execute(
-                "SELECT COALESCE(SUM(pnl), 0) as total FROM trades WHERE closed_at >= date('now')",
-            ).fetchone()
-        return row["total"] if row else 0.0
+        """Total realized PnL from trades closed today.
+
+        ``source`` is interpreted as a stream id (news / strategy /
+        hybrid:<name>) and resolved via the unified analytics module's
+        stream → source mapping, so callers don't need to know whether
+        trades are stored under ``llm``, ``strategy:momentum``, etc.
+        """
+        from backend.analytics import pnl as _pnl
+        from datetime import date
+        agg = _pnl.aggregate_pnl(db=self, stream=source, since=date.today().isoformat())
+        return agg.total_pnl
 
     def table_counts(self) -> dict[str, int]:
         """Return row counts for all tables. Useful for verification."""

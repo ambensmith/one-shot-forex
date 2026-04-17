@@ -41,106 +41,66 @@ def export_all(db_path: str = "data/sentinel.db"):
 
 
 def export_dashboard_summary(db, config):
-    """Export main dashboard summary."""
-    streams_data = []
+    """Export main dashboard summary. PnL figures all come from the unified
+    analytics module, so every card on the dashboard agrees with every other.
+    """
+    from backend.analytics import pnl as _pnl
+
+    streams_data: list[dict] = []
     streams_cfg = config.get("streams", {})
+    today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    for stream_id, stream_name, cfg_key in [
-        ("news", "News Stream", "news_stream"),
-        ("strategy", "Strategy Stream", "strategy_stream"),
-    ]:
-        stream_cfg = streams_cfg.get(cfg_key, {})
-        trades = db.get_trades(stream_id, limit=1000)
-        # Exclude phantom/failed trades from all metrics
-        real_trades = [t for t in trades if t.get("status") != "failed"]
+    stream_defs = [
+        ("news", "News Stream", streams_cfg.get("news_stream", {}).get("capital_allocation", 100)),
+        ("strategy", "Strategy Stream", streams_cfg.get("strategy_stream", {}).get("capital_allocation", 100)),
+    ]
+    for hybrid in db.get_active_hybrids():
+        stream_defs.append((
+            f"hybrid:{hybrid['name']}",
+            hybrid["name"],
+            hybrid.get("capital_allocation", 100),
+        ))
+
+    for stream_id, stream_name, capital_allocation in stream_defs:
+        agg = _pnl.aggregate_pnl(db, stream=stream_id)
+        daily = _pnl.aggregate_pnl(db, stream=stream_id, since=today_iso)
         open_trades = db.get_open_trades(stream_id)
-        equity = db.get_stream_equity(stream_id)
-        capital_allocation = stream_cfg.get("capital_allocation", 100)
-
-        closed = [t for t in real_trades if t.get("pnl") is not None]
-        total_pnl = sum(t["pnl"] for t in closed)
-        wins = sum(1 for t in closed if t["pnl"] > 0)
-        win_rate = wins / len(closed) if closed else 0
-
-        # Daily P&L — trades closed today
-        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        daily_pnl = sum(
-            t["pnl"] for t in closed
-            if t.get("closed_at", "").startswith(today_str)
-        )
-
-        # Signal count
         signals = db.get_signals(stream=stream_id, limit=10000)
-        signal_count = len(signals)
 
-        # Compute Sharpe from equity history
+        equity_points = _pnl.equity_curve(
+            db, stream=stream_id, starting_capital=float(capital_allocation),
+        )
+        current_equity = equity_points[-1]["equity"] if equity_points else float(capital_allocation)
+
+        # Sharpe / drawdown are historical time-series metrics; keep reading
+        # from equity_snapshots so hybrids that still have history don't lose
+        # them. For news/strategy (stream snapshots retired) these will now
+        # default to 0 — acceptable until we rebuild these metrics on top of
+        # the step-function curve.
         eq_history = db.get_equity_history(stream_id)
-        sharpe = _compute_sharpe(eq_history)
-
-        # Max drawdown
-        max_dd = _compute_max_drawdown(eq_history)
+        sharpe = _compute_sharpe(eq_history) if eq_history else 0.0
+        max_dd = _compute_max_drawdown(eq_history) if eq_history else 0.0
 
         streams_data.append({
             "id": stream_id,
             "name": stream_name,
-            "equity": equity,
+            "equity": round(current_equity, 2),
             "capital_allocation": capital_allocation,
-            "total_pnl": round(total_pnl, 2),
-            "daily_pnl": round(daily_pnl, 2),
-            "trade_count": len(real_trades),
-            "signal_count": signal_count,
+            "total_pnl": round(agg.total_pnl, 2),
+            "daily_pnl": round(daily.total_pnl, 2),
+            "trade_count": agg.trade_count,
+            "signal_count": len(signals),
             "open_positions": len(open_trades),
-            "win_rate": round(win_rate, 3),
+            "win_rate": round(agg.win_rate, 3),
             "sharpe_ratio": round(sharpe, 2),
             "max_drawdown": round(max_dd, 4),
         })
 
-    # Add hybrid streams
-    for hybrid in db.get_active_hybrids():
-        hid = f"hybrid:{hybrid['name']}"
-        trades = db.get_trades(hid, limit=1000)
-        real_trades = [t for t in trades if t.get("status") != "failed"]
-        open_trades = db.get_open_trades(hid)
-        equity = db.get_stream_equity(hid)
-        capital_allocation = hybrid.get("capital_allocation", 100)
-        closed = [t for t in real_trades if t.get("pnl") is not None]
-        total_pnl = sum(t["pnl"] for t in closed)
-        wins = sum(1 for t in closed if t["pnl"] > 0)
-
-        today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        daily_pnl = sum(
-            t["pnl"] for t in closed
-            if t.get("closed_at", "").startswith(today_str)
-        )
-
-        signals = db.get_signals(stream=hid, limit=10000)
-
-        streams_data.append({
-            "id": hid,
-            "name": hybrid["name"],
-            "equity": equity,
-            "capital_allocation": capital_allocation,
-            "total_pnl": round(total_pnl, 2),
-            "daily_pnl": round(daily_pnl, 2),
-            "trade_count": len(real_trades),
-            "signal_count": len(signals),
-            "open_positions": len(open_trades),
-            "win_rate": round(wins / len(closed), 3) if closed else 0,
-            "sharpe_ratio": 0,
-            "max_drawdown": 0,
-        })
-
-    # Strategy breakdown
-    strategy_breakdown = _get_strategy_breakdown(db)
-
-    # Instrument breakdown
-    instrument_breakdown = _get_instrument_breakdown(db)
-
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "streams": streams_data,
-        "strategy_breakdown": strategy_breakdown,
-        "instrument_breakdown": instrument_breakdown,
+        "strategy_breakdown": _get_strategy_breakdown(db),
+        "instrument_breakdown": _get_instrument_breakdown(db),
     }
 
     _write_json("dashboard.json", summary)
@@ -261,21 +221,43 @@ def export_trades(db):
 
 
 def export_equity(db):
-    """Export equity curves for all streams."""
-    curves = {}
-    for stream_id in ["news", "strategy", "account"]:
-        history = db.get_equity_history(stream_id)
+    """Export equity curves for all streams.
+
+    Stream curves are step functions derived directly from closed trades (via
+    the unified analytics module) — every point maps to a real trade close,
+    so the JSON cannot drift from the trade ledger.
+
+    The ``account`` curve is still sourced from ``equity_snapshots`` because
+    it's the only stream that captures live broker balance (incl. unrealized
+    PnL) and can't be reconstructed from closed trades alone.
+    """
+    from backend.analytics import pnl as _pnl
+    from backend.core.config import load_config
+
+    config = load_config(db=db)
+    curves: dict[str, list[dict]] = {}
+
+    for stream_id in ("news", "strategy"):
+        cap = _pnl.stream_capital(config, stream_id)
+        curve = _pnl.equity_curve(db, stream=stream_id, starting_capital=cap)
         curves[stream_id] = [
-            {"time": h["recorded_at"], "equity": h["equity"], "positions": h["open_positions"]}
-            for h in history
+            {"time": p["timestamp"], "equity": p["equity"], "positions": None}
+            for p in curve
         ]
+
+    account_history = db.get_equity_history("account")
+    curves["account"] = [
+        {"time": h["recorded_at"], "equity": h["equity"], "positions": h["open_positions"]}
+        for h in account_history
+    ]
 
     for hybrid in db.get_active_hybrids():
         hid = f"hybrid:{hybrid['name']}"
-        history = db.get_equity_history(hid)
+        cap = float(hybrid.get("capital_allocation", 100) or 100)
+        curve = _pnl.equity_curve(db, stream=hid, starting_capital=cap)
         curves[hid] = [
-            {"time": h["recorded_at"], "equity": h["equity"], "positions": h["open_positions"]}
-            for h in history
+            {"time": p["timestamp"], "equity": p["equity"], "positions": None}
+            for p in curve
         ]
 
     _write_json("equity.json", {"curves": curves})
@@ -411,7 +393,14 @@ def export_run_reviews(db):
 
 
 def export_bias(db):
-    """Export current directional bias per instrument. Matches /api/bias shape."""
+    """Export current directional bias per instrument, enriched with PnL.
+
+    Mirrors ``/api/bias``: maps ``current_bias`` → ``direction`` /
+    ``bias_strength`` → ``strength`` for the frontend, and joins in realized
+    PnL + trade count from the unified analytics module.
+    """
+    from backend.analytics import pnl as _pnl
+
     states = db.get_bias_state()
     for s in states:
         val = s.get("contributing_signals")
@@ -420,7 +409,24 @@ def export_bias(db):
                 s["contributing_signals"] = json.loads(val)
             except (json.JSONDecodeError, TypeError):
                 pass
-    _write_json("bias.json", {"bias": states})
+
+    pnl_by_inst = {r["instrument"]: r for r in _pnl.per_instrument_breakdown(db)}
+    bias_by_inst = {s.get("instrument"): s for s in states}
+    all_instruments = set(bias_by_inst) | set(pnl_by_inst)
+
+    enriched: list[dict] = []
+    for inst in all_instruments:
+        s = bias_by_inst.get(inst, {})
+        p = pnl_by_inst.get(inst, {})
+        enriched.append({
+            **s,
+            "instrument": inst,
+            "direction": s.get("current_bias") or "neutral",
+            "strength": s.get("bias_strength") or 0.0,
+            "total_pnl": p.get("total_pnl", 0.0),
+            "trade_count": p.get("trade_count", 0),
+        })
+    _write_json("bias.json", {"bias": enriched})
 
 
 def export_llm_activity(db):
@@ -555,48 +561,29 @@ def export_prompts(db):
 
 
 def _get_strategy_breakdown(db) -> list[dict]:
-    """Get per-strategy performance metrics."""
-    strategies = ["momentum", "carry", "breakout", "mean_reversion", "volatility_breakout"]
-    breakdown = []
-
-    for strat_name in strategies:
-        signals = db.execute(
-            "SELECT * FROM signals WHERE source = ?",
-            (f"strategy:{strat_name}",),
-        ).fetchall()
-
-        traded_signal_ids = [dict(s)["trade_id"] for s in signals if dict(s).get("was_traded")]
-        trades = []
-        for tid in traded_signal_ids:
-            if tid:
-                t = db.execute("SELECT * FROM trades WHERE id = ?", (tid,)).fetchone()
-                if t:
-                    trades.append(dict(t))
-
-        closed = [t for t in trades if t.get("pnl") is not None]
-        total_pnl = sum(t["pnl"] for t in closed)
-        wins = sum(1 for t in closed if t["pnl"] > 0)
-
-        breakdown.append({
-            "name": strat_name,
-            "signal_count": len(signals),
-            "trade_count": len(trades),
-            "total_pnl": round(total_pnl, 2),
-            "win_rate": round(wins / len(closed), 3) if closed else 0,
-        })
-
-    return breakdown
+    """Per-strategy performance metrics (delegates to unified analytics)."""
+    from backend.analytics import pnl as _pnl
+    return _pnl.per_strategy_breakdown(db)
 
 
 def _get_instrument_breakdown(db) -> list[dict]:
-    """Get per-instrument P&L across all streams."""
-    rows = db.execute(
-        """SELECT instrument, COUNT(*) as count, COALESCE(SUM(pnl), 0) as total_pnl
-           FROM trades GROUP BY instrument ORDER BY total_pnl DESC"""
-    ).fetchall()
+    """Per-instrument P&L across all streams (delegates to unified analytics).
 
-    return [{"instrument": dict(r)["instrument"], "count": dict(r)["count"],
-             "total_pnl": round(dict(r)["total_pnl"], 2)} for r in rows]
+    Preserves the legacy ``count`` field alongside the unified ``trade_count``
+    for consumers that already rely on the old name.
+    """
+    from backend.analytics import pnl as _pnl
+    rows = _pnl.per_instrument_breakdown(db)
+    return [
+        {
+            "instrument": r["instrument"],
+            "count": r["trade_count"],
+            "trade_count": r["trade_count"],
+            "total_pnl": r["total_pnl"],
+            "win_rate": r["win_rate"],
+        }
+        for r in rows
+    ]
 
 
 def _compute_sharpe(equity_history: list[dict]) -> float:

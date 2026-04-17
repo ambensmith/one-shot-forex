@@ -51,16 +51,16 @@ class BaseStream(ABC):
         """Run one cycle."""
 
     def get_state(self) -> StreamState:
+        from backend.analytics import pnl as _pnl
         open_trades = self.db.get_open_trades(self.stream_id)
-        all_trades = self.db.get_trades(self.stream_id)
-        total_pnl = sum(t.get("pnl", 0) or 0 for t in all_trades)
+        agg = _pnl.aggregate_pnl(self.db, stream=self.stream_id)
         return StreamState(
             stream_id=self.stream_id,
             name=self.stream_id,
             status="running",
             open_positions=open_trades,
-            total_pnl=total_pnl,
-            trade_count=len(all_trades),
+            total_pnl=agg.total_pnl,
+            trade_count=agg.trade_count,
         )
 
     def record_signal(self, signal: StreamSignal, source: str,
@@ -77,6 +77,8 @@ class BaseStream(ABC):
         )
 
     def record_equity(self):
-        equity = self.db.get_stream_equity(self.stream_id)
-        open_count = self.db.count_open_positions(self.stream_id)
-        self.db.insert_equity_snapshot(self.stream_id, equity, open_count)
+        """No-op — stream equity curves are derived from closed trades on
+        demand (see ``backend.analytics.pnl.equity_curve``). Kept so existing
+        callers in each stream don't need touching.
+        """
+        return None

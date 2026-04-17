@@ -8,18 +8,20 @@ from datetime import datetime, timedelta, timezone
 
 def compute_stream_metrics(db, stream_id: str, since: datetime) -> dict:
     """Compute comprehensive metrics for a stream over a period."""
-    trades = db.get_trades(stream_id, limit=10000, since=since)
+    from backend.analytics import pnl as _pnl
+
     signals = db.get_signals(stream_id, limit=10000, since=since)
     equity_history = db.get_equity_history(stream_id, since=since)
+    open_trades = db.get_open_trades(stream_id)
 
-    closed = [t for t in trades if t.get("pnl") is not None]
-    open_trades = [t for t in trades if t["status"] == "open"]
+    closed = _pnl.list_closed_trades(db, stream=stream_id, since=since)
+    agg = _pnl.aggregate_pnl(db, stream=stream_id, since=since)
 
-    total_pnl = sum(t["pnl"] for t in closed)
+    total_pnl = agg.total_pnl
     wins = [t for t in closed if t["pnl"] > 0]
     losses = [t for t in closed if t["pnl"] < 0]
 
-    win_rate = len(wins) / len(closed) if closed else 0
+    win_rate = agg.win_rate
     avg_win = statistics.mean([t["pnl"] for t in wins]) if wins else 0
     avg_loss = statistics.mean([t["pnl"] for t in losses]) if losses else 0
     profit_factor = abs(sum(t["pnl"] for t in wins) / sum(t["pnl"] for t in losses)) if losses else 0
@@ -53,8 +55,8 @@ def compute_stream_metrics(db, stream_id: str, since: datetime) -> dict:
     return {
         "stream_id": stream_id,
         "total_pnl": round(total_pnl, 2),
-        "trade_count": len(trades),
-        "closed_count": len(closed),
+        "trade_count": len(closed) + len(open_trades),
+        "closed_count": agg.trade_count,
         "open_count": len(open_trades),
         "win_rate": round(win_rate, 3),
         "avg_win": round(avg_win, 2),
@@ -69,67 +71,50 @@ def compute_stream_metrics(db, stream_id: str, since: datetime) -> dict:
 
 
 def compute_instrument_metrics(db, since: datetime) -> list[dict]:
-    """P&L per instrument across all streams."""
-    trades = db.get_trades(limit=10000, since=since)
-    instruments: dict[str, dict] = {}
+    """Per-instrument P&L across all streams (over a period)."""
+    from backend.analytics import pnl as _pnl
 
-    for t in trades:
+    closed = _pnl.list_closed_trades(db, since=since)
+    instruments: dict[str, dict] = {}
+    for t in closed:
         inst = t["instrument"]
-        if inst not in instruments:
-            instruments[inst] = {"total_pnl": 0, "count": 0, "wins": 0}
-        instruments[inst]["count"] += 1
-        if t.get("pnl") is not None:
-            instruments[inst]["total_pnl"] += t["pnl"]
-            if t["pnl"] > 0:
-                instruments[inst]["wins"] += 1
+        bucket = instruments.setdefault(inst, {"total_pnl": 0.0, "count": 0, "wins": 0})
+        bucket["count"] += 1
+        bucket["total_pnl"] += t["pnl"]
+        if t["pnl"] > 0:
+            bucket["wins"] += 1
 
     return [
         {
             "instrument": inst,
-            "total_pnl": round(data["total_pnl"], 2),
-            "trade_count": data["count"],
-            "win_rate": round(data["wins"] / data["count"], 3) if data["count"] > 0 else 0,
+            "total_pnl": round(d["total_pnl"], 2),
+            "trade_count": d["count"],
+            "win_rate": round(d["wins"] / d["count"], 3) if d["count"] else 0,
         }
-        for inst, data in sorted(instruments.items(), key=lambda x: x[1]["total_pnl"], reverse=True)
+        for inst, d in sorted(instruments.items(), key=lambda x: x[1]["total_pnl"], reverse=True)
     ]
 
 
 def compute_strategy_metrics(db, since: datetime) -> list[dict]:
-    """Per-strategy metrics within the strategy stream."""
-    strategies = ["momentum", "carry", "breakout", "mean_reversion", "volatility_breakout"]
-    results = []
+    """Per-strategy metrics within the strategy stream (over a period)."""
+    from backend.analytics import pnl as _pnl
 
-    for name in strategies:
-        rows = db.execute(
-            "SELECT * FROM signals WHERE stream = 'strategy' AND source = ? AND created_at >= ?",
-            (name, since.isoformat()),
-        ).fetchall()
-        signals = [dict(r) for r in rows]
-
-        traded = [s for s in signals if s.get("was_traded")]
-        trade_ids = [s["trade_id"] for s in traded if s.get("trade_id")]
-
-        pnl = 0
-        wins = 0
-        total = 0
-        for tid in trade_ids:
-            t = db.execute("SELECT * FROM trades WHERE id = ?", (tid,)).fetchone()
-            if t:
-                t = dict(t)
-                if t.get("pnl") is not None:
-                    pnl += t["pnl"]
-                    total += 1
-                    if t["pnl"] > 0:
-                        wins += 1
-
+    results: list[dict] = []
+    for name in _pnl.STRATEGY_NAMES:
+        source = f"strategy:{name}"
+        agg = _pnl.aggregate_pnl(db, source=source, since=since)
+        signal_rows = db.execute(
+            "SELECT COUNT(*) AS c FROM signals WHERE source = ? AND created_at >= ?",
+            (source, since.isoformat()),
+        ).fetchone()
+        signal_count = int(signal_rows["c"] or 0) if signal_rows else 0
         results.append({
             "name": name,
-            "signal_count": len(signals),
-            "trade_count": len(trade_ids),
-            "total_pnl": round(pnl, 2),
-            "win_rate": round(wins / total, 3) if total > 0 else 0,
+            "signal_count": signal_count,
+            "trade_count": agg.trade_count,
+            "total_pnl": round(agg.total_pnl, 2),
+            "win_rate": round(agg.win_rate, 3),
         })
-
     return results
 
 

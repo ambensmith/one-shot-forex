@@ -224,29 +224,23 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
 
 
 def _record_all_equity(db, broker, config):
-    """Record equity snapshots for all streams based on actual trade P&L."""
-    streams_cfg = config.get("streams", {})
+    """Record the broker-level account equity snapshot.
 
-    stream_list = [
-        ("news", streams_cfg.get("news_stream", {}).get("capital_allocation", 100)),
-        ("strategy", streams_cfg.get("strategy_stream", {}).get("capital_allocation", 100)),
-    ]
-    for hybrid in db.get_active_hybrids():
-        stream_list.append((f"hybrid:{hybrid['name']}", hybrid.get("capital_allocation", 100)))
+    Per-stream equity curves are derived on-demand from closed trades (see
+    ``backend.analytics.pnl.equity_curve``) — there is no snapshot loop for
+    news/strategy/hybrid streams any more, which eliminates the €100
+    snap-back artefacts those snapshots produced when a cycle had no closed
+    trades.
 
-    for stream_id, capital in stream_list:
-        trades = db.get_trades(stream_id, limit=10000)
-        realized_pnl = sum(t["pnl"] for t in trades if t.get("pnl") is not None)
-        equity = capital + realized_pnl
-        open_count = db.count_open_positions(stream_id)
-        db.insert_equity_snapshot(stream_id, round(equity, 2), open_count)
-
-    # Account-level equity from live broker balance
+    The ``account`` stream still writes a snapshot here because it captures
+    the broker's live balance including unrealized PnL, which can't be
+    reconstructed from the closed-trade ledger.
+    """
     try:
         if broker and broker.is_connected:
             summary = broker.get_account_summary()
             account_equity = summary.get("balance", 0) + summary.get("unrealizedPL", 0)
-            total_open = sum(db.count_open_positions(s) for s, _ in stream_list)
+            total_open = db.count_open_positions()
             db.insert_equity_snapshot("account", round(account_equity, 2), total_open)
     except Exception as e:
         logging.getLogger(__name__).warning(f"Failed to record account equity: {e}")
