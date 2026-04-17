@@ -110,24 +110,17 @@ export async function fetchEquity(stream) {
       timestamp: d.timestamp || d.recorded_at || d.time,
     }))
   }
-  // Static equity.json has shape: { curves: { streamId: [{time, equity, positions}] } }
+  // Static equity.json has shape:
+  //   { curves: { streamId: [{time, equity, positions}],
+  //               combined: [{time, equity, positions}] } }
+  // `combined` is a single step-function curve spanning all streams,
+  // starting at the sum of their capital allocations — it's the
+  // "whole account" view the dashboard defaults to.
   const data = await fetchStaticJSON('equity.json')
   const curves = data?.curves || {}
-  if (stream && curves[stream]) {
-    return curves[stream].map(d => ({
-      ...d,
-      timestamp: d.time || d.recorded_at,
-    }))
-  }
-  // Merge all streams, sorted by time
-  const all = []
-  for (const entries of Object.values(curves)) {
-    for (const d of entries) {
-      all.push({ ...d, timestamp: d.time || d.recorded_at })
-    }
-  }
-  all.sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''))
-  return all
+  const key = stream || 'combined'
+  const series = curves[key] || []
+  return series.map(d => ({ ...d, timestamp: d.time || d.recorded_at }))
 }
 
 export async function fetchLLMActivity(hours = 12) {

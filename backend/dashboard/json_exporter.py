@@ -223,22 +223,26 @@ def export_trades(db):
 def export_equity(db):
     """Export equity curves for all streams.
 
-    Stream curves are step functions derived directly from closed trades (via
-    the unified analytics module) — every point maps to a real trade close,
-    so the JSON cannot drift from the trade ledger.
+    Stream curves are step functions derived from closed trades via the
+    unified analytics module — every point maps to a real close event. A
+    ``combined`` curve is also emitted: one step-function covering all
+    streams together, starting at the sum of their capital allocations.
+    That's the curve the dashboard chart should default to.
 
     The ``account`` curve is still sourced from ``equity_snapshots`` because
-    it's the only stream that captures live broker balance (incl. unrealized
-    PnL) and can't be reconstructed from closed trades alone.
+    it captures live broker balance (incl. unrealized PnL) and can't be
+    reconstructed from the closed-trade ledger.
     """
     from backend.analytics import pnl as _pnl
     from backend.core.config import load_config
 
     config = load_config(db=db)
     curves: dict[str, list[dict]] = {}
+    combined_capital = 0.0
 
     for stream_id in ("news", "strategy"):
         cap = _pnl.stream_capital(config, stream_id)
+        combined_capital += cap
         curve = _pnl.equity_curve(db, stream=stream_id, starting_capital=cap)
         curves[stream_id] = [
             {"time": p["timestamp"], "equity": p["equity"], "positions": None}
@@ -254,11 +258,18 @@ def export_equity(db):
     for hybrid in db.get_active_hybrids():
         hid = f"hybrid:{hybrid['name']}"
         cap = float(hybrid.get("capital_allocation", 100) or 100)
+        combined_capital += cap
         curve = _pnl.equity_curve(db, stream=hid, starting_capital=cap)
         curves[hid] = [
             {"time": p["timestamp"], "equity": p["equity"], "positions": None}
             for p in curve
         ]
+
+    combined = _pnl.equity_curve(db, stream=None, starting_capital=combined_capital)
+    curves["combined"] = [
+        {"time": p["timestamp"], "equity": p["equity"], "positions": None}
+        for p in combined
+    ]
 
     _write_json("equity.json", {"curves": curves})
 
@@ -507,6 +518,8 @@ def export_strategies_detail(db):
             name = dict(r)["source"].replace("strategy:", "")
             strategy_info[name] = {"name": name, "description": "", "parameters": {}}
 
+    from backend.analytics import pnl as _pnl
+
     result = []
     for name, info in strategy_info.items():
         source_key = f"strategy:{name}"
@@ -521,13 +534,12 @@ def export_strategies_detail(db):
                     except (json.JSONDecodeError, TypeError):
                         pass
 
-        all_trades = db.query(
-            "SELECT * FROM trades WHERE source = ? ORDER BY opened_at DESC",
+        agg = _pnl.aggregate_pnl(db, source=source_key)
+        total_row = db.execute(
+            "SELECT COUNT(*) AS c FROM trades WHERE source = ?",
             (source_key,),
-        )
-        closed = [t for t in all_trades if t.get("pnl") is not None]
-        wins = sum(1 for t in closed if t["pnl"] > 0)
-        total_pnl = sum(t["pnl"] for t in closed)
+        ).fetchone()
+        total_trades = int(total_row["c"] or 0) if total_row else 0
 
         result.append({
             "name": info["name"],
@@ -543,11 +555,11 @@ def export_strategies_detail(db):
                 for s in recent_signals
             ],
             "trade_stats": {
-                "total": len(all_trades),
-                "won": wins,
-                "lost": len(closed) - wins,
-                "net_pnl": round(total_pnl, 2),
-                "win_rate": round(wins / len(closed), 3) if closed else 0,
+                "total": total_trades,
+                "won": agg.wins,
+                "lost": agg.losses,
+                "net_pnl": round(agg.total_pnl, 2),
+                "win_rate": round(agg.win_rate, 3),
             },
         })
 
