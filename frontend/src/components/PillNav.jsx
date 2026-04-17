@@ -51,8 +51,14 @@ export default function PillNav({ expanded, onToggleExpand }) {
   const [syncState, triggerSync] = useWorkflowTrigger('/api/trigger-sync')
 
   return (
-    <nav
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-2 py-1.5 rounded-pill max-w-[520px]"
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
+      <div
+        className="font-serif text-[11px] tracking-[0.22em] uppercase text-[rgba(28,25,23,0.55)]"
+      >
+        One Shot Forex
+      </div>
+      <nav
+      className="flex items-center gap-1 px-2 py-1.5 rounded-pill max-w-[520px]"
       style={{
         background: 'rgba(28, 25, 23, 0.92)',
         backdropFilter: 'blur(12px)',
@@ -144,5 +150,6 @@ export default function PillNav({ expanded, onToggleExpand }) {
         />
       </button>
     </nav>
+    </div>
   )
 }
