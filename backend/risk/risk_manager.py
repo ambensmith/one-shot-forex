@@ -43,6 +43,7 @@ class RiskManager:
         self.leverage = risk_cfg.get("leverage", 1)
         self.target_notional_eur = risk_cfg.get("target_notional_eur", 0)
         self.fixed_position_size = risk_cfg.get("fixed_position_size", 0)
+        self.max_notional_eur = risk_cfg.get("max_notional_eur", 0)
 
     def check_trade(self, stream_id: str, instrument: str,
                     direction: str, entry_price: float,
@@ -96,6 +97,23 @@ class RiskManager:
 
         if position_size <= 0:
             return RiskCheck(approved=False, rejection_reason="Position size too small")
+
+        # Hard notional ceiling — defence against sizing bugs regardless of code path
+        if self.max_notional_eur > 0:
+            try:
+                base = instrument.split("_")[0]
+                eur_per_base = 1.0 if base == "EUR" else self._get_eur_per_base(base)
+                notional_eur = position_size * eur_per_base
+                if notional_eur > self.max_notional_eur:
+                    return RiskCheck(
+                        approved=False,
+                        rejection_reason=(
+                            f"Notional €{notional_eur:.0f} exceeds cap €{self.max_notional_eur:.0f} "
+                            f"(size={position_size} {base})"
+                        ),
+                    )
+            except Exception as e:
+                logger.warning("Notional cap check failed for %s: %s", instrument, e)
 
         return RiskCheck(approved=True, position_size=position_size)
 

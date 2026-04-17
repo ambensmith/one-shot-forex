@@ -322,6 +322,30 @@ class CapitalComClient:
             logger.warning(f"Failed to get open trades: {e}")
             return []
 
+    def get_realized_pnl(self, deal_id: str, lookback_hours: int = 72) -> dict | None:
+        """Look up realized EUR PnL for a closed deal from the broker's transaction ledger.
+
+        The transactions endpoint is authoritative for PnL: it's denominated in
+        the account currency (EUR) and uses the broker's actual fill prices.
+        Prefer this over local quote-currency math whenever we have a deal_id.
+        """
+        if not self._connected or not deal_id:
+            return None
+        from datetime import datetime, timedelta, timezone
+        from_iso = (datetime.now(timezone.utc) - timedelta(hours=lookback_hours)).isoformat()
+        txs = self.get_history_transactions(from_iso)
+        for tx in txs:
+            if tx.get("dealId") == deal_id and tx.get("transactionType") == "TRADE":
+                try:
+                    return {
+                        "pnl": float(tx.get("size", 0)),
+                        "currency": tx.get("currency"),
+                        "date": tx.get("date") or tx.get("dateUtc"),
+                    }
+                except (TypeError, ValueError):
+                    return None
+        return None
+
     def get_deal_activity(self, deal_id: str) -> dict | None:
         """Fetch activity details for a specific deal from Capital.com."""
         if not self._connected:
@@ -333,6 +357,148 @@ class CapitalComClient:
         except Exception as e:
             logger.warning(f"Failed to fetch deal activity for {deal_id}: {e}")
             return None
+
+    @staticmethod
+    def _normalize_history_ts(ts: str) -> str:
+        """Capital.com history endpoints reject timezone suffixes — strip 'Z' / '+00:00'."""
+        if not ts:
+            return ts
+        ts = ts.replace("Z", "")
+        if "+" in ts:
+            ts = ts.split("+", 1)[0]
+        if "." in ts:
+            ts = ts.split(".", 1)[0]
+        return ts
+
+    def get_history_activities(self, from_iso: str, to_iso: str | None = None) -> list[dict]:
+        """Fetch all deal activities in a time window."""
+        if not self._connected:
+            return []
+        from_ts = self._normalize_history_ts(from_iso)
+        params = f"from={from_ts}&detailed=true"
+        if to_iso:
+            params += f"&to={self._normalize_history_ts(to_iso)}"
+        try:
+            data = self._request("GET", f"/api/v1/history/activity?{params}")
+            return data.get("activities", [])
+        except Exception as e:
+            logger.warning(f"Failed to fetch history activities from={from_ts}: {e}")
+            return []
+
+    def get_history_transactions(self, from_iso: str, to_iso: str | None = None) -> list[dict]:
+        """Fetch account transactions (including realized PnL for closed trades) in a time window."""
+        if not self._connected:
+            return []
+        from_ts = self._normalize_history_ts(from_iso)
+        params = f"from={from_ts}"
+        if to_iso:
+            params += f"&to={self._normalize_history_ts(to_iso)}"
+        try:
+            data = self._request("GET", f"/api/v1/history/transactions?{params}")
+            return data.get("transactions", [])
+        except Exception as e:
+            logger.warning(f"Failed to fetch history transactions from={from_ts}: {e}")
+            return []
+
+    def get_closed_trades_since(self, from_iso: str, to_iso: str | None = None) -> list[dict]:
+        """Reconstruct closed trades from Capital.com history.
+
+        Drives off TRANSACTIONS (the realized-PnL ledger — one row per closed deal
+        with the true EUR PnL) and enriches each with the deal's full activity trail
+        (open/close levels, size, direction, SL/TP). Activities alone are
+        unreliable because the general /activity listing drops position OPEN/CLOSE
+        pairs for deals that have already been settled.
+        """
+        transactions = self.get_history_transactions(from_iso, to_iso)
+
+        def _f(v):
+            try:
+                return float(v) if v is not None and v != "" else None
+            except (TypeError, ValueError):
+                return None
+
+        closed: list[dict] = []
+        for tx in transactions:
+            if tx.get("transactionType") != "TRADE":
+                continue
+            deal_id = tx.get("dealId") or ""
+            if not deal_id:
+                continue
+
+            # Per-deal activity gives open level, size, direction, SL/TP, close level
+            try:
+                detail_data = self._request(
+                    "GET", f"/api/v1/history/activity?dealId={deal_id}&detailed=true"
+                )
+                deal_activities = detail_data.get("activities", []) or []
+            except Exception as e:
+                logger.warning(f"Per-deal activity lookup failed for {deal_id}: {e}")
+                deal_activities = []
+
+            acts_sorted = sorted(deal_activities, key=lambda a: a.get("date") or "")
+
+            # Find the OPEN (POSITION/ACCEPTED) and CLOSE (POSITION/DELETED) activities
+            open_act = None
+            close_act = None
+            for a in acts_sorted:
+                a_type = (a.get("type") or "").upper()
+                a_status = (a.get("status") or "").upper()
+                if a_type == "POSITION" and a_status in ("OPENED", "ACCEPTED") and not open_act:
+                    open_act = a
+                if a_type == "POSITION" and a_status in ("CLOSED", "DELETED"):
+                    close_act = a
+            if not open_act and acts_sorted:
+                open_act = acts_sorted[0]
+            if not close_act and len(acts_sorted) >= 2:
+                close_act = acts_sorted[-1]
+
+            open_details = (open_act or {}).get("details") or {}
+            close_details = (close_act or {}).get("details") or {}
+
+            epic = (
+                (open_act or {}).get("epic")
+                or open_details.get("epic")
+                or tx.get("instrumentName")
+                or ""
+            )
+            instrument = EPIC_TO_INSTRUMENT.get(epic, epic)
+
+            raw_direction = (
+                open_details.get("direction")
+                or (open_act or {}).get("direction")
+                or ""
+            ).upper()
+            direction = "long" if raw_direction == "BUY" else ("short" if raw_direction == "SELL" else "")
+
+            size = _f(open_details.get("size") or (open_act or {}).get("size"))
+            entry_price = _f(open_details.get("level") or (open_act or {}).get("level"))
+            exit_price = _f(close_details.get("level") or (close_act or {}).get("level"))
+            stop_loss = _f(open_details.get("stopLevel"))
+            take_profit = _f(open_details.get("profitLevel"))
+            opened_at = (open_act or {}).get("date") or open_details.get("date")
+            closed_at = (close_act or {}).get("date") or tx.get("date") or close_details.get("date")
+            # Realized PnL — transaction's "size" is the signed amount credited/debited to account
+            pnl = _f(tx.get("size"))
+
+            closed.append({
+                "broker_deal_id": deal_id,
+                "instrument": instrument,
+                "epic": epic,
+                "direction": direction,
+                "size": size,
+                "entry_price": entry_price,
+                "exit_price": exit_price,
+                "stop_loss": stop_loss,
+                "take_profit": take_profit,
+                "pnl": pnl,
+                "pnl_currency": tx.get("currency"),
+                "opened_at": opened_at,
+                "closed_at": closed_at,
+                "raw_activities": acts_sorted,
+                "raw_transaction": tx,
+            })
+
+        return closed
 
     def close_trade(self, trade_id: str) -> dict:
         """Close a specific position by dealId."""

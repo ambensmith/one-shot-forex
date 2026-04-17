@@ -555,8 +555,191 @@ def cmd_execute():
         db.close()
 
 
+def cmd_backfill_broker_history(since: str, repair: bool = False):
+    """Import closed trades from Capital.com history for diagnostic inspection.
+
+    Useful when trades opened and closed between reconcile ticks and are missing
+    from the local DB. Idempotent — skips deals already present in `trades`.
+    With --repair, also overwrites `pnl` on already-present closed trades when
+    the broker's realized EUR PnL differs from what's stored locally (fixes
+    mis-denominated PnL from the old quote-currency bug).
+    """
+    from backend.core.config import load_config
+    from backend.core.database import Database
+    from backend.core.models import Trade
+    from backend.data.capitalcom_client import CapitalComClient
+    from backend.data.provider import pip_value
+
+    config = load_config()
+    db = Database("data/sentinel.db")
+    broker = CapitalComClient(config)
+
+    if not broker.is_connected:
+        logger.error("Broker not connected — cannot backfill history")
+        print(json.dumps({"status": "error", "command": "backfill-broker-history",
+                          "error": "broker not connected"}))
+        db.close()
+        return
+
+    try:
+        closed = broker.get_closed_trades_since(since)
+        logger.info(f"Broker returned {len(closed)} closed deals since {since}")
+
+        imported = 0
+        skipped = 0
+        repaired = 0
+        total_pnl = 0.0
+        rows_for_print: list[dict] = []
+        repair_log: list[dict] = []
+
+        for deal in closed:
+            deal_id = deal.get("broker_deal_id") or ""
+            if not deal_id:
+                continue
+
+            existing = db.get_trade_by_deal_id(deal_id)
+            if existing:
+                broker_pnl = deal.get("pnl")
+                local_pnl = existing.get("pnl")
+                if (
+                    repair
+                    and broker_pnl is not None
+                    and (local_pnl is None or abs(float(local_pnl) - float(broker_pnl)) > 0.01)
+                ):
+                    update_kwargs = {"pnl": broker_pnl}
+                    # If broker says closed but DB says open, also flip status
+                    if existing.get("status") == "open":
+                        update_kwargs["status"] = "closed"
+                        update_kwargs["close_reason"] = "broker_backfill_repair"
+                        if deal.get("closed_at"):
+                            update_kwargs["closed_at"] = deal["closed_at"]
+                        if deal.get("exit_price"):
+                            update_kwargs["exit_price"] = deal["exit_price"]
+                    db.update_trade(existing["id"], **update_kwargs)
+                    db.insert_trade_event(existing["id"], "pnl_repaired", {
+                        "source": "broker_backfill_repair",
+                        "old_pnl": local_pnl,
+                        "new_pnl": broker_pnl,
+                        "broker_currency": deal.get("pnl_currency"),
+                        "status_flip": existing.get("status") == "open",
+                    })
+                    repaired += 1
+                    repair_log.append({
+                        "deal_id": deal_id,
+                        "instrument": deal.get("instrument"),
+                        "old_pnl": local_pnl,
+                        "new_pnl": broker_pnl,
+                        "status_flipped_to_closed": existing.get("status") == "open",
+                    })
+                    logger.info(
+                        f"Repaired trade {existing['id']} ({deal.get('instrument')}): "
+                        f"{local_pnl} → {broker_pnl} EUR"
+                    )
+                skipped += 1
+                continue
+
+            # Derive pip-based PnL when the broker gave us a numeric PnL
+            pnl = deal.get("pnl")
+            entry = deal.get("entry_price")
+            exit_p = deal.get("exit_price")
+            pnl_pips = None
+            instrument = deal.get("instrument", "")
+            if entry and exit_p and instrument:
+                try:
+                    pv = pip_value(instrument)
+                    if deal.get("direction") == "long":
+                        pnl_pips = round((exit_p - entry) / pv, 1)
+                    elif deal.get("direction") == "short":
+                        pnl_pips = round((entry - exit_p) / pv, 1)
+                except Exception:
+                    pass
+
+            # Fall back to the close timestamp (or now) if the broker didn't
+            # return an explicit opened_at — per-deal activity lookup often
+            # returns empty for older settled deals.
+            opened_at = deal.get("opened_at") or deal.get("closed_at")
+            closed_at = deal.get("closed_at") or deal.get("opened_at")
+
+            trade_kwargs = dict(
+                instrument=instrument,
+                direction=deal.get("direction", "") or "long",
+                size=deal.get("size") or 0.0,
+                entry_price=entry or 0.0,
+                stop_loss=deal.get("stop_loss"),
+                take_profit=deal.get("take_profit"),
+                exit_price=exit_p,
+                pnl=pnl,
+                pnl_pips=pnl_pips,
+                status="closed",
+                source="broker_backfill",
+                broker_deal_id=deal_id,
+                closed_at=closed_at,
+                close_reason="broker_backfill",
+            )
+            if opened_at:
+                trade_kwargs["opened_at"] = opened_at
+            trade = Trade(**trade_kwargs)
+            trade_id = db.insert_trade(trade)
+
+            db.insert_trade_event(trade_id, "broker_backfill", {
+                "source": "capitalcom_history",
+                "deal": {
+                    "broker_deal_id": deal_id,
+                    "instrument": instrument,
+                    "epic": deal.get("epic"),
+                    "direction": deal.get("direction"),
+                    "size": deal.get("size"),
+                    "entry_price": entry,
+                    "exit_price": exit_p,
+                    "stop_loss": deal.get("stop_loss"),
+                    "take_profit": deal.get("take_profit"),
+                    "pnl": pnl,
+                    "opened_at": deal.get("opened_at"),
+                    "closed_at": deal.get("closed_at"),
+                },
+                "raw_activities": deal.get("raw_activities"),
+                "raw_transaction": deal.get("raw_transaction"),
+            })
+
+            if isinstance(pnl, (int, float)):
+                total_pnl += pnl
+            imported += 1
+
+            rows_for_print.append({
+                "deal_id": deal_id,
+                "instrument": instrument,
+                "direction": deal.get("direction"),
+                "size": deal.get("size"),
+                "entry": entry,
+                "exit": exit_p,
+                "pnl": pnl,
+                "opened_at": deal.get("opened_at"),
+                "closed_at": deal.get("closed_at"),
+            })
+
+        logger.info(
+            f"Backfill complete: {imported} imported, {skipped} skipped, "
+            f"{repaired} repaired, total_pnl={total_pnl:.2f}"
+        )
+        print(json.dumps({
+            "status": "ok",
+            "command": "backfill-broker-history",
+            "since": since,
+            "broker_deals_returned": len(closed),
+            "imported": imported,
+            "skipped": skipped,
+            "repaired": repaired,
+            "repair_log": repair_log,
+            "total_pnl": round(total_pnl, 2),
+            "trades": rows_for_print,
+        }, indent=2))
+    finally:
+        db.close()
+
+
 def cmd_reconcile():
     """Sync local trade state with broker positions."""
+    from datetime import datetime, timedelta, timezone
     from backend.core.config import load_config
     from backend.core.database import Database
     from backend.main import create_data_provider
@@ -571,16 +754,31 @@ def cmd_reconcile():
         closed_ids = executor.reconcile_positions()
         untracked = executor.get_untracked_positions()
 
+        # Catch trades that opened and closed between ticks — those never show up
+        # in /positions, so the bidirectional sync above misses them entirely.
+        # Look back 2h by default; backfill is idempotent per broker_deal_id.
+        # repair=True auto-fixes any mismatched PnL on already-imported trades.
+        history_since = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+        bf = executor.backfill_closed_history(history_since, repair=True)
+        backfilled = bf.get("imported", [])
+        repaired = bf.get("repaired", [])
+
         if closed_ids:
             logger.info(f"Reconciled {len(closed_ids)} closed trades: {closed_ids}")
         if untracked:
             logger.info(f"Imported {len(untracked)} untracked broker positions")
+        if backfilled:
+            logger.info(f"Backfilled {len(backfilled)} closed trades from broker history")
+        if repaired:
+            logger.info(f"Repaired PnL on {len(repaired)} existing trades")
 
         print(json.dumps({
             "status": "ok",
             "command": "reconcile",
             "trades_closed": len(closed_ids),
             "untracked_imported": len(untracked),
+            "history_backfilled": len(backfilled),
+            "pnl_repaired": len(repaired),
             "closed_trade_ids": closed_ids,
         }))
     finally:
@@ -762,6 +960,17 @@ def main():
     sub = subparsers.add_parser("tick", help="Run full pipeline (all stages in order)")
     sub.add_argument("--force-market-open", action="store_true", help="Bypass market hours check")
 
+    # backfill-broker-history
+    sub = subparsers.add_parser(
+        "backfill-broker-history",
+        help="Import closed trades from Capital.com history since a given timestamp",
+    )
+    sub.add_argument("--since", required=True,
+                     help="ISO timestamp to start from (e.g. 2026-04-15T14:57:00Z)")
+    sub.add_argument("--repair", action="store_true",
+                     help="Also overwrite pnl on already-imported trades when the "
+                          "broker's realized EUR PnL differs from what's stored locally")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -790,6 +999,8 @@ def main():
         cmd_reconcile()
     elif args.command == "tick":
         cmd_tick(force_market_open=args.force_market_open)
+    elif args.command == "backfill-broker-history":
+        cmd_backfill_broker_history(since=args.since, repair=args.repair)
 
 
 if __name__ == "__main__":

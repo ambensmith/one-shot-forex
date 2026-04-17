@@ -49,6 +49,21 @@ def run_sync():
     # Reconcile all streams (no stream filter = check everything)
     newly_closed = executor.reconcile_positions(stream_id=None)
 
+    # Also pull broker history so trades that opened and closed between ticks
+    # don't vanish, and any PnL mismatches (e.g. from the old quote-currency
+    # bug) get corrected using the broker's realized EUR numbers.
+    from datetime import timedelta
+    history_since = (datetime.now(timezone.utc) - timedelta(hours=72)).isoformat()
+    try:
+        bf = executor.backfill_closed_history(history_since, repair=True)
+        if bf.get("imported") or bf.get("repaired"):
+            logger.info(
+                f"History backfill: {len(bf.get('imported', []))} imported, "
+                f"{len(bf.get('repaired', []))} PnL-repaired"
+            )
+    except Exception as e:
+        logger.warning(f"History backfill failed: {e}")
+
     # Capture rich context for newly closed trades
     for trade_id in newly_closed:
         try:

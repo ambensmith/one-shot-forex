@@ -87,6 +87,125 @@ class Executor:
         logger.info(f"Trade {trade_id} recorded: {direction} {instrument} deal_id={broker_deal_id}")
         return trade_id
 
+    def backfill_closed_history(self, since_iso: str, repair: bool = False) -> dict:
+        """Import closed deals from broker history that aren't in the local DB.
+
+        Catches trades that opened and closed between reconcile ticks — those
+        never appear in `/api/v1/positions` and would otherwise be lost.
+
+        When `repair=True`, also overwrites the PnL (and flips status to closed
+        if still open locally) on already-imported deals when the broker's
+        realized EUR PnL differs from what's stored locally. Idempotent — if
+        local already matches broker, it's a no-op.
+
+        Returns a dict with `imported` and `repaired` lists of trade IDs.
+        """
+        if not self.broker.is_connected:
+            return {"imported": [], "repaired": []}
+        get_history = getattr(self.broker, "get_closed_trades_since", None)
+        if not callable(get_history):
+            return {"imported": [], "repaired": []}
+
+        try:
+            closed_deals = get_history(since_iso)
+        except Exception as e:
+            logger.warning(f"Broker history fetch failed: {e}")
+            return {"imported": [], "repaired": []}
+
+        imported: list[str] = []
+        repaired: list[str] = []
+        for deal in closed_deals:
+            deal_id = deal.get("broker_deal_id") or ""
+            if not deal_id:
+                continue
+            existing = self.db.get_trade_by_deal_id(deal_id)
+            if existing:
+                if repair:
+                    broker_pnl = deal.get("pnl")
+                    local_pnl = existing.get("pnl")
+                    if broker_pnl is not None and (
+                        local_pnl is None
+                        or abs(float(local_pnl) - float(broker_pnl)) > 0.01
+                    ):
+                        update_kwargs = {"pnl": broker_pnl}
+                        if existing.get("status") == "open":
+                            update_kwargs["status"] = "closed"
+                            update_kwargs["close_reason"] = "broker_backfill_repair"
+                            if deal.get("closed_at"):
+                                update_kwargs["closed_at"] = deal["closed_at"]
+                            if deal.get("exit_price"):
+                                update_kwargs["exit_price"] = deal["exit_price"]
+                        self.db.update_trade(existing["id"], **update_kwargs)
+                        self.db.insert_trade_event(existing["id"], "pnl_repaired", {
+                            "source": "sync_backfill_repair",
+                            "old_pnl": local_pnl,
+                            "new_pnl": broker_pnl,
+                            "broker_currency": deal.get("pnl_currency"),
+                            "status_flip": existing.get("status") == "open",
+                        })
+                        logger.info(
+                            f"Repaired trade {existing['id']} ({deal.get('instrument')}): "
+                            f"pnl {local_pnl} → {broker_pnl} EUR"
+                        )
+                        repaired.append(existing["id"])
+                continue
+
+            instrument = deal.get("instrument") or ""
+            entry = deal.get("entry_price") or 0.0
+            exit_p = deal.get("exit_price")
+            pnl_pips = None
+            if entry and exit_p and instrument:
+                try:
+                    from backend.data.provider import pip_value
+                    pv = pip_value(instrument)
+                    if deal.get("direction") == "long":
+                        pnl_pips = round((exit_p - entry) / pv, 1)
+                    elif deal.get("direction") == "short":
+                        pnl_pips = round((entry - exit_p) / pv, 1)
+                except Exception:
+                    pass
+
+            opened_at = deal.get("opened_at") or deal.get("closed_at")
+            closed_at = deal.get("closed_at") or deal.get("opened_at")
+            from backend.core.models import Trade
+            trade_kwargs = dict(
+                instrument=instrument,
+                direction=deal.get("direction") or "long",
+                size=deal.get("size") or 0.0,
+                entry_price=entry,
+                stop_loss=deal.get("stop_loss"),
+                take_profit=deal.get("take_profit"),
+                exit_price=exit_p,
+                pnl=deal.get("pnl"),
+                pnl_pips=pnl_pips,
+                status="closed",
+                source="broker_backfill",
+                broker_deal_id=deal_id,
+                closed_at=closed_at,
+                close_reason="broker_backfill",
+            )
+            if opened_at:
+                trade_kwargs["opened_at"] = opened_at
+            trade = Trade(**trade_kwargs)
+            trade_id = self.db.insert_trade(trade)
+            self.db.insert_trade_event(trade_id, "broker_backfill", {
+                "source": "capitalcom_history",
+                "deal": {k: deal.get(k) for k in (
+                    "broker_deal_id", "instrument", "epic", "direction", "size",
+                    "entry_price", "exit_price", "stop_loss", "take_profit",
+                    "pnl", "opened_at", "closed_at",
+                )},
+                "raw_activities": deal.get("raw_activities"),
+                "raw_transaction": deal.get("raw_transaction"),
+            })
+            logger.info(
+                f"Backfilled closed trade {trade_id} deal_id={deal_id} "
+                f"{instrument} {deal.get('direction')} size={deal.get('size')} pnl={deal.get('pnl')}"
+            )
+            imported.append(trade_id)
+
+        return {"imported": imported, "repaired": repaired}
+
     def reconcile_positions(self, stream_id: str = None) -> list[int]:
         """Full bidirectional reconciliation between local DB and broker.
 
@@ -254,11 +373,17 @@ class Executor:
     def _fetch_exit_details(self, trade: dict) -> dict:
         """Get exit price/pnl/close time for a reconciled trade.
 
-        Priority: broker deal activity → current market price → SL price → entry price.
-        Returns dict with exit_price, pnl, pnl_pips, and optionally actual_close_time.
+        Priority:
+        1. Broker's realized EUR PnL from the transactions ledger (authoritative).
+        2. Broker deal activity for exit level + local EUR calc as fallback.
+        3. Current market price as estimate.
+        4. SL price as last resort.
         """
-        # Try broker deal activity
         deal_id = trade.get("broker_deal_id", "")
+
+        # Try broker deal activity for exit level and close time
+        exit_price = None
+        actual_close_time = None
         if deal_id:
             try:
                 activity = self.broker.get_deal_activity(deal_id)
@@ -270,33 +395,43 @@ class Executor:
                         None,
                     )
                     if close_action:
-                        exit_price = float(close_action.get("level", 0))
-                        if exit_price > 0:
-                            result = self._calc_pnl(trade, exit_price)
-                            # Extract actual close timestamp from activity
-                            close_time = activity.get("date") or activity.get("timestamp")
-                            if close_time:
-                                result["actual_close_time"] = close_time
-                            return result
+                        lvl = float(close_action.get("level", 0) or 0)
+                        if lvl > 0:
+                            exit_price = lvl
+                    actual_close_time = activity.get("date") or activity.get("timestamp")
             except Exception as e:
                 logger.warning(f"Deal activity lookup failed for {deal_id}: {e}")
 
-        # Fallback 1: use current market price as estimate
-        try:
-            price_data = self.broker.get_current_price(trade["instrument"])
-            return self._calc_pnl(trade, price_data["mid"])
-        except Exception as e:
-            logger.warning(f"Market price fallback failed for trade {trade['id']}: {e}")
+        # Fallbacks for exit price
+        if not exit_price:
+            try:
+                exit_price = self.broker.get_current_price(trade["instrument"])["mid"]
+            except Exception as e:
+                logger.warning(f"Market price fallback failed for trade {trade['id']}: {e}")
+                exit_price = trade.get("stop_loss") or trade.get("entry_price")
+                logger.warning(f"Using fallback exit estimate {exit_price} for trade {trade['id']}")
 
-        # Fallback 2: estimate from SL (conservative — assumes worst case)
-        sl = trade.get("stop_loss")
-        if sl:
-            logger.warning(f"Using SL as exit estimate for trade {trade['id']}")
-            return self._calc_pnl(trade, sl)
+        result = Executor.calc_pnl(trade, exit_price, broker=self.broker)
 
-        # Fallback 3: use entry price (P&L = 0, better than null)
-        logger.error(f"No exit price available for trade {trade['id']} — using entry price")
-        return self._calc_pnl(trade, trade["entry_price"])
+        # Prefer broker's realized PnL from the transaction ledger — it's the
+        # account-currency source of truth and uses the broker's actual fill.
+        if deal_id:
+            try:
+                realized = getattr(self.broker, "get_realized_pnl", lambda *_: None)(deal_id)
+                if realized and realized.get("pnl") is not None:
+                    logger.info(
+                        f"Trade {trade['id']} PnL: broker realized={realized['pnl']} "
+                        f"{realized.get('currency')} (local calc={result['pnl']} EUR)"
+                    )
+                    result["pnl"] = realized["pnl"]
+                    if realized.get("date") and not actual_close_time:
+                        actual_close_time = realized["date"]
+            except Exception as e:
+                logger.warning(f"Realized PnL lookup failed for {deal_id}: {e}")
+
+        if actual_close_time:
+            result["actual_close_time"] = actual_close_time
+        return result
 
     @staticmethod
     def _infer_exit_status(trade: dict, exit_price: float) -> str:
@@ -328,20 +463,53 @@ class Executor:
 
     def _calc_pnl(self, trade: dict, exit_price: float) -> dict:
         """Calculate P&L from entry and exit price."""
-        return Executor.calc_pnl(trade, exit_price)
+        return Executor.calc_pnl(trade, exit_price, broker=self.broker)
 
     @staticmethod
-    def calc_pnl(trade: dict, exit_price: float) -> dict:
-        """Calculate P&L from entry and exit price (static, no Executor instance needed)."""
+    def calc_pnl(trade: dict, exit_price: float, broker=None) -> dict:
+        """Calculate P&L from entry and exit price, converted to the account currency (EUR).
+
+        The raw `(exit - entry) * size` expression returns PnL in the *quote*
+        currency of the pair (JPY for USD/JPY, CHF for USD/CHF, etc). Without a
+        conversion step, reconciled trades got stored as if those numbers were
+        EUR — which was how a ~84-pip loss on USD/JPY was rendered as €843
+        when the real loss was about €5. When a `broker` is provided we pull a
+        live EUR-per-quote rate and convert; otherwise we return the raw
+        quote-currency number and mark it as unconverted.
+        """
         from backend.data.provider import pip_value
         pip_val = pip_value(trade["instrument"])
         entry = trade["entry_price"]
+        size = trade.get("size") or 0.0
         if trade["direction"] == "long":
             pnl_pips = (exit_price - entry) / pip_val
         else:
             pnl_pips = (entry - exit_price) / pip_val
-        pnl = pnl_pips * pip_val * trade["size"]
-        return {"exit_price": exit_price, "pnl": round(pnl, 2), "pnl_pips": round(pnl_pips, 1)}
+        pnl_quote = pnl_pips * pip_val * size
+
+        instrument = trade.get("instrument") or ""
+        quote = instrument.split("_")[1] if "_" in instrument else ""
+        pnl_eur = pnl_quote
+        converted = False
+        if quote and quote != "EUR" and broker is not None:
+            try:
+                rate = broker.get_current_price(f"EUR_{quote}")["mid"]
+                if rate and rate > 0:
+                    pnl_eur = pnl_quote / rate
+                    converted = True
+            except Exception as e:
+                logger.warning(
+                    f"EUR conversion for {instrument} failed ({e}); storing raw {quote} PnL"
+                )
+        elif quote == "EUR":
+            converted = True
+
+        return {
+            "exit_price": exit_price,
+            "pnl": round(pnl_eur, 2),
+            "pnl_pips": round(pnl_pips, 1),
+            "pnl_currency": "EUR" if converted else quote or "unknown",
+        }
 
     def check_and_close_trades(self, stream_id: str):
         """Check open trades for SL/TP hits and close them."""
@@ -377,20 +545,16 @@ class Executor:
                 closed, status = True, "closed_tp"
 
         if closed:
-            from backend.data.provider import pip_value
-            pip_val = pip_value(trade["instrument"])
-            if direction == "long":
-                pnl_pips = (current_price - entry) / pip_val
-            else:
-                pnl_pips = (entry - current_price) / pip_val
-            pnl = pnl_pips * pip_val * trade["size"]
-
+            result = Executor.calc_pnl(trade, current_price, broker=self.broker)
             self.db.update_trade(
                 trade["id"],
                 exit_price=current_price,
-                pnl=pnl,
-                pnl_pips=pnl_pips,
+                pnl=result["pnl"],
+                pnl_pips=result["pnl_pips"],
                 status=status,
                 closed_at=datetime.now(timezone.utc).isoformat(),
             )
-            logger.info(f"Trade {trade['id']} {status}: PnL={pnl:.2f} ({pnl_pips:.1f} pips)")
+            logger.info(
+                f"Trade {trade['id']} {status}: PnL=€{result['pnl']:.2f} "
+                f"({result['pnl_pips']:.1f} pips)"
+            )
