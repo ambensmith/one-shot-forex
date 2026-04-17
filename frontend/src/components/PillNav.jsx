@@ -51,14 +51,8 @@ export default function PillNav({ expanded, onToggleExpand }) {
   const [syncState, triggerSync] = useWorkflowTrigger('/api/trigger-sync')
 
   return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
-      <div
-        className="font-serif text-[11px] tracking-[0.22em] uppercase text-[rgba(28,25,23,0.55)]"
-      >
-        One Shot Forex
-      </div>
-      <nav
-      className="flex items-center gap-1 px-2 py-1.5 rounded-pill max-w-[520px]"
+    <nav
+      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-2 py-1.5 rounded-pill max-w-[520px]"
       style={{
         background: 'rgba(28, 25, 23, 0.92)',
         backdropFilter: 'blur(12px)',
@@ -100,25 +94,32 @@ export default function PillNav({ expanded, onToggleExpand }) {
         <RefreshCw size={18} className={syncState === 'running' ? 'animate-spin' : ''} />
       </button>
 
-      {NAV_ITEMS.map(({ to, label }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
-          className={({ isActive }) =>
-            `px-4 py-2.5 text-[13px] font-medium transition-colors duration-150 rounded-[10px] whitespace-nowrap ${
-              isActive
-                ? 'text-[#FAFAF9]'
-                : 'text-[rgba(250,250,249,0.5)] hover:text-[rgba(250,250,249,0.75)]'
-            }`
-          }
-          style={({ isActive }) =>
-            isActive ? { background: 'rgba(250, 250, 249, 0.12)' } : undefined
-          }
-        >
-          {label}
-        </NavLink>
-      ))}
+      <div className="flex flex-col items-center">
+        <div className="font-serif text-[10px] tracking-[0.22em] uppercase text-[rgba(250,250,249,0.55)] leading-none pt-0.5 pb-0.5">
+          One Shot Forex
+        </div>
+        <div className="flex items-center gap-1">
+          {NAV_ITEMS.map(({ to, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              className={({ isActive }) =>
+                `px-4 py-1.5 text-[13px] font-medium transition-colors duration-150 rounded-[10px] whitespace-nowrap ${
+                  isActive
+                    ? 'text-[#FAFAF9]'
+                    : 'text-[rgba(250,250,249,0.5)] hover:text-[rgba(250,250,249,0.75)]'
+                }`
+              }
+              style={({ isActive }) =>
+                isActive ? { background: 'rgba(250, 250, 249, 0.12)' } : undefined
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      </div>
 
       <NavLink
         to="/settings"
@@ -150,6 +151,5 @@ export default function PillNav({ expanded, onToggleExpand }) {
         />
       </button>
     </nav>
-    </div>
   )
 }
