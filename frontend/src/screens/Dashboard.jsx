@@ -3,6 +3,7 @@ import BiasCardRow from '../components/BiasCardRow'
 import TradeTable from '../components/TradeTable'
 import TradeFilters from '../components/TradeFilters'
 import EquityCurve from '../components/EquityCurve'
+import PerformanceChart from '../components/PerformanceChart'
 import { useOpenTrades, useClosedTrades } from '../hooks/useDashboardData'
 import { timeAgo } from '../lib/constants'
 
@@ -75,12 +76,20 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* Equity curve */}
+      {/* Equity curve — total account value (broker balance) */}
       <section>
         <h2 className="font-display text-[28px] font-semibold tracking-tight text-primary mb-4" style={{ letterSpacing: '-0.3px', lineHeight: 1.2 }}>
-          Equity
+          Total account value
         </h2>
         <EquityCurve />
+      </section>
+
+      {/* Strategy performance — per-strategy cumulative PnL vs LLM */}
+      <section>
+        <h2 className="font-display text-[28px] font-semibold tracking-tight text-primary mb-4" style={{ letterSpacing: '-0.3px', lineHeight: 1.2 }}>
+          Strategy performance
+        </h2>
+        <PerformanceChart />
       </section>
     </div>
   )

@@ -162,6 +162,8 @@ def equity_curve(
     db,
     *,
     stream: str | None = None,
+    source: str | None = None,
+    source_prefix: str | None = None,
     starting_capital: float = 100.0,
 ) -> list[dict]:
     """Step-function equity curve derived from closed trades.
@@ -169,10 +171,14 @@ def equity_curve(
     Every point is bound to an immutable trade-close event, so the curve cannot
     drift from the trade ledger. The first point is a synthetic anchor one
     second before the first close so the chart opens flat at the capital line.
+
+    Pass ``starting_capital=0`` with a ``source`` filter to get a cumulative
+    PnL series for one strategy or the LLM stream.
     """
     where, params = _build_where(
         stream=stream, instrument=None,
-        source=None, source_prefix=None, since=None, until=None,
+        source=source, source_prefix=source_prefix,
+        since=None, until=None,
     )
     sql = "SELECT id, closed_at, pnl FROM trades" + where + " ORDER BY closed_at ASC"
     rows = db.execute(sql, tuple(params)).fetchall()

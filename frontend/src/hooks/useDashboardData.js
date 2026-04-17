@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { fetchOpenTrades, fetchClosedTrades, fetchTradeDetail, fetchBias, fetchEquity } from '../lib/api'
+import { fetchOpenTrades, fetchClosedTrades, fetchTradeDetail, fetchBias, fetchEquity, fetchPerformance } from '../lib/api'
 
 export function useOpenTrades(pollInterval = 30000) {
   const [trades, setTrades] = useState([])
@@ -91,6 +91,21 @@ export function useEquity(stream) {
   }, [stream])
 
   return { data, loading, error }
+}
+
+export function usePerformance() {
+  const [series, setSeries] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetchPerformance()
+      .then(s => { setSeries(s); setError(null) })
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  return { series, loading, error }
 }
 
 export function useTradeDetail(tradeId) {

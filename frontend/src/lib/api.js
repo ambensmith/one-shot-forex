@@ -111,16 +111,26 @@ export async function fetchEquity(stream) {
     }))
   }
   // Static equity.json has shape:
-  //   { curves: { streamId: [{time, equity, positions}],
-  //               combined: [{time, equity, positions}] } }
-  // `combined` is a single step-function curve spanning all streams,
-  // starting at the sum of their capital allocations — it's the
-  // "whole account" view the dashboard defaults to.
+  //   { curves: { account:  [{time, equity, positions}],
+  //               combined: [{time, equity, positions}],
+  //               news/strategy/hybrid:<name>: [...] } }
+  // Default (`stream` undefined) → `account`: the broker balance line,
+  // matching what Capital.com shows. `combined` is realized PnL across
+  // all streams; per-stream curves are realized within one stream.
   const data = await fetchStaticJSON('equity.json')
   const curves = data?.curves || {}
-  const key = stream || 'combined'
+  const key = stream || 'account'
   const series = curves[key] || []
   return series.map(d => ({ ...d, timestamp: d.time || d.recorded_at }))
+}
+
+export async function fetchPerformance() {
+  if (IS_DEV) {
+    const data = await fetchLiveJSON('/performance')
+    return data?.series || []
+  }
+  const data = await fetchStaticJSON('performance.json')
+  return data?.series || []
 }
 
 export async function fetchLLMActivity(hours = 12) {

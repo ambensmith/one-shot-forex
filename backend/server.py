@@ -667,28 +667,23 @@ async def api_strategies():
             instance = cls()
             source_key = f"strategy:{name}"
 
-            recent_signals = db.get_signals(source=source_key, limit=10)
-            for s in recent_signals:
-                _parse_json_fields(s, _SIGNAL_JSON_COLS)
-
             agg = _pnl.aggregate_pnl(db, source=source_key)
             total_trade_count = db.execute(
                 "SELECT COUNT(*) AS c FROM trades WHERE source = ?", (source_key,),
             ).fetchone()
 
+            recent_trade_rows = db.query(
+                "SELECT id, instrument, direction, entry_price, exit_price, pnl, "
+                "status, opened_at, closed_at FROM trades WHERE source = ? "
+                "ORDER BY opened_at DESC LIMIT 10",
+                (source_key,),
+            )
+
             result.append({
                 "name": instance.name,
                 "description": instance.description,
                 "parameters": instance.get_parameters(),
-                "recent_signals": [
-                    {
-                        "instrument": s["instrument"],
-                        "direction": s["direction"],
-                        "confidence": s["confidence"],
-                        "created_at": s["created_at"],
-                    }
-                    for s in recent_signals
-                ],
+                "recent_trades": recent_trade_rows,
                 "trade_stats": {
                     "total": int(total_trade_count["c"] or 0) if total_trade_count else 0,
                     "won": agg.wins,
@@ -780,34 +775,77 @@ async def api_bias():
 async def api_equity(stream: str | None = None):
     """Equity curve.
 
-    For stream-level queries (news / strategy / hybrid:*), the curve is a
-    step function derived from closed trades — every point is bound to an
-    immutable trade-close event, so the chart can't drift from the ledger.
+    Default (no ``stream``): the broker account balance over time (filtered
+    for transient API outliers) — this is the "total account value" line that
+    matches what Capital.com shows.
 
-    For ``stream=account``, returns broker-balance snapshots (the only data
-    source that captures unrealized PnL and broker-side changes).
+    ``stream=account``: same as default — explicit request for broker balance.
 
-    When ``stream`` is omitted, returns the combined realized-PnL curve across
-    all configured streams — the "whole account" view.
+    ``stream=combined``: the realized-PnL step curve across all configured
+    streams, starting at the sum of their capital allocations.
+
+    Per-stream (``news`` / ``strategy`` / ``hybrid:<name>``): realized-PnL
+    step curve for just that stream, starting at its configured capital.
     """
     from backend.analytics import pnl as _pnl
     from backend.core.config import load_config
 
     db = _get_db()
     try:
-        if stream == "account":
+        if stream is None or stream == "account":
             history = db.get_equity_history(stream="account")
             normalized = [
                 {"timestamp": h.get("recorded_at"), "equity": h.get("equity"),
                  "trade_id": None, "delta_pnl": None}
                 for h in history
+                if (h.get("equity") or 0) > 0
             ]
             return JSONResponse({"equity": normalized, "count": len(normalized)})
 
         config = load_config(db=db)
-        starting = _combined_capital(db, config) if not stream else _pnl.stream_capital(config, stream)
-        curve = _pnl.equity_curve(db, stream=stream, starting_capital=starting)
+        if stream == "combined":
+            starting = _combined_capital(db, config)
+            curve = _pnl.equity_curve(db, stream=None, starting_capital=starting)
+        else:
+            starting = _pnl.stream_capital(config, stream)
+            curve = _pnl.equity_curve(db, stream=stream, starting_capital=starting)
         return JSONResponse({"equity": curve, "count": len(curve)})
+    finally:
+        db.close()
+
+
+_PERFORMANCE_SERIES = [
+    ("LLM", "llm"),
+    ("Momentum", "strategy:momentum"),
+    ("Carry", "strategy:carry"),
+    ("Breakout", "strategy:breakout"),
+    ("Mean reversion", "strategy:mean_reversion"),
+    ("Volatility breakout", "strategy:volatility_breakout"),
+]
+
+
+@app.get("/api/performance")
+async def api_performance():
+    """Cumulative realized-PnL series per strategy + LLM.
+
+    Each series starts at €0 and steps by trade PnL on each close. Series
+    come straight from the ``trades`` table via the unified analytics
+    module, so totals always match the Strategies page / dashboard cards.
+    """
+    from backend.analytics import pnl as _pnl
+
+    db = _get_db()
+    try:
+        series = []
+        for name, source in _PERFORMANCE_SERIES:
+            curve = _pnl.equity_curve(db, source=source, starting_capital=0.0)
+            points = [
+                {"timestamp": p["timestamp"], "pnl": p["equity"],
+                 "trade_id": p["trade_id"], "delta_pnl": p["delta_pnl"]}
+                for p in curve
+            ]
+            series.append({"name": name, "source": source, "points": points})
+        return JSONResponse({"series": series})
     finally:
         db.close()
 

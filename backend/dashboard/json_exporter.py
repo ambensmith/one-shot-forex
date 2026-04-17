@@ -25,6 +25,7 @@ def export_all(db_path: str = "data/sentinel.db"):
     export_dashboard_summary(db, config)
     export_trades(db)
     export_equity(db)
+    export_performance(db)
     export_signals(db)
     export_models(db, config)
     export_review(db, config)
@@ -253,6 +254,7 @@ def export_equity(db):
     curves["account"] = [
         {"time": h["recorded_at"], "equity": h["equity"], "positions": h["open_positions"]}
         for h in account_history
+        if (h.get("equity") or 0) > 0
     ]
 
     for hybrid in db.get_active_hybrids():
@@ -272,6 +274,38 @@ def export_equity(db):
     ]
 
     _write_json("equity.json", {"curves": curves})
+
+
+PERFORMANCE_SERIES_DEFS = [
+    ("LLM", "llm"),
+    ("Momentum", "strategy:momentum"),
+    ("Carry", "strategy:carry"),
+    ("Breakout", "strategy:breakout"),
+    ("Mean reversion", "strategy:mean_reversion"),
+    ("Volatility breakout", "strategy:volatility_breakout"),
+]
+
+
+def export_performance(db):
+    """Cumulative realized-PnL series per strategy and for LLM trades.
+
+    Each series starts at €0 and steps by trade PnL on each close. All
+    computed from ``trades`` via the unified analytics module, so the
+    per-strategy line ends at exactly the ``total_pnl`` shown on the
+    Strategies page and the dashboard card.
+    """
+    from backend.analytics import pnl as _pnl
+
+    series = []
+    for name, source in PERFORMANCE_SERIES_DEFS:
+        curve = _pnl.equity_curve(db, source=source, starting_capital=0.0)
+        points = [
+            {"timestamp": p["timestamp"], "pnl": p["equity"],
+             "trade_id": p["trade_id"], "delta_pnl": p["delta_pnl"]}
+            for p in curve
+        ]
+        series.append({"name": name, "source": source, "points": points})
+    _write_json("performance.json", {"series": series})
 
 
 def export_signals(db):
@@ -488,12 +522,7 @@ def export_llm_activity(db):
 
 
 def export_strategies_detail(db):
-    """Export strategy definitions + signals + trade stats. Matches /api/strategies shape."""
-    json_cols = [
-        "key_factors", "risk_factors", "headlines_used", "price_context",
-        "challenge_output", "bias_check", "risk_check", "metadata",
-    ]
-
+    """Export strategy definitions + recent trades + trade stats. Matches /api/strategies shape."""
     # Try to load strategy classes for descriptions/parameters.
     # Falls back to DB-only approach if dependencies (e.g. pandas) are missing.
     strategy_info = {}
@@ -524,16 +553,6 @@ def export_strategies_detail(db):
     for name, info in strategy_info.items():
         source_key = f"strategy:{name}"
 
-        recent_signals = db.get_signals(source=source_key, limit=10)
-        for s in recent_signals:
-            for col in json_cols:
-                val = s.get(col)
-                if isinstance(val, str):
-                    try:
-                        s[col] = json.loads(val)
-                    except (json.JSONDecodeError, TypeError):
-                        pass
-
         agg = _pnl.aggregate_pnl(db, source=source_key)
         total_row = db.execute(
             "SELECT COUNT(*) AS c FROM trades WHERE source = ?",
@@ -541,19 +560,18 @@ def export_strategies_detail(db):
         ).fetchone()
         total_trades = int(total_row["c"] or 0) if total_row else 0
 
+        recent_trades = db.query(
+            "SELECT id, instrument, direction, entry_price, exit_price, pnl, "
+            "status, opened_at, closed_at FROM trades WHERE source = ? "
+            "ORDER BY opened_at DESC LIMIT 10",
+            (source_key,),
+        )
+
         result.append({
             "name": info["name"],
             "description": info["description"],
             "parameters": info["parameters"],
-            "recent_signals": [
-                {
-                    "instrument": s["instrument"],
-                    "direction": s["direction"],
-                    "confidence": s["confidence"],
-                    "created_at": s["created_at"],
-                }
-                for s in recent_signals
-            ],
+            "recent_trades": recent_trades,
             "trade_stats": {
                 "total": total_trades,
                 "won": agg.wins,

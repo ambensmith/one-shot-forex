@@ -1,6 +1,5 @@
 import { useStrategies } from '../hooks/useLLMData'
 import DirectionBadge from '../components/DirectionBadge'
-import { ConfidenceBar } from '../components/TimelineChapter'
 import { INSTRUMENT_META, timeAgo, formatPnlCurrency } from '../lib/constants'
 
 const STRATEGY_DESCRIPTIONS = {
@@ -102,37 +101,53 @@ function StrategyCard({ strategy }) {
         </div>
       )}
 
-      {/* Recent Signals */}
-      {strategy.recent_signals?.length > 0 && (
+      {/* Recent Trades — actual trades executed by this strategy */}
+      {strategy.recent_trades?.length > 0 && (
         <div className="mt-5">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.8px] text-tertiary">Recent signals</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.8px] text-tertiary">Recent trades</span>
           <div className="mt-2 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th className="px-2 py-2 text-left text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Instrument</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Direction</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Confidence</th>
-                  <th className="px-2 py-2 text-right text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Time</th>
+                  <th className="px-2 py-2 text-right text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Entry</th>
+                  <th className="px-2 py-2 text-right text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Exit</th>
+                  <th className="px-2 py-2 text-right text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">PnL</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Status</th>
+                  <th className="px-2 py-2 text-right text-xs font-semibold uppercase tracking-[0.5px] text-tertiary">Opened</th>
                 </tr>
               </thead>
               <tbody>
-                {strategy.recent_signals.map((sig, i) => {
-                  const meta = INSTRUMENT_META[sig.instrument]
-                  const semantic = sig.direction === 'long' ? 'profitable' : sig.direction === 'short' ? 'loss' : 'cooldown'
+                {strategy.recent_trades.map((t, i) => {
+                  const meta = INSTRUMENT_META[t.instrument]
+                  const pnlClass = t.pnl == null
+                    ? 'text-tertiary'
+                    : t.pnl >= 0
+                      ? 'text-profitable-text'
+                      : 'text-loss-text'
                   return (
-                    <tr key={i} className="border-b border-border-subtle">
+                    <tr key={t.id || i} className="border-b border-border-subtle">
                       <td className="px-2 py-2.5 font-medium text-primary">
-                        {meta?.name || sig.instrument?.replace('_', '/')}
+                        {meta?.name || t.instrument?.replace('_', '/')}
                       </td>
                       <td className="px-2 py-2.5">
-                        <DirectionBadge direction={sig.direction} size="small" />
+                        <DirectionBadge direction={t.direction} size="small" />
                       </td>
-                      <td className="px-2 py-2.5">
-                        <ConfidenceBar value={sig.confidence} semantic={semantic} />
+                      <td className="px-2 py-2.5 text-right font-tabular text-secondary">
+                        {t.entry_price != null ? t.entry_price : '\u2014'}
+                      </td>
+                      <td className="px-2 py-2.5 text-right font-tabular text-secondary">
+                        {t.exit_price != null ? t.exit_price : '\u2014'}
+                      </td>
+                      <td className={`px-2 py-2.5 text-right font-tabular ${pnlClass}`}>
+                        {t.pnl != null ? formatPnlCurrency(t.pnl) : '\u2014'}
+                      </td>
+                      <td className="px-2 py-2.5 text-xs text-tertiary">
+                        {(t.status || '').replace('closed_', '').replace('_', ' ')}
                       </td>
                       <td className="px-2 py-2.5 text-right text-xs text-tertiary">
-                        {sig.created_at ? timeAgo(sig.created_at) : ''}
+                        {t.opened_at ? timeAgo(t.opened_at) : ''}
                       </td>
                     </tr>
                   )
