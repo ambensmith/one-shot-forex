@@ -69,6 +69,54 @@ def cmd_init_db(fresh: bool = False):
     }))
 
 
+def cmd_prompts():
+    """Show every prompt in the DB and which one is in use per stage."""
+    from backend.core.database import Database, STAGE_TARGETS
+
+    db = Database("data/sentinel.db")
+    try:
+        rows = db.get_all_prompts()
+        by_stage: dict[str, list[dict]] = {}
+        for r in rows:
+            stage = r["name"].rsplit("_v", 1)[0] if "_v" in r["name"] else r["name"]
+            by_stage.setdefault(stage, []).append(r)
+
+        out = {"stages": {}}
+        for stage, target in STAGE_TARGETS.items():
+            stage_rows = []
+            in_use_name = None
+            for r in by_stage.get(stage, []):
+                stage_rows.append({
+                    "name": r["name"],
+                    "version": r["version"],
+                    "in_use": bool(r.get("in_use", 0)),
+                    "is_active": bool(r.get("is_active", 0)),
+                    "updated_at": r.get("updated_at"),
+                    "preview": (r.get("template") or "")[:80],
+                })
+                if r.get("in_use"):
+                    in_use_name = r["name"]
+            out["stages"][stage] = {
+                "target": target,
+                "in_use": in_use_name,
+                "matches_target": in_use_name == target,
+                "prompts": stage_rows,
+            }
+
+        # Pretty log for humans
+        logger.info("Prompt configuration:")
+        for stage, info in out["stages"].items():
+            marker = "OK" if info["matches_target"] else "MISMATCH"
+            logger.info(f"  [{marker}] {stage}: in_use={info['in_use']} target={info['target']}")
+            for p in info["prompts"]:
+                flag = "*" if p["in_use"] else " "
+                logger.info(f"      {flag} {p['name']} (active={p['is_active']}) — {p['preview']}...")
+
+        print(json.dumps({"status": "ok", "command": "prompts", **out}, indent=2))
+    finally:
+        db.close()
+
+
 def cmd_ingest():
     """Fetch news + prices from all configured sources, store in DB."""
     import asyncio
@@ -357,14 +405,27 @@ def cmd_risk():
             rc = s.get("risk_check")
             if isinstance(rc, str):
                 rc = json.loads(rc)
-            if bc and bc.get("approved_by_bias") and not rc:
-                if s["direction"] in ("long", "short"):
-                    to_check.append(s)
-                else:
-                    # Reject neutral/invalid direction signals
-                    db.update_signal(s["id"], status="rejected", risk_check={
-                        "approved": False, "rejection_reason": f"Invalid direction: {s['direction']}",
-                    })
+            if not (bc and bc.get("approved_by_bias") and not rc):
+                continue
+            if s["direction"] not in ("long", "short"):
+                # Defensive: signal generator already rejects neutrals at insert.
+                db.update_signal(s["id"], status="rejected",
+                                 rejection_reason=f"Invalid direction: {s['direction']}",
+                                 risk_check={
+                                     "approved": False,
+                                     "rejection_reason": f"Invalid direction: {s['direction']}",
+                                 })
+                continue
+            # Every LLM signal must have been counter-argued before risk.
+            if s.get("source") == "llm" and not s.get("challenge_output"):
+                db.update_signal(s["id"], status="rejected",
+                                 rejection_reason="LLM signal not challenged",
+                                 risk_check={
+                                     "approved": False,
+                                     "rejection_reason": "LLM signal not challenged",
+                                 })
+                continue
+            to_check.append(s)
 
         # Track batch-level state so risk limits apply across the batch
         from backend.risk.risk_manager import CORRELATION_GROUPS
@@ -785,6 +846,34 @@ def cmd_reconcile():
         db.close()
 
 
+async def _run_llm_pipeline(db, config, broker, risk, executor):
+    """Run the LLM news pipeline end-to-end against an existing DB connection.
+
+    Used by the FastAPI server endpoints in place of the deleted NewsStream
+    class. Goes through the full orchestrated flow: ingest → relevance →
+    signals → challenge → bias → risk → execute. Bias/risk/execute are
+    stream-agnostic, so any pending strategy signals will also be processed.
+    """
+    from backend.data.news_ingestor import ingest_pipeline
+    from backend.data.price_ingestor import ingest_prices
+    from backend.signals.relevance import run_relevance
+    from backend.signals.signal_generator import run_signals
+    from backend.signals.challenge import run_challenge
+    from backend.signals.bias import run_bias
+
+    await ingest_pipeline(config, db)
+    ingest_prices(config, db)
+    run_relevance(db, config)
+    run_signals(db, config)
+    run_challenge(db, config)
+    run_bias(db, config)
+    # Risk + execute reuse the same logic as cmd_risk/cmd_execute. Calling
+    # the cli command functions directly is simplest — they manage their own
+    # DB lifecycle but operate on the shared sentinel.db file.
+    cmd_risk()
+    cmd_execute()
+
+
 def cmd_tick(force_market_open: bool = False):
     """Run full pipeline: ingest → relevance → signals → challenge → strategies → bias → risk → execute → reconcile."""
     from backend.main import is_market_open
@@ -953,6 +1042,7 @@ def main():
         ("risk", "Run risk checks on pending signals"),
         ("execute", "Execute approved trades"),
         ("reconcile", "Sync with broker positions"),
+        ("prompts", "Show prompts in DB and which one is live per stage"),
     ]:
         subparsers.add_parser(cmd, help=help_text)
 
@@ -999,6 +1089,8 @@ def main():
         cmd_reconcile()
     elif args.command == "tick":
         cmd_tick(force_market_open=args.force_market_open)
+    elif args.command == "prompts":
+        cmd_prompts()
     elif args.command == "backfill-broker-history":
         cmd_backfill_broker_history(since=args.since, repair=args.repair)
 

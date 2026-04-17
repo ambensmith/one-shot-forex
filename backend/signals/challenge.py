@@ -44,9 +44,9 @@ def run_challenge(db, config) -> dict[str, Any]:
     logger.info(f"Found {len(to_challenge)} LLM signals to challenge")
 
     # 2. Load challenge prompt
-    prompt_row = db.get_active_prompt("challenge_v1")
+    prompt_row = db.get_in_use_prompt("challenge")
     if not prompt_row:
-        raise RuntimeError("No active 'challenge_v1' prompt found in database")
+        raise RuntimeError("No in-use challenge prompt found in database")
     template = prompt_row["template"]
     prompt_version = f"{prompt_row['name']}/{prompt_row['version']}"
 

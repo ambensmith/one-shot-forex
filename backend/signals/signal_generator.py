@@ -113,9 +113,9 @@ def run_signals(db, config) -> dict[str, Any]:
         return {"instruments_processed": 0, "signals_stored": 0, "skipped_existing": len(already_signalled), "model": None}
 
     # 2. Load prompt template
-    prompt_row = db.get_active_prompt("signal_v1")
+    prompt_row = db.get_in_use_prompt("signal")
     if not prompt_row:
-        raise RuntimeError("No active 'signal_v1' prompt found in database")
+        raise RuntimeError("No in-use signal prompt found in database")
     template = prompt_row["template"]
     prompt_version = f"{prompt_row['name']}/{prompt_row['version']}"
 
@@ -174,8 +174,10 @@ def run_signals(db, config) -> dict[str, Any]:
                 "trend": trend,
             }
 
-            # Store signal
+            # Store signal. Neutral signals are persisted for audit but
+            # rejected immediately so they never enter challenge/bias/risk.
             headline_ids = [h["headline_id"] for h in headlines]
+            is_neutral = output.direction == "neutral"
             signal = Signal(
                 source="llm",
                 instrument=instrument,
@@ -188,7 +190,8 @@ def run_signals(db, config) -> dict[str, Any]:
                 prompt_version=prompt_version,
                 model=model_used,
                 price_context=price_context,
-                status="pending",
+                status="rejected" if is_neutral else "pending",
+                rejection_reason="LLM had no directional conviction" if is_neutral else None,
             )
             db.insert_signal(signal)
             signals_stored += 1
@@ -196,6 +199,7 @@ def run_signals(db, config) -> dict[str, Any]:
             logger.info(
                 f"{instrument} | {output.direction} | conf={output.confidence:.2f} | "
                 f"factors={len(output.key_factors)}"
+                + (" | rejected:neutral" if is_neutral else "")
             )
 
         except Exception as e:

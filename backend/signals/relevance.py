@@ -98,9 +98,9 @@ def run_relevance(db, config) -> dict[str, Any]:
     logger.info(f"Loaded {len(headlines)} headlines from last {lookback_hours}h")
 
     # 2. Load prompt template
-    prompt_row = db.get_active_prompt("relevance_v2") or db.get_active_prompt("relevance_v1")
+    prompt_row = db.get_in_use_prompt("relevance")
     if not prompt_row:
-        raise RuntimeError("No active relevance prompt found in database")
+        raise RuntimeError("No in-use relevance prompt found in database")
     template = prompt_row["template"]
     prompt_version = f"{prompt_row['name']}/{prompt_row['version']}"
 

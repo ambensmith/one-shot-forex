@@ -95,6 +95,7 @@ class Signal(_DBSerializable):
     was_traded: bool = False
     trade_id: str | None = None
     status: str = "pending"  # 'pending', 'approved', 'rejected'
+    rejection_reason: str | None = None
     metadata: dict[str, Any] | None = None
     created_at: datetime = Field(default_factory=_utcnow)
 

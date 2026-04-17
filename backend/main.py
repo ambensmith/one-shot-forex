@@ -112,16 +112,10 @@ async def run_tick(stream_filter: str = "all", force_market_open: bool = False):
     streams_cfg = config.get("streams", {})
     streams_run = []
 
-    # Run News Stream
-    if stream_filter in ("all", "news"):
-        if streams_cfg.get("news_stream", {}).get("enabled", False):
-            from backend.streams.news_stream import NewsStream
-            news_stream = NewsStream(
-                config=config, db=db, broker=broker,
-                risk=risk, executor=executor,
-            )
-            await news_stream.tick()
-            streams_run.append("news")
+    # The LLM "news" stream is no longer an inline class. Its work is done by
+    # the orchestrated pipeline stages (cmd_relevance → cmd_signals →
+    # cmd_challenge), invoked via `python -m backend tick`. This run_tick
+    # path is kept only for hybrid/strategy stream invocation.
 
     # Run Strategy Stream
     if stream_filter in ("all", "strategy"):

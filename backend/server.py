@@ -118,7 +118,7 @@ def _force_market_open():
 
 @app.post("/api/run-stream/news")
 async def run_news_stream():
-    """Run the news stream: fetch news, LLM analysis, risk check, trade."""
+    """Run the LLM news pipeline: ingest → relevance → signals → challenge → bias → risk → execute."""
     _force_market_open()
     config, db, broker, risk, executor = _get_components()
 
@@ -126,20 +126,20 @@ async def run_news_stream():
     before_trades = len(db.get_trades(stream="news", limit=10000))
 
     try:
-        from backend.streams.news_stream import NewsStream
-        stream = NewsStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
-        signals = await stream.tick()
+        from backend.cli import _run_llm_pipeline
+        await _run_llm_pipeline(db, config, broker, risk, executor)
 
         _export_json(db, config)
         result = _count_results(db, "news", before_signals, before_trades)
+        new_signals = db.get_signals(source="llm", limit=10)
         result["signals_detail"] = [
             {
-                "instrument": s.instrument,
-                "direction": s.direction,
-                "confidence": s.confidence,
-                "reasoning": s.reasoning[:200] if s.reasoning else "",
+                "instrument": s["instrument"],
+                "direction": s["direction"],
+                "confidence": s["confidence"],
+                "reasoning": (s.get("reasoning") or "")[:200],
             }
-            for s in signals[:10]
+            for s in new_signals[:10]
         ]
         return JSONResponse({"status": "ok", **result})
     except Exception as e:
@@ -233,13 +233,12 @@ async def run_all_streams():
     try:
         streams_cfg = config.get("streams", {})
 
-        # News stream
+        # LLM news pipeline (orchestrated stages — replaces inline NewsStream)
         if streams_cfg.get("news_stream", {}).get("enabled", False):
-            from backend.streams.news_stream import NewsStream
+            from backend.cli import _run_llm_pipeline
             before_s = len(db.get_signals(stream="news", limit=10000))
             before_t = len(db.get_trades(stream="news", limit=10000))
-            stream = NewsStream(config=config, db=db, broker=broker, risk=risk, executor=executor)
-            await stream.tick()
+            await _run_llm_pipeline(db, config, broker, risk, executor)
             results["news"] = _count_results(db, "news", before_s, before_t)
 
         # Strategy stream

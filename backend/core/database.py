@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS signals (
     was_traded INTEGER DEFAULT 0,
     trade_id TEXT,
     status TEXT DEFAULT 'pending',
+    rejection_reason TEXT,
     metadata JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -103,6 +104,7 @@ CREATE TABLE IF NOT EXISTS prompts (
     template TEXT NOT NULL,
     version TEXT NOT NULL,
     is_active INTEGER DEFAULT 1,
+    in_use INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -191,6 +193,16 @@ DROPPABLE_TABLES = [
 ]
 
 # ── Seed prompts ────────────────────────────────────────────
+
+# Single source of truth: which prompt version each pipeline stage uses.
+# `in_use` is backfilled from this mapping on every startup — all other
+# prompts for the same stage are flipped to in_use=0 so there is never
+# ambiguity about which prompt is live.
+STAGE_TARGETS = {
+    "relevance": "relevance_v2",
+    "signal": "signal_v1",
+    "challenge": "challenge_v1",
+}
 
 SEED_PROMPTS = [
     {
@@ -324,6 +336,38 @@ class Database:
                     self.conn.execute(line)
                 except sqlite3.OperationalError:
                     pass
+        self._migrate_prompts_in_use()
+        self._migrate_signals_rejection_reason()
+        self.conn.commit()
+        self._ensure_in_use_assignments()
+
+    def _migrate_prompts_in_use(self):
+        """Idempotently add the `in_use` column to existing prompts tables."""
+        cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(prompts)").fetchall()}
+        if "in_use" not in cols:
+            self.conn.execute("ALTER TABLE prompts ADD COLUMN in_use INTEGER NOT NULL DEFAULT 0")
+
+    def _migrate_signals_rejection_reason(self):
+        """Idempotently add the `rejection_reason` column to existing signals tables."""
+        cols = {row["name"] for row in self.conn.execute("PRAGMA table_info(signals)").fetchall()}
+        if "rejection_reason" not in cols:
+            self.conn.execute("ALTER TABLE signals ADD COLUMN rejection_reason TEXT")
+
+    def _ensure_in_use_assignments(self):
+        """Ensure exactly one prompt per stage is marked in_use=1.
+
+        Driven by STAGE_TARGETS. All other prompts matching the stage prefix
+        are demoted to in_use=0. Idempotent — safe to call repeatedly.
+        """
+        for stage, target_name in STAGE_TARGETS.items():
+            self.conn.execute(
+                "UPDATE prompts SET in_use = 0 WHERE name LIKE ? AND name != ?",
+                (f"{stage}_%", target_name),
+            )
+            self.conn.execute(
+                "UPDATE prompts SET in_use = 1 WHERE name = ?",
+                (target_name,),
+            )
         self.conn.commit()
 
     def init_db(self, fresh: bool = False):
@@ -348,6 +392,7 @@ class Database:
                 (p["name"], p["template"], p["version"]),
             )
         self.conn.commit()
+        self._ensure_in_use_assignments()
 
     # ── Generic helpers ─────────────────────────────────────
 
@@ -731,6 +776,19 @@ class Database:
         row = self.execute(
             "SELECT * FROM prompts WHERE name = ? AND is_active = 1 LIMIT 1",
             (name,),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def get_in_use_prompt(self, stage: str) -> dict | None:
+        """Return the prompt currently in use for a pipeline stage.
+
+        Exactly one row per stage has in_use=1 (enforced by
+        _ensure_in_use_assignments). Returns None if no row matches — which
+        would indicate a seeding/migration problem.
+        """
+        row = self.execute(
+            "SELECT * FROM prompts WHERE name LIKE ? AND in_use = 1 LIMIT 1",
+            (f"{stage}_%",),
         ).fetchone()
         return dict(row) if row else None
 
