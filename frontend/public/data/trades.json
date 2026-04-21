@@ -1,20 +1,115 @@
 {
   "trades": [
     {
+      "id": "fbbc860d6a594fa3bb9b88d3dd7b30cb",
+      "stream": "strategy:breakout",
+      "instrument": "USD_JPY",
+      "direction": "long",
+      "entry_price": 159.305,
+      "exit_price": null,
+      "stop_loss": 159.13400000000001,
+      "take_profit": 159.647,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-04-21T15:09:48.052541+00:00",
+      "closed_at": null,
+      "broker_deal_id": "000154c4-0029-065e-0000-000080e2ee81",
+      "events": [
+        {
+          "id": 3612,
+          "trade_id": "fbbc860d6a594fa3bb9b88d3dd7b30cb",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 159.305,
+            "stop_loss": 159.13400000000001,
+            "take_profit": 159.647,
+            "position_size": 118,
+            "broker_deal_id": "000154c4-0029-065e-0000-000080e2ee81"
+          },
+          "created_at": "2026-04-21 15:09:48"
+        },
+        {
+          "id": 3613,
+          "trade_id": "fbbc860d6a594fa3bb9b88d3dd7b30cb",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 118.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 15:09:48"
+        }
+      ],
+      "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=159.204, asian_low=158.738, asian_range=0.466, buffer=0.1",
+      "source": "strategy:breakout",
+      "record": {
+        "trade_id": "fbbc860d6a594fa3bb9b88d3dd7b30cb",
+        "signal_id": "87bd9f1e25ce46a09c881cfb27b0881a",
+        "instrument": "USD_JPY",
+        "direction": "long",
+        "source": "strategy:breakout",
+        "signal": {
+          "confidence": 0.497,
+          "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=159.204, asian_low=158.738, asian_range=0.466, buffer=0.1",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.928,
+          "bias_since": "2026-04-15T14:25:22.418788+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 118,
+          "rejection_reason": null,
+          "entry_price": 159.305,
+          "stop_loss": 159.13400000000001,
+          "take_profit": 159.647
+        },
+        "metadata": {
+          "parameters": {
+            "asian_start": "22:00",
+            "asian_end": "6:00",
+            "breakout_buffer_pips": 10
+          },
+          "indicators": {
+            "asian_high": 159.204,
+            "asian_low": 158.738,
+            "asian_range": 0.466,
+            "buffer": 0.1
+          },
+          "entry_price": 159.317
+        },
+        "entry": {
+          "price": 159.305,
+          "time": "2026-04-21T15:09:48.052541+00:00",
+          "broker_deal_id": "000154c4-0029-065e-0000-000080e2ee81"
+        }
+      }
+    },
+    {
       "id": "791b84374f0848f18ce550d0a4db6806",
       "stream": "llm",
       "instrument": "AUD_USD",
       "direction": "long",
       "entry_price": 0.71607,
-      "exit_price": null,
+      "exit_price": 0.71706,
       "stop_loss": 0.71496,
       "take_profit": 0.7183,
       "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": 0.19,
+      "pnl_pips": 9.9,
+      "status": "closed_reconciled",
       "opened_at": "2026-04-21T13:13:14.212775+00:00",
-      "closed_at": null,
+      "closed_at": "2026-04-21T15:38:44.333",
       "broker_deal_id": "00001544-0055-311e-0000-000080db661b",
       "events": [
         {
@@ -75,6 +170,19 @@
             "distance_tp_pips": 3.9
           },
           "created_at": "2026-04-21 14:20:03"
+        },
+        {
+          "id": 3614,
+          "trade_id": "791b84374f0848f18ce550d0a4db6806",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.71706,
+            "pnl": 0.19,
+            "pnl_pips": 9.9,
+            "actual_close_time": "2026-04-21T15:38:44.333",
+            "detection_time": "2026-04-21T15:09:50.452253+00:00"
+          },
+          "created_at": "2026-04-21 15:09:50"
         }
       ],
       "reasoning": "The recent New Zealand inflation data showed a higher-than-expected CPI q/q and y/y, which led to a jump in NZD. Given the trade relationship between Australia and New Zealand, this could have a positive impact on AUD/USD. Additionally, the market context shows a ranging recent trend, but the NZD's reaction to the inflation data could be a sign of a potential AUD/USD increase. However, the evidence is not extremely strong, as there are multiple factors at play, and some headlines may have ambiguous effects.",
@@ -153,6 +261,13 @@
           "price": 0.71607,
           "time": "2026-04-21T13:13:14.212775+00:00",
           "broker_deal_id": "00001544-0055-311e-0000-000080db661b"
+        },
+        "exit": {
+          "price": 0.71706,
+          "time": "2026-04-21T15:38:44.333",
+          "pnl": 0.19,
+          "pnl_pips": 9.9,
+          "close_reason": null
         }
       },
       "latest_snapshot": {
@@ -161,750 +276,6 @@
         "unrealized_pips": 18.4,
         "distance_sl_pips": 29.5,
         "distance_tp_pips": 3.9
-      }
-    },
-    {
-      "id": "00a890c966034f00b7c822192b30ba1e",
-      "stream": "strategy:mean_reversion",
-      "instrument": "GBP_USD",
-      "direction": "long",
-      "entry_price": 1.350245,
-      "exit_price": null,
-      "stop_loss": 1.34878,
-      "take_profit": 1.35317,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-04-21T09:22:22.865748+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00007090-0055-311e-0000-00008118b160",
-      "events": [
-        {
-          "id": 3576,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.350245,
-            "stop_loss": 1.3487846428571428,
-            "take_profit": 1.353165714285714,
-            "position_size": 100,
-            "broker_deal_id": "00007090-0055-311e-0000-00008118b160"
-          },
-          "created_at": "2026-04-21 09:22:22"
-        },
-        {
-          "id": 3577,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.3487846428571428,
-            "new_value": 1.34878,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 09:22:23"
-        },
-        {
-          "id": 3578,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.353165714285714,
-            "new_value": 1.35317,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 09:22:23"
-        },
-        {
-          "id": 3584,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.350455,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 2.1,
-            "distance_sl_pips": 16.7,
-            "distance_tp_pips": 27.2
-          },
-          "created_at": "2026-04-21 10:19:58"
-        },
-        {
-          "id": 3588,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.352075,
-            "unrealized_pl": 0.18,
-            "unrealized_pips": 18.3,
-            "distance_sl_pips": 32.9,
-            "distance_tp_pips": 11.0
-          },
-          "created_at": "2026-04-21 11:34:28"
-        },
-        {
-          "id": 3592,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.351155,
-            "unrealized_pl": 0.09,
-            "unrealized_pips": 9.1,
-            "distance_sl_pips": 23.7,
-            "distance_tp_pips": 20.2
-          },
-          "created_at": "2026-04-21 12:43:22"
-        },
-        {
-          "id": 3609,
-          "trade_id": "00a890c966034f00b7c822192b30ba1e",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.352685,
-            "unrealized_pl": 0.24,
-            "unrealized_pips": 24.4,
-            "distance_sl_pips": 39.0,
-            "distance_tp_pips": 4.9
-          },
-          "created_at": "2026-04-21 14:20:04"
-        }
-      ],
-      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.35455, bb_lower=1.35036, bb_mid=1.35245, rsi=16.9, pct_b=-0.091",
-      "source": "strategy:mean_reversion",
-      "record": {
-        "trade_id": "00a890c966034f00b7c822192b30ba1e",
-        "signal_id": "301b22879fee479c972a119974c0d24a",
-        "instrument": "GBP_USD",
-        "direction": "long",
-        "source": "strategy:mean_reversion",
-        "signal": {
-          "confidence": 0.691,
-          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.35455, bb_lower=1.35036, bb_mid=1.35245, rsi=16.9, pct_b=-0.091",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 0.9526,
-          "bias_since": "2026-04-15T14:25:22.418788+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.350245,
-          "stop_loss": 1.3487846428571428,
-          "take_profit": 1.353165714285714
-        },
-        "metadata": {
-          "parameters": {
-            "bb_period": 20,
-            "bb_std": 2.0,
-            "rsi_period": 14,
-            "rsi_oversold": 30,
-            "rsi_overbought": 70
-          },
-          "indicators": {
-            "bb_upper": 1.35455,
-            "bb_lower": 1.35036,
-            "bb_mid": 1.35245,
-            "rsi": 16.9,
-            "pct_b": -0.091
-          },
-          "entry_price": 1.349975
-        },
-        "entry": {
-          "price": 1.350245,
-          "time": "2026-04-21T09:22:22.865748+00:00",
-          "broker_deal_id": "00007090-0055-311e-0000-00008118b160"
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 1.352685,
-        "unrealized_pl": 0.24,
-        "unrealized_pips": 24.4,
-        "distance_sl_pips": 39.0,
-        "distance_tp_pips": 4.9
-      }
-    },
-    {
-      "id": "066c577376924c788c505000019ec8b8",
-      "stream": "strategy:mean_reversion",
-      "instrument": "USD_CHF",
-      "direction": "short",
-      "entry_price": 0.7802199999999999,
-      "exit_price": null,
-      "stop_loss": 0.78107,
-      "take_profit": 0.77852,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-04-21T09:22:22.048596+00:00",
-      "closed_at": null,
-      "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa",
-      "events": [
-        {
-          "id": 3575,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.7802199999999999,
-            "stop_loss": 0.7810723214285713,
-            "take_profit": 0.7785153571428571,
-            "position_size": 118,
-            "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa"
-          },
-          "created_at": "2026-04-21 09:22:22"
-        },
-        {
-          "id": 3579,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.7810723214285713,
-            "new_value": 0.78107,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 09:22:23"
-        },
-        {
-          "id": 3580,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.7785153571428571,
-            "new_value": 0.77852,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 09:22:23"
-        },
-        {
-          "id": 3581,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 118.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 09:22:23"
-        },
-        {
-          "id": 3585,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.77997,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 2.5,
-            "distance_sl_pips": 11.0,
-            "distance_tp_pips": 14.5
-          },
-          "created_at": "2026-04-21 10:19:59"
-        },
-        {
-          "id": 3589,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.779435,
-            "unrealized_pl": 0.08,
-            "unrealized_pips": 7.8,
-            "distance_sl_pips": 16.4,
-            "distance_tp_pips": 9.1
-          },
-          "created_at": "2026-04-21 11:34:28"
-        },
-        {
-          "id": 3593,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.78,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 2.2,
-            "distance_sl_pips": 10.7,
-            "distance_tp_pips": 14.8
-          },
-          "created_at": "2026-04-21 12:43:22"
-        },
-        {
-          "id": 3610,
-          "trade_id": "066c577376924c788c505000019ec8b8",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.778885,
-            "unrealized_pl": 0.13,
-            "unrealized_pips": 13.3,
-            "distance_sl_pips": 21.8,
-            "distance_tp_pips": 3.7
-          },
-          "created_at": "2026-04-21 14:20:04"
-        }
-      ],
-      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.78003, bb_lower=0.77763, bb_mid=0.77883, rsi=74.19, pct_b=1.109",
-      "source": "strategy:mean_reversion",
-      "record": {
-        "trade_id": "066c577376924c788c505000019ec8b8",
-        "signal_id": "ae17f48ae7494e4b861949b541c393d4",
-        "instrument": "USD_CHF",
-        "direction": "short",
-        "source": "strategy:mean_reversion",
-        "signal": {
-          "confidence": 0.821,
-          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.78003, bb_lower=0.77763, bb_mid=0.77883, rsi=74.19, pct_b=1.109",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.6025,
-          "bias_since": "2026-04-20T07:57:59.914080+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 118,
-          "rejection_reason": null,
-          "entry_price": 0.7802199999999999,
-          "stop_loss": 0.7810723214285713,
-          "take_profit": 0.7785153571428571
-        },
-        "metadata": {
-          "parameters": {
-            "bb_period": 20,
-            "bb_std": 2.0,
-            "rsi_period": 14,
-            "rsi_oversold": 30,
-            "rsi_overbought": 70
-          },
-          "indicators": {
-            "bb_upper": 0.78003,
-            "bb_lower": 0.77763,
-            "bb_mid": 0.77883,
-            "rsi": 74.19,
-            "pct_b": 1.109
-          },
-          "entry_price": 0.78029
-        },
-        "entry": {
-          "price": 0.7802199999999999,
-          "time": "2026-04-21T09:22:22.048596+00:00",
-          "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa"
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.778885,
-        "unrealized_pl": 0.13,
-        "unrealized_pips": 13.3,
-        "distance_sl_pips": 21.8,
-        "distance_tp_pips": 3.7
-      }
-    },
-    {
-      "id": "17b08dc3cefc49f3ad0d5db8c776c569",
-      "stream": "llm",
-      "instrument": "EUR_USD",
-      "direction": "long",
-      "entry_price": 1.176915,
-      "exit_price": null,
-      "stop_loss": 1.17536,
-      "take_profit": 1.18002,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-04-20T13:18:48.103784+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9",
-      "events": [
-        {
-          "id": 3473,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.176915,
-            "stop_loss": 1.1753635714285713,
-            "take_profit": 1.1800178571428572,
-            "position_size": 100,
-            "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9"
-          },
-          "created_at": "2026-04-20 13:18:48"
-        },
-        {
-          "id": 3474,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.1753635714285713,
-            "new_value": 1.17536,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-20 13:18:49"
-        },
-        {
-          "id": 3475,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.1800178571428572,
-            "new_value": 1.18002,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-20 13:18:49"
-        },
-        {
-          "id": 3479,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.177375,
-            "unrealized_pl": 0.05,
-            "unrealized_pips": 4.6,
-            "distance_sl_pips": 20.2,
-            "distance_tp_pips": 26.5
-          },
-          "created_at": "2026-04-20 14:25:19"
-        },
-        {
-          "id": 3490,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178515,
-            "unrealized_pl": 0.16,
-            "unrealized_pips": 16.0,
-            "distance_sl_pips": 31.6,
-            "distance_tp_pips": 15.1
-          },
-          "created_at": "2026-04-20 15:49:52"
-        },
-        {
-          "id": 3492,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178325,
-            "unrealized_pl": 0.14,
-            "unrealized_pips": 14.1,
-            "distance_sl_pips": 29.7,
-            "distance_tp_pips": 17.0
-          },
-          "created_at": "2026-04-20 16:47:21"
-        },
-        {
-          "id": 3504,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178325,
-            "unrealized_pl": 0.14,
-            "unrealized_pips": 14.1,
-            "distance_sl_pips": 29.7,
-            "distance_tp_pips": 17.0
-          },
-          "created_at": "2026-04-20 17:42:39"
-        },
-        {
-          "id": 3508,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178235,
-            "unrealized_pl": 0.13,
-            "unrealized_pips": 13.2,
-            "distance_sl_pips": 28.7,
-            "distance_tp_pips": 17.9
-          },
-          "created_at": "2026-04-20 18:41:21"
-        },
-        {
-          "id": 3512,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178775,
-            "unrealized_pl": 0.19,
-            "unrealized_pips": 18.6,
-            "distance_sl_pips": 34.1,
-            "distance_tp_pips": 12.5
-          },
-          "created_at": "2026-04-20 19:43:10"
-        },
-        {
-          "id": 3516,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178595,
-            "unrealized_pl": 0.17,
-            "unrealized_pips": 16.8,
-            "distance_sl_pips": 32.4,
-            "distance_tp_pips": 14.3
-          },
-          "created_at": "2026-04-20 20:25:46"
-        },
-        {
-          "id": 3521,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.17853,
-            "unrealized_pl": 0.16,
-            "unrealized_pips": 16.1,
-            "distance_sl_pips": 31.7,
-            "distance_tp_pips": 14.9
-          },
-          "created_at": "2026-04-20 21:05:29"
-        },
-        {
-          "id": 3529,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.17871,
-            "unrealized_pl": 0.18,
-            "unrealized_pips": 17.9,
-            "distance_sl_pips": 33.5,
-            "distance_tp_pips": 13.1
-          },
-          "created_at": "2026-04-20 21:57:15"
-        },
-        {
-          "id": 3533,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178585,
-            "unrealized_pl": 0.17,
-            "unrealized_pips": 16.7,
-            "distance_sl_pips": 32.3,
-            "distance_tp_pips": 14.4
-          },
-          "created_at": "2026-04-20 22:35:58"
-        },
-        {
-          "id": 3539,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178515,
-            "unrealized_pl": 0.16,
-            "unrealized_pips": 16.0,
-            "distance_sl_pips": 31.6,
-            "distance_tp_pips": 15.1
-          },
-          "created_at": "2026-04-20 23:24:36"
-        },
-        {
-          "id": 3547,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178335,
-            "unrealized_pl": 0.14,
-            "unrealized_pips": 14.2,
-            "distance_sl_pips": 29.7,
-            "distance_tp_pips": 16.9
-          },
-          "created_at": "2026-04-21 00:02:12"
-        },
-        {
-          "id": 3551,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.177635,
-            "unrealized_pl": 0.07,
-            "unrealized_pips": 7.2,
-            "distance_sl_pips": 22.8,
-            "distance_tp_pips": 23.9
-          },
-          "created_at": "2026-04-21 03:21:59"
-        },
-        {
-          "id": 3557,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.178135,
-            "unrealized_pl": 0.12,
-            "unrealized_pips": 12.2,
-            "distance_sl_pips": 27.7,
-            "distance_tp_pips": 18.9
-          },
-          "created_at": "2026-04-21 05:37:42"
-        },
-        {
-          "id": 3559,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.177485,
-            "unrealized_pl": 0.06,
-            "unrealized_pips": 5.7,
-            "distance_sl_pips": 21.2,
-            "distance_tp_pips": 25.4
-          },
-          "created_at": "2026-04-21 07:13:07"
-        },
-        {
-          "id": 3573,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.176285,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -6.3,
-            "distance_sl_pips": 9.3,
-            "distance_tp_pips": 37.4
-          },
-          "created_at": "2026-04-21 09:01:28"
-        },
-        {
-          "id": 3587,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.175725,
-            "unrealized_pl": -0.12,
-            "unrealized_pips": -11.9,
-            "distance_sl_pips": 3.6,
-            "distance_tp_pips": 43.0
-          },
-          "created_at": "2026-04-21 10:20:00"
-        },
-        {
-          "id": 3591,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.176635,
-            "unrealized_pl": -0.03,
-            "unrealized_pips": -2.8,
-            "distance_sl_pips": 12.8,
-            "distance_tp_pips": 33.8
-          },
-          "created_at": "2026-04-21 11:34:29"
-        },
-        {
-          "id": 3595,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.175795,
-            "unrealized_pl": -0.11,
-            "unrealized_pips": -11.2,
-            "distance_sl_pips": 4.3,
-            "distance_tp_pips": 42.3
-          },
-          "created_at": "2026-04-21 12:43:23"
-        },
-        {
-          "id": 3611,
-          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.176785,
-            "unrealized_pl": -0.01,
-            "unrealized_pips": -1.3,
-            "distance_sl_pips": 14.3,
-            "distance_tp_pips": 32.4
-          },
-          "created_at": "2026-04-21 14:20:05"
-        }
-      ],
-      "reasoning": "The recent German producer prices data shows a significant monthly increase of 2.5% in March, which is the largest jump since August 2022. This is primarily driven by a sharp increase in energy product prices. Although the year-on-year figure is -0.2%, it's an improvement from February's -3.3%. This data suggests that inflationary pressures are picking up in Germany, which could lead to a more hawkish European Central Bank (ECB) stance. Additionally, the current bearish trend and recent market tensions may have created a buying opportunity for EUR/USD. However, the evidence is not overwhelming, and there are potential risks that could invalidate this signal.",
-      "source": "llm",
-      "record": {
-        "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
-        "signal_id": "76b626656e484a2188d665ae8ff210e7",
-        "instrument": "EUR_USD",
-        "direction": "long",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent German producer prices data shows a significant monthly increase of 2.5% in March, which is the largest jump since August 2022. This is primarily driven by a sharp increase in energy product prices. Although the year-on-year figure is -0.2%, it's an improvement from February's -3.3%. This data suggests that inflationary pressures are picking up in Germany, which could lead to a more hawkish European Central Bank (ECB) stance. Additionally, the current bearish trend and recent market tensions may have created a buying opportunity for EUR/USD. However, the evidence is not overwhelming, and there are potential risks that could invalidate this signal.",
-          "key_factors": [
-            "German producer prices increase",
-            "Energy product price surge",
-            "Potential ECB hawkishness",
-            "Market tensions"
-          ],
-          "risk_factors": [
-            "Global market volatility",
-            "Unexpected ECB policy decisions",
-            "Further escalation of geopolitical tensions",
-            "Weak Eurozone economic data"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this trade is that the German producer price index (PPI) increase, although significant on a monthly basis, does not necessarily translate to sustained inflationary pressures or a more hawkish ECB stance. The year-on-year figure remains negative (-0.2%), indicating that the overall trend is still disinflationary. Moreover, the ECB's primary mandate is to maintain price stability, but it also considers other factors such as economic growth and employment. A one-off increase in energy prices might not be enough to change the ECB's dovish stance, especially if the Eurozone's economic recovery remains fragile.",
-          "alternative_interpretation": "An alternative interpretation of the same news is that the increase in German producer prices could be largely driven by supply-side factors, such as the recent surge in energy prices due to geopolitical tensions, rather than a broad-based recovery in inflation. This could lead to a temporary spike in prices rather than a sustained increase, potentially limiting the ECB's need to take a more hawkish stance. Furthermore, if the global economy is on the cusp of a slowdown, as some indicators suggest, the ECB might maintain its accommodative policy to support growth, thereby reducing the attractiveness of the EUR/USD long position.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the German producer price index (PPI) increase, although significant on a monthly basis, does not necessarily translate to sustained inflationary pressures or a more hawkish ECB stance. The year-on-year figure remains negative (-0.2%), indicating that the overall trend is still disinflationary. Moreover, the ECB's primary mandate is to maintain price stability, but it also considers other factors such as economic growth and employment. A one-off increase in energy prices might not be enough to change the ECB's dovish stance, especially if the Eurozone's economic recovery remains fragile.\",\n  \n  \"alternative_interpretation\": \"An alternative interpretation of the same news is that the increase in German producer prices could be largely driven by supply-side factors, such as the recent surge in energy prices due to geopolitical tensions, rather than a broad-based recovery in inflation. This could lead to a temporary spike in prices rather than a sustained increase, potentially limiting the ECB's need to take a more hawkish stance. Furthermore, if the global economy is on the cusp of a slowdown, as some indicators suggest, the ECB might maintain its accommodative policy to support growth, thereby reducing the attractiveness of the EUR/USD long position.\",\n  \n  \"conviction_after_challenge\": 0.4,\n  \n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "6c91dc41e5a14801b628f2b1009da92b",
-          "6c91dc41e5a14801b628f2b1009da92b",
-          "42080e16355b4d50b74c5f50201c202f",
-          "c75312957293416691d261ad6b69517e",
-          "c75312957293416691d261ad6b69517e",
-          "c75312957293416691d261ad6b69517e",
-          "92f1e5373ab043a194c0e5f0334dab86",
-          "9cf5694036504a37a517c7424a714d8e",
-          "d1a73fb7a5a64789870589669ad79bcd",
-          "9cf5694036504a37a517c7424a714d8e",
-          "d1a73fb7a5a64789870589669ad79bcd",
-          "92f1e5373ab043a194c0e5f0334dab86",
-          "d1a73fb7a5a64789870589669ad79bcd",
-          "92f1e5373ab043a194c0e5f0334dab86"
-        ],
-        "price_context": {
-          "current_price": 1.176865,
-          "daily_change_pct": -0.5586,
-          "trend": "bearish"
-        },
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 0.9083,
-          "bias_since": "2026-04-19T23:29:51.530804+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.176915,
-          "stop_loss": 1.1753635714285713,
-          "take_profit": 1.1800178571428572
-        },
-        "metadata": null,
-        "entry": {
-          "price": 1.176915,
-          "time": "2026-04-20T13:18:48.103784+00:00",
-          "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9"
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 1.176785,
-        "unrealized_pl": -0.01,
-        "unrealized_pips": -1.3,
-        "distance_sl_pips": 14.3,
-        "distance_tp_pips": 32.4
       }
     },
     {
@@ -1298,6 +669,393 @@
         ],
         "atr_14": 0.1305,
         "trade_duration_hours": 1.1
+      }
+    },
+    {
+      "id": "00a890c966034f00b7c822192b30ba1e",
+      "stream": "strategy:mean_reversion",
+      "instrument": "GBP_USD",
+      "direction": "long",
+      "entry_price": 1.350245,
+      "exit_price": 1.351675,
+      "stop_loss": 1.34878,
+      "take_profit": 1.35317,
+      "position_size": 100.0,
+      "pnl": 0.25,
+      "pnl_pips": 14.3,
+      "status": "closed_reconciled",
+      "opened_at": "2026-04-21T09:22:22.865748+00:00",
+      "closed_at": "2026-04-21T15:41:35.803",
+      "broker_deal_id": "00007090-0055-311e-0000-00008118b160",
+      "events": [
+        {
+          "id": 3576,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.350245,
+            "stop_loss": 1.3487846428571428,
+            "take_profit": 1.353165714285714,
+            "position_size": 100,
+            "broker_deal_id": "00007090-0055-311e-0000-00008118b160"
+          },
+          "created_at": "2026-04-21 09:22:22"
+        },
+        {
+          "id": 3577,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.3487846428571428,
+            "new_value": 1.34878,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 09:22:23"
+        },
+        {
+          "id": 3578,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 1.353165714285714,
+            "new_value": 1.35317,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 09:22:23"
+        },
+        {
+          "id": 3584,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.350455,
+            "unrealized_pl": 0.02,
+            "unrealized_pips": 2.1,
+            "distance_sl_pips": 16.7,
+            "distance_tp_pips": 27.2
+          },
+          "created_at": "2026-04-21 10:19:58"
+        },
+        {
+          "id": 3588,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.352075,
+            "unrealized_pl": 0.18,
+            "unrealized_pips": 18.3,
+            "distance_sl_pips": 32.9,
+            "distance_tp_pips": 11.0
+          },
+          "created_at": "2026-04-21 11:34:28"
+        },
+        {
+          "id": 3592,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.351155,
+            "unrealized_pl": 0.09,
+            "unrealized_pips": 9.1,
+            "distance_sl_pips": 23.7,
+            "distance_tp_pips": 20.2
+          },
+          "created_at": "2026-04-21 12:43:22"
+        },
+        {
+          "id": 3609,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.352685,
+            "unrealized_pl": 0.24,
+            "unrealized_pips": 24.4,
+            "distance_sl_pips": 39.0,
+            "distance_tp_pips": 4.9
+          },
+          "created_at": "2026-04-21 14:20:04"
+        },
+        {
+          "id": 3615,
+          "trade_id": "00a890c966034f00b7c822192b30ba1e",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 1.351675,
+            "pnl": 0.25,
+            "pnl_pips": 14.3,
+            "actual_close_time": "2026-04-21T15:41:35.803",
+            "detection_time": "2026-04-21T15:09:51.892988+00:00"
+          },
+          "created_at": "2026-04-21 15:09:51"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.35455, bb_lower=1.35036, bb_mid=1.35245, rsi=16.9, pct_b=-0.091",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "00a890c966034f00b7c822192b30ba1e",
+        "signal_id": "301b22879fee479c972a119974c0d24a",
+        "instrument": "GBP_USD",
+        "direction": "long",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.691,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.35455, bb_lower=1.35036, bb_mid=1.35245, rsi=16.9, pct_b=-0.091",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.9526,
+          "bias_since": "2026-04-15T14:25:22.418788+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 1.350245,
+          "stop_loss": 1.3487846428571428,
+          "take_profit": 1.353165714285714
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 1.35455,
+            "bb_lower": 1.35036,
+            "bb_mid": 1.35245,
+            "rsi": 16.9,
+            "pct_b": -0.091
+          },
+          "entry_price": 1.349975
+        },
+        "entry": {
+          "price": 1.350245,
+          "time": "2026-04-21T09:22:22.865748+00:00",
+          "broker_deal_id": "00007090-0055-311e-0000-00008118b160"
+        },
+        "exit": {
+          "price": 1.351675,
+          "time": "2026-04-21T15:41:35.803",
+          "pnl": 0.25,
+          "pnl_pips": 14.3,
+          "close_reason": null
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 1.352685,
+        "unrealized_pl": 0.24,
+        "unrealized_pips": 24.4,
+        "distance_sl_pips": 39.0,
+        "distance_tp_pips": 4.9
+      }
+    },
+    {
+      "id": "066c577376924c788c505000019ec8b8",
+      "stream": "strategy:mean_reversion",
+      "instrument": "USD_CHF",
+      "direction": "short",
+      "entry_price": 0.7802199999999999,
+      "exit_price": 0.77945,
+      "stop_loss": 0.78107,
+      "take_profit": 0.77852,
+      "position_size": 100.0,
+      "pnl": 0.18,
+      "pnl_pips": 7.7,
+      "status": "closed_reconciled",
+      "opened_at": "2026-04-21T09:22:22.048596+00:00",
+      "closed_at": "2026-04-21T15:41:36.605",
+      "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa",
+      "events": [
+        {
+          "id": 3575,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.7802199999999999,
+            "stop_loss": 0.7810723214285713,
+            "take_profit": 0.7785153571428571,
+            "position_size": 118,
+            "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa"
+          },
+          "created_at": "2026-04-21 09:22:22"
+        },
+        {
+          "id": 3579,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.7810723214285713,
+            "new_value": 0.78107,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 09:22:23"
+        },
+        {
+          "id": 3580,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.7785153571428571,
+            "new_value": 0.77852,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 09:22:23"
+        },
+        {
+          "id": 3581,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 118.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-21 09:22:23"
+        },
+        {
+          "id": 3585,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.77997,
+            "unrealized_pl": 0.02,
+            "unrealized_pips": 2.5,
+            "distance_sl_pips": 11.0,
+            "distance_tp_pips": 14.5
+          },
+          "created_at": "2026-04-21 10:19:59"
+        },
+        {
+          "id": 3589,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.779435,
+            "unrealized_pl": 0.08,
+            "unrealized_pips": 7.8,
+            "distance_sl_pips": 16.4,
+            "distance_tp_pips": 9.1
+          },
+          "created_at": "2026-04-21 11:34:28"
+        },
+        {
+          "id": 3593,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.78,
+            "unrealized_pl": 0.02,
+            "unrealized_pips": 2.2,
+            "distance_sl_pips": 10.7,
+            "distance_tp_pips": 14.8
+          },
+          "created_at": "2026-04-21 12:43:22"
+        },
+        {
+          "id": 3610,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.778885,
+            "unrealized_pl": 0.13,
+            "unrealized_pips": 13.3,
+            "distance_sl_pips": 21.8,
+            "distance_tp_pips": 3.7
+          },
+          "created_at": "2026-04-21 14:20:04"
+        },
+        {
+          "id": 3616,
+          "trade_id": "066c577376924c788c505000019ec8b8",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.77945,
+            "pnl": 0.18,
+            "pnl_pips": 7.7,
+            "actual_close_time": "2026-04-21T15:41:36.605",
+            "detection_time": "2026-04-21T15:09:53.401845+00:00"
+          },
+          "created_at": "2026-04-21 15:09:53"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.78003, bb_lower=0.77763, bb_mid=0.77883, rsi=74.19, pct_b=1.109",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "066c577376924c788c505000019ec8b8",
+        "signal_id": "ae17f48ae7494e4b861949b541c393d4",
+        "instrument": "USD_CHF",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.821,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.78003, bb_lower=0.77763, bb_mid=0.77883, rsi=74.19, pct_b=1.109",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.6025,
+          "bias_since": "2026-04-20T07:57:59.914080+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 118,
+          "rejection_reason": null,
+          "entry_price": 0.7802199999999999,
+          "stop_loss": 0.7810723214285713,
+          "take_profit": 0.7785153571428571
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.78003,
+            "bb_lower": 0.77763,
+            "bb_mid": 0.77883,
+            "rsi": 74.19,
+            "pct_b": 1.109
+          },
+          "entry_price": 0.78029
+        },
+        "entry": {
+          "price": 0.7802199999999999,
+          "time": "2026-04-21T09:22:22.048596+00:00",
+          "broker_deal_id": "000154c4-000c-819e-0000-000080c543aa"
+        },
+        "exit": {
+          "price": 0.77945,
+          "time": "2026-04-21T15:41:36.605",
+          "pnl": 0.18,
+          "pnl_pips": 7.7,
+          "close_reason": null
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 0.778885,
+        "unrealized_pl": 0.13,
+        "unrealized_pips": 13.3,
+        "distance_sl_pips": 21.8,
+        "distance_tp_pips": 3.7
       }
     },
     {
@@ -3812,6 +3570,423 @@
         "unrealized_pips": -2.8,
         "distance_sl_pips": 11.2,
         "distance_tp_pips": 30.6
+      }
+    },
+    {
+      "id": "17b08dc3cefc49f3ad0d5db8c776c569",
+      "stream": "llm",
+      "instrument": "EUR_USD",
+      "direction": "long",
+      "entry_price": 1.176915,
+      "exit_price": 1.175705,
+      "stop_loss": 1.17536,
+      "take_profit": 1.18002,
+      "position_size": 100.0,
+      "pnl": -0.14,
+      "pnl_pips": -12.1,
+      "status": "closed_reconciled",
+      "opened_at": "2026-04-20T13:18:48.103784+00:00",
+      "closed_at": "2026-04-21T15:57:26.361",
+      "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9",
+      "events": [
+        {
+          "id": 3473,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.176915,
+            "stop_loss": 1.1753635714285713,
+            "take_profit": 1.1800178571428572,
+            "position_size": 100,
+            "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9"
+          },
+          "created_at": "2026-04-20 13:18:48"
+        },
+        {
+          "id": 3474,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.1753635714285713,
+            "new_value": 1.17536,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-20 13:18:49"
+        },
+        {
+          "id": 3475,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 1.1800178571428572,
+            "new_value": 1.18002,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-20 13:18:49"
+        },
+        {
+          "id": 3479,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.177375,
+            "unrealized_pl": 0.05,
+            "unrealized_pips": 4.6,
+            "distance_sl_pips": 20.2,
+            "distance_tp_pips": 26.5
+          },
+          "created_at": "2026-04-20 14:25:19"
+        },
+        {
+          "id": 3490,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178515,
+            "unrealized_pl": 0.16,
+            "unrealized_pips": 16.0,
+            "distance_sl_pips": 31.6,
+            "distance_tp_pips": 15.1
+          },
+          "created_at": "2026-04-20 15:49:52"
+        },
+        {
+          "id": 3492,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178325,
+            "unrealized_pl": 0.14,
+            "unrealized_pips": 14.1,
+            "distance_sl_pips": 29.7,
+            "distance_tp_pips": 17.0
+          },
+          "created_at": "2026-04-20 16:47:21"
+        },
+        {
+          "id": 3504,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178325,
+            "unrealized_pl": 0.14,
+            "unrealized_pips": 14.1,
+            "distance_sl_pips": 29.7,
+            "distance_tp_pips": 17.0
+          },
+          "created_at": "2026-04-20 17:42:39"
+        },
+        {
+          "id": 3508,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178235,
+            "unrealized_pl": 0.13,
+            "unrealized_pips": 13.2,
+            "distance_sl_pips": 28.7,
+            "distance_tp_pips": 17.9
+          },
+          "created_at": "2026-04-20 18:41:21"
+        },
+        {
+          "id": 3512,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178775,
+            "unrealized_pl": 0.19,
+            "unrealized_pips": 18.6,
+            "distance_sl_pips": 34.1,
+            "distance_tp_pips": 12.5
+          },
+          "created_at": "2026-04-20 19:43:10"
+        },
+        {
+          "id": 3516,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178595,
+            "unrealized_pl": 0.17,
+            "unrealized_pips": 16.8,
+            "distance_sl_pips": 32.4,
+            "distance_tp_pips": 14.3
+          },
+          "created_at": "2026-04-20 20:25:46"
+        },
+        {
+          "id": 3521,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.17853,
+            "unrealized_pl": 0.16,
+            "unrealized_pips": 16.1,
+            "distance_sl_pips": 31.7,
+            "distance_tp_pips": 14.9
+          },
+          "created_at": "2026-04-20 21:05:29"
+        },
+        {
+          "id": 3529,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.17871,
+            "unrealized_pl": 0.18,
+            "unrealized_pips": 17.9,
+            "distance_sl_pips": 33.5,
+            "distance_tp_pips": 13.1
+          },
+          "created_at": "2026-04-20 21:57:15"
+        },
+        {
+          "id": 3533,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178585,
+            "unrealized_pl": 0.17,
+            "unrealized_pips": 16.7,
+            "distance_sl_pips": 32.3,
+            "distance_tp_pips": 14.4
+          },
+          "created_at": "2026-04-20 22:35:58"
+        },
+        {
+          "id": 3539,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178515,
+            "unrealized_pl": 0.16,
+            "unrealized_pips": 16.0,
+            "distance_sl_pips": 31.6,
+            "distance_tp_pips": 15.1
+          },
+          "created_at": "2026-04-20 23:24:36"
+        },
+        {
+          "id": 3547,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178335,
+            "unrealized_pl": 0.14,
+            "unrealized_pips": 14.2,
+            "distance_sl_pips": 29.7,
+            "distance_tp_pips": 16.9
+          },
+          "created_at": "2026-04-21 00:02:12"
+        },
+        {
+          "id": 3551,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.177635,
+            "unrealized_pl": 0.07,
+            "unrealized_pips": 7.2,
+            "distance_sl_pips": 22.8,
+            "distance_tp_pips": 23.9
+          },
+          "created_at": "2026-04-21 03:21:59"
+        },
+        {
+          "id": 3557,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.178135,
+            "unrealized_pl": 0.12,
+            "unrealized_pips": 12.2,
+            "distance_sl_pips": 27.7,
+            "distance_tp_pips": 18.9
+          },
+          "created_at": "2026-04-21 05:37:42"
+        },
+        {
+          "id": 3559,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.177485,
+            "unrealized_pl": 0.06,
+            "unrealized_pips": 5.7,
+            "distance_sl_pips": 21.2,
+            "distance_tp_pips": 25.4
+          },
+          "created_at": "2026-04-21 07:13:07"
+        },
+        {
+          "id": 3573,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.176285,
+            "unrealized_pl": -0.06,
+            "unrealized_pips": -6.3,
+            "distance_sl_pips": 9.3,
+            "distance_tp_pips": 37.4
+          },
+          "created_at": "2026-04-21 09:01:28"
+        },
+        {
+          "id": 3587,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.175725,
+            "unrealized_pl": -0.12,
+            "unrealized_pips": -11.9,
+            "distance_sl_pips": 3.6,
+            "distance_tp_pips": 43.0
+          },
+          "created_at": "2026-04-21 10:20:00"
+        },
+        {
+          "id": 3591,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.176635,
+            "unrealized_pl": -0.03,
+            "unrealized_pips": -2.8,
+            "distance_sl_pips": 12.8,
+            "distance_tp_pips": 33.8
+          },
+          "created_at": "2026-04-21 11:34:29"
+        },
+        {
+          "id": 3595,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.175795,
+            "unrealized_pl": -0.11,
+            "unrealized_pips": -11.2,
+            "distance_sl_pips": 4.3,
+            "distance_tp_pips": 42.3
+          },
+          "created_at": "2026-04-21 12:43:23"
+        },
+        {
+          "id": 3611,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.176785,
+            "unrealized_pl": -0.01,
+            "unrealized_pips": -1.3,
+            "distance_sl_pips": 14.3,
+            "distance_tp_pips": 32.4
+          },
+          "created_at": "2026-04-21 14:20:05"
+        },
+        {
+          "id": 3617,
+          "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 1.175705,
+            "pnl": -0.14,
+            "pnl_pips": -12.1,
+            "actual_close_time": "2026-04-21T15:57:26.361",
+            "detection_time": "2026-04-21T15:09:54.839983+00:00"
+          },
+          "created_at": "2026-04-21 15:09:54"
+        }
+      ],
+      "reasoning": "The recent German producer prices data shows a significant monthly increase of 2.5% in March, which is the largest jump since August 2022. This is primarily driven by a sharp increase in energy product prices. Although the year-on-year figure is -0.2%, it's an improvement from February's -3.3%. This data suggests that inflationary pressures are picking up in Germany, which could lead to a more hawkish European Central Bank (ECB) stance. Additionally, the current bearish trend and recent market tensions may have created a buying opportunity for EUR/USD. However, the evidence is not overwhelming, and there are potential risks that could invalidate this signal.",
+      "source": "llm",
+      "record": {
+        "trade_id": "17b08dc3cefc49f3ad0d5db8c776c569",
+        "signal_id": "76b626656e484a2188d665ae8ff210e7",
+        "instrument": "EUR_USD",
+        "direction": "long",
+        "source": "llm",
+        "signal": {
+          "confidence": 0.4,
+          "reasoning": "The recent German producer prices data shows a significant monthly increase of 2.5% in March, which is the largest jump since August 2022. This is primarily driven by a sharp increase in energy product prices. Although the year-on-year figure is -0.2%, it's an improvement from February's -3.3%. This data suggests that inflationary pressures are picking up in Germany, which could lead to a more hawkish European Central Bank (ECB) stance. Additionally, the current bearish trend and recent market tensions may have created a buying opportunity for EUR/USD. However, the evidence is not overwhelming, and there are potential risks that could invalidate this signal.",
+          "key_factors": [
+            "German producer prices increase",
+            "Energy product price surge",
+            "Potential ECB hawkishness",
+            "Market tensions"
+          ],
+          "risk_factors": [
+            "Global market volatility",
+            "Unexpected ECB policy decisions",
+            "Further escalation of geopolitical tensions",
+            "Weak Eurozone economic data"
+          ],
+          "prompt_version": "signal_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        "challenge": {
+          "counter_argument": "The strongest argument against this trade is that the German producer price index (PPI) increase, although significant on a monthly basis, does not necessarily translate to sustained inflationary pressures or a more hawkish ECB stance. The year-on-year figure remains negative (-0.2%), indicating that the overall trend is still disinflationary. Moreover, the ECB's primary mandate is to maintain price stability, but it also considers other factors such as economic growth and employment. A one-off increase in energy prices might not be enough to change the ECB's dovish stance, especially if the Eurozone's economic recovery remains fragile.",
+          "alternative_interpretation": "An alternative interpretation of the same news is that the increase in German producer prices could be largely driven by supply-side factors, such as the recent surge in energy prices due to geopolitical tensions, rather than a broad-based recovery in inflation. This could lead to a temporary spike in prices rather than a sustained increase, potentially limiting the ECB's need to take a more hawkish stance. Furthermore, if the global economy is on the cusp of a slowdown, as some indicators suggest, the ECB might maintain its accommodative policy to support growth, thereby reducing the attractiveness of the EUR/USD long position.",
+          "conviction_after_challenge": 0.4,
+          "recommendation": "reduce_size",
+          "prompt_version": "challenge_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the German producer price index (PPI) increase, although significant on a monthly basis, does not necessarily translate to sustained inflationary pressures or a more hawkish ECB stance. The year-on-year figure remains negative (-0.2%), indicating that the overall trend is still disinflationary. Moreover, the ECB's primary mandate is to maintain price stability, but it also considers other factors such as economic growth and employment. A one-off increase in energy prices might not be enough to change the ECB's dovish stance, especially if the Eurozone's economic recovery remains fragile.\",\n  \n  \"alternative_interpretation\": \"An alternative interpretation of the same news is that the increase in German producer prices could be largely driven by supply-side factors, such as the recent surge in energy prices due to geopolitical tensions, rather than a broad-based recovery in inflation. This could lead to a temporary spike in prices rather than a sustained increase, potentially limiting the ECB's need to take a more hawkish stance. Furthermore, if the global economy is on the cusp of a slowdown, as some indicators suggest, the ECB might maintain its accommodative policy to support growth, thereby reducing the attractiveness of the EUR/USD long position.\",\n  \n  \"conviction_after_challenge\": 0.4,\n  \n  \"recommendation\": \"reduce_size\"\n}"
+        },
+        "headlines_used": [
+          "6c91dc41e5a14801b628f2b1009da92b",
+          "6c91dc41e5a14801b628f2b1009da92b",
+          "42080e16355b4d50b74c5f50201c202f",
+          "c75312957293416691d261ad6b69517e",
+          "c75312957293416691d261ad6b69517e",
+          "c75312957293416691d261ad6b69517e",
+          "92f1e5373ab043a194c0e5f0334dab86",
+          "9cf5694036504a37a517c7424a714d8e",
+          "d1a73fb7a5a64789870589669ad79bcd",
+          "9cf5694036504a37a517c7424a714d8e",
+          "d1a73fb7a5a64789870589669ad79bcd",
+          "92f1e5373ab043a194c0e5f0334dab86",
+          "d1a73fb7a5a64789870589669ad79bcd",
+          "92f1e5373ab043a194c0e5f0334dab86"
+        ],
+        "price_context": {
+          "current_price": 1.176865,
+          "daily_change_pct": -0.5586,
+          "trend": "bearish"
+        },
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.9083,
+          "bias_since": "2026-04-19T23:29:51.530804+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 1.176915,
+          "stop_loss": 1.1753635714285713,
+          "take_profit": 1.1800178571428572
+        },
+        "metadata": null,
+        "entry": {
+          "price": 1.176915,
+          "time": "2026-04-20T13:18:48.103784+00:00",
+          "broker_deal_id": "00005552-0055-311e-0000-000081e5b6b9"
+        },
+        "exit": {
+          "price": 1.175705,
+          "time": "2026-04-21T15:57:26.361",
+          "pnl": -0.14,
+          "pnl_pips": -12.1,
+          "close_reason": null
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 1.176785,
+        "unrealized_pl": -0.01,
+        "unrealized_pips": -1.3,
+        "distance_sl_pips": 14.3,
+        "distance_tp_pips": 32.4
       }
     },
     {
