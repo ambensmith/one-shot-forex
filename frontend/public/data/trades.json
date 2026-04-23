@@ -1,6 +1,115 @@
 {
   "trades": [
     {
+      "id": "5b1fccca5f114652ab24812caa769233",
+      "stream": "strategy:mean_reversion",
+      "instrument": "EUR_USD",
+      "direction": "long",
+      "entry_price": 1.168095,
+      "exit_price": null,
+      "stop_loss": 1.16681,
+      "take_profit": 1.17066,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-04-23T11:07:46.933171+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-0055-311e-0000-000081e6146f",
+      "events": [
+        {
+          "id": 3769,
+          "trade_id": "5b1fccca5f114652ab24812caa769233",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.168095,
+            "stop_loss": 1.1668119642857144,
+            "take_profit": 1.1706610714285715,
+            "position_size": 100,
+            "broker_deal_id": "00005552-0055-311e-0000-000081e6146f"
+          },
+          "created_at": "2026-04-23 11:07:46"
+        },
+        {
+          "id": 3770,
+          "trade_id": "5b1fccca5f114652ab24812caa769233",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.1668119642857144,
+            "new_value": 1.16681,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-23 11:07:47"
+        },
+        {
+          "id": 3771,
+          "trade_id": "5b1fccca5f114652ab24812caa769233",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 1.1706610714285715,
+            "new_value": 1.17066,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-23 11:07:47"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.17191, bb_lower=1.16895, bb_mid=1.17043, rsi=28.2, pct_b=-0.237",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "5b1fccca5f114652ab24812caa769233",
+        "signal_id": "19b4bceaa6124c69b0916b177003610b",
+        "instrument": "EUR_USD",
+        "direction": "long",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.733,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.17191, bb_lower=1.16895, bb_mid=1.17043, rsi=28.2, pct_b=-0.237",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.7816,
+          "bias_since": "2026-04-19T23:29:51.530804+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 1.168095,
+          "stop_loss": 1.1668119642857144,
+          "take_profit": 1.1706610714285715
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 1.17191,
+            "bb_lower": 1.16895,
+            "bb_mid": 1.17043,
+            "rsi": 28.2,
+            "pct_b": -0.237
+          },
+          "entry_price": 1.168245
+        },
+        "entry": {
+          "price": 1.168095,
+          "time": "2026-04-23T11:07:46.933171+00:00",
+          "broker_deal_id": "00005552-0055-311e-0000-000081e6146f"
+        }
+      }
+    },
+    {
       "id": "abe958182a1647678669769128b0fd75",
       "stream": "strategy:carry",
       "instrument": "USD_CHF",
