@@ -1,6 +1,121 @@
 {
   "trades": [
     {
+      "id": "32f08e4723e34a10bb0d4054aa123858",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.86631,
+      "exit_price": null,
+      "stop_loss": 0.86692,
+      "take_profit": 0.86508,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-04-30T06:27:14.042202+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080a43180",
+      "events": [
+        {
+          "id": 4203,
+          "trade_id": "32f08e4723e34a10bb0d4054aa123858",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.86631,
+            "stop_loss": 0.8669239285714286,
+            "take_profit": 0.8650821428571428,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080a43180"
+          },
+          "created_at": "2026-04-30 06:27:14"
+        },
+        {
+          "id": 4204,
+          "trade_id": "32f08e4723e34a10bb0d4054aa123858",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8669239285714286,
+            "new_value": 0.86692,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-30 06:27:15"
+        },
+        {
+          "id": 4205,
+          "trade_id": "32f08e4723e34a10bb0d4054aa123858",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8650821428571428,
+            "new_value": 0.86508,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-04-30 06:27:15"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.016",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "32f08e4723e34a10bb0d4054aa123858",
+        "signal_id": "29b664185a3d4e3da3cf7db5ad796607",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.134,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.016",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 1.0,
+          "bias_since": "2026-04-26T22:31:03.329213+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.86631,
+          "stop_loss": 0.8669239285714286,
+          "take_profit": 0.8650821428571428
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.016
+          },
+          "entry_price": 0.86638
+        },
+        "entry": {
+          "price": 0.86631,
+          "time": "2026-04-30T06:27:14.042202+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080a43180"
+        }
+      }
+    },
+    {
       "id": "f180824f2c7741c78757c548b77a616c",
       "stream": "strategy:breakout",
       "instrument": "AUD_USD",
