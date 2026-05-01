@@ -1,6 +1,125 @@
 {
   "trades": [
     {
+      "id": "4ca9c14050c24903bb74985780963767",
+      "stream": "strategy:volatility_breakout",
+      "instrument": "USD_CAD",
+      "direction": "short",
+      "entry_price": 1.35734,
+      "exit_price": null,
+      "stop_loss": 1.35835,
+      "take_profit": 1.35531,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-01T09:04:24.995034+00:00",
+      "closed_at": null,
+      "broker_deal_id": "000154c4-000c-111e-0000-000080ef4820",
+      "events": [
+        {
+          "id": 4311,
+          "trade_id": "4ca9c14050c24903bb74985780963767",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.35734,
+            "stop_loss": 1.3583530357142857,
+            "take_profit": 1.3553139285714286,
+            "position_size": 117,
+            "broker_deal_id": "000154c4-000c-111e-0000-000080ef4820"
+          },
+          "created_at": "2026-05-01 09:04:24"
+        },
+        {
+          "id": 4312,
+          "trade_id": "4ca9c14050c24903bb74985780963767",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.3583530357142857,
+            "new_value": 1.35835,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-01 09:04:25"
+        },
+        {
+          "id": 4313,
+          "trade_id": "4ca9c14050c24903bb74985780963767",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 1.3553139285714286,
+            "new_value": 1.35531,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-01 09:04:25"
+        },
+        {
+          "id": 4314,
+          "trade_id": "4ca9c14050c24903bb74985780963767",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 117.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-01 09:04:25"
+        }
+      ],
+      "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00071, avg_atr=0.00119, atr_ratio=0.592, recent_high=1.35891, recent_low=1.3572, contracted=True",
+      "source": "strategy:volatility_breakout",
+      "record": {
+        "trade_id": "4ca9c14050c24903bb74985780963767",
+        "signal_id": "71db1c327dd04da4ad11c3db8a87d43f",
+        "instrument": "USD_CAD",
+        "direction": "short",
+        "source": "strategy:volatility_breakout",
+        "signal": {
+          "confidence": 0.473,
+          "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00071, avg_atr=0.00119, atr_ratio=0.592, recent_high=1.35891, recent_low=1.3572, contracted=True",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 1.0,
+          "bias_since": "2026-04-30T03:33:36.182791+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 117,
+          "rejection_reason": null,
+          "entry_price": 1.35734,
+          "stop_loss": 1.3583530357142857,
+          "take_profit": 1.3553139285714286
+        },
+        "metadata": {
+          "parameters": {
+            "atr_period": 14,
+            "atr_contraction_threshold": 0.7,
+            "breakout_atr_multiplier": 1.0
+          },
+          "indicators": {
+            "atr": 0.00071,
+            "avg_atr": 0.00119,
+            "atr_ratio": 0.592,
+            "recent_high": 1.35891,
+            "recent_low": 1.3572,
+            "contracted": true
+          },
+          "entry_price": 1.35728
+        },
+        "entry": {
+          "price": 1.35734,
+          "time": "2026-05-01T09:04:24.995034+00:00",
+          "broker_deal_id": "000154c4-000c-111e-0000-000080ef4820"
+        }
+      }
+    },
+    {
       "id": "cb57e17aadda4c1795bae8923a10ec2b",
       "stream": "strategy:breakout",
       "instrument": "USD_CAD",
