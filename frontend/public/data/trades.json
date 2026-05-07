@@ -1,6 +1,126 @@
 {
   "trades": [
     {
+      "id": "f7f86f7fc95240c4bbe2cd01216857b2",
+      "stream": "strategy:mean_reversion",
+      "instrument": "AUD_USD",
+      "direction": "long",
+      "entry_price": 0.72078,
+      "exit_price": null,
+      "stop_loss": 0.71916,
+      "take_profit": 0.72401,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-07T21:53:17.085973+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00001544-0055-311e-0000-000080dbb812",
+      "events": [
+        {
+          "id": 4753,
+          "trade_id": "f7f86f7fc95240c4bbe2cd01216857b2",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.72078,
+            "stop_loss": 0.7191632142857142,
+            "take_profit": 0.7240135714285716,
+            "position_size": 163,
+            "broker_deal_id": "00001544-0055-311e-0000-000080dbb812"
+          },
+          "created_at": "2026-05-07 21:53:17"
+        },
+        {
+          "id": 4754,
+          "trade_id": "f7f86f7fc95240c4bbe2cd01216857b2",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.7191632142857142,
+            "new_value": 0.71916,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-07 21:53:18"
+        },
+        {
+          "id": 4755,
+          "trade_id": "f7f86f7fc95240c4bbe2cd01216857b2",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.7240135714285716,
+            "new_value": 0.72401,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-07 21:53:18"
+        },
+        {
+          "id": 4756,
+          "trade_id": "f7f86f7fc95240c4bbe2cd01216857b2",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 163.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-07 21:53:18"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.72748, bb_lower=0.72135, bb_mid=0.72441, rsi=22.84, pct_b=-0.091",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "f7f86f7fc95240c4bbe2cd01216857b2",
+        "signal_id": "c01003d1b9bd4ea1938f7b454d33e13e",
+        "instrument": "AUD_USD",
+        "direction": "long",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.79,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.72748, bb_lower=0.72135, bb_mid=0.72441, rsi=22.84, pct_b=-0.091",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.6941,
+          "bias_since": "2026-05-06T05:54:15.713531+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 163,
+          "rejection_reason": null,
+          "entry_price": 0.72078,
+          "stop_loss": 0.7191632142857142,
+          "take_profit": 0.7240135714285716
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.72748,
+            "bb_lower": 0.72135,
+            "bb_mid": 0.72441,
+            "rsi": 22.84,
+            "pct_b": -0.091
+          },
+          "entry_price": 0.72079
+        },
+        "entry": {
+          "price": 0.72078,
+          "time": "2026-05-07T21:53:17.085973+00:00",
+          "broker_deal_id": "00001544-0055-311e-0000-000080dbb812"
+        }
+      }
+    },
+    {
       "id": "0a4a067b77c649d198b14c08ca04d45f",
       "stream": "strategy:carry",
       "instrument": "USD_CHF",
