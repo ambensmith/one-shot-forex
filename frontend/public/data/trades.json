@@ -1,6 +1,121 @@
 {
   "trades": [
     {
+      "id": "1f003b2e36d3475a94b53685c4f8e32a",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.86778,
+      "exit_price": null,
+      "stop_loss": 0.86888,
+      "take_profit": 0.86558,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-12T09:33:59.983459+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080a7042d",
+      "events": [
+        {
+          "id": 4999,
+          "trade_id": "1f003b2e36d3475a94b53685c4f8e32a",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.86778,
+            "stop_loss": 0.8688819642857143,
+            "take_profit": 0.8655760714285714,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080a7042d"
+          },
+          "created_at": "2026-05-12 09:33:59"
+        },
+        {
+          "id": 5000,
+          "trade_id": "1f003b2e36d3475a94b53685c4f8e32a",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8688819642857143,
+            "new_value": 0.86888,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-12 09:34:00"
+        },
+        {
+          "id": 5001,
+          "trade_id": "1f003b2e36d3475a94b53685c4f8e32a",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8655760714285714,
+            "new_value": 0.86558,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-12 09:34:00"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.047",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "1f003b2e36d3475a94b53685c4f8e32a",
+        "signal_id": "58ebbeac260b41af8f1129dbaf6dab2f",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.103,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.047",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.8959,
+          "bias_since": "2026-04-26T22:31:03.329213+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.86778,
+          "stop_loss": 0.8688819642857143,
+          "take_profit": 0.8655760714285714
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.047
+          },
+          "entry_price": 0.86768
+        },
+        "entry": {
+          "price": 0.86778,
+          "time": "2026-05-12T09:33:59.983459+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080a7042d"
+        }
+      }
+    },
+    {
       "id": "219cb297f4db481a94b1feff94d9497d",
       "stream": "strategy:carry",
       "instrument": "USD_CHF",
@@ -141,15 +256,15 @@
       "instrument": "USD_CAD",
       "direction": "short",
       "entry_price": 1.36916,
-      "exit_price": null,
+      "exit_price": 1.37064,
       "stop_loss": 1.3703107142857143,
       "take_profit": 1.36686,
       "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": -0.08,
+      "pnl_pips": -14.8,
+      "status": "closed_sl",
       "opened_at": "2026-05-12T02:31:35.111986+00:00",
-      "closed_at": null,
+      "closed_at": "2026-05-12T08:47:01.331",
       "broker_deal_id": "000154c4-000c-111e-0000-000080f2042d",
       "events": [
         {
@@ -212,6 +327,19 @@
             "distance_tp_pips": 27.0
           },
           "created_at": "2026-05-12 07:32:43"
+        },
+        {
+          "id": 5002,
+          "trade_id": "acf21e51405f4862886b473cda45acb5",
+          "event_type": "closed_sl",
+          "data": {
+            "exit_price": 1.37064,
+            "pnl": -0.08,
+            "pnl_pips": -14.8,
+            "actual_close_time": "2026-05-12T08:47:01.331",
+            "detection_time": "2026-05-12T09:34:01.898346+00:00"
+          },
+          "created_at": "2026-05-12 09:34:01"
         }
       ],
       "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.36908, bb_lower=1.36563, bb_mid=1.36736, rsi=75.64, pct_b=1.018",
@@ -267,6 +395,13 @@
           "price": 1.36916,
           "time": "2026-05-12T02:31:35.111986+00:00",
           "broker_deal_id": "000154c4-000c-111e-0000-000080f2042d"
+        },
+        "exit": {
+          "price": 1.37064,
+          "time": "2026-05-12T08:47:01.331",
+          "pnl": -0.08,
+          "pnl_pips": -14.8,
+          "close_reason": null
         }
       },
       "latest_snapshot": {
