@@ -1,6 +1,132 @@
 {
   "trades": [
     {
+      "id": "217633fc709441a289eadcbe44504395",
+      "stream": "strategy:carry",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "entry_price": 0.72559,
+      "exit_price": null,
+      "stop_loss": 0.72697,
+      "take_profit": 0.72284,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-13T19:47:12.431209+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00001544-0055-311e-0000-000080de0f1a",
+      "events": [
+        {
+          "id": 5124,
+          "trade_id": "217633fc709441a289eadcbe44504395",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.72559,
+            "stop_loss": 0.7269673214285713,
+            "take_profit": 0.7228353571428572,
+            "position_size": 161,
+            "broker_deal_id": "00001544-0055-311e-0000-000080de0f1a"
+          },
+          "created_at": "2026-05-13 19:47:12"
+        },
+        {
+          "id": 5125,
+          "trade_id": "217633fc709441a289eadcbe44504395",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.7269673214285713,
+            "new_value": 0.72697,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-13 19:47:13"
+        },
+        {
+          "id": 5126,
+          "trade_id": "217633fc709441a289eadcbe44504395",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.7228353571428572,
+            "new_value": 0.72284,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-13 19:47:13"
+        },
+        {
+          "id": 5127,
+          "trade_id": "217633fc709441a289eadcbe44504395",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 161.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-13 19:47:13"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.037",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "217633fc709441a289eadcbe44504395",
+        "signal_id": "eb5b272cacf14047b4f03b30433fcdd0",
+        "instrument": "AUD_USD",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.143,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.037",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.54,
+          "bias_since": "2026-05-13T03:57:01.202284+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 161,
+          "rejection_reason": null,
+          "entry_price": 0.72559,
+          "stop_loss": 0.7269673214285713,
+          "take_profit": 0.7228353571428572
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.35,
+            "quote_rate": 5.25,
+            "differential": -0.9,
+            "vol_penalty": 0.037
+          },
+          "entry_price": 0.72563
+        },
+        "entry": {
+          "price": 0.72559,
+          "time": "2026-05-13T19:47:12.431209+00:00",
+          "broker_deal_id": "00001544-0055-311e-0000-000080de0f1a"
+        }
+      }
+    },
+    {
       "id": "69470e7ea68f48909f8c497354d7d23f",
       "stream": "llm",
       "instrument": "USD_CHF",
