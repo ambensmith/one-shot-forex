@@ -1,20 +1,168 @@
 {
   "trades": [
     {
+      "id": "a40f4b41dd6c48c088833bca6a971c02",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.86668,
+      "exit_price": null,
+      "stop_loss": 0.86744,
+      "take_profit": 0.86516,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-19T11:58:53.655068+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f",
+      "events": [
+        {
+          "id": 5456,
+          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.86668,
+            "stop_loss": 0.86744125,
+            "take_profit": 0.8651574999999999,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
+          },
+          "created_at": "2026-05-19 11:58:53"
+        },
+        {
+          "id": 5460,
+          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.86744125,
+            "new_value": 0.86744,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-19 11:58:55"
+        },
+        {
+          "id": 5461,
+          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8651574999999999,
+            "new_value": 0.86516,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-19 11:58:55"
+        },
+        {
+          "id": 5463,
+          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.8668,
+            "unrealized_pl": -0.01,
+            "unrealized_pips": -1.2,
+            "distance_sl_pips": 6.4,
+            "distance_tp_pips": 16.4
+          },
+          "created_at": "2026-05-19 14:18:25"
+        },
+        {
+          "id": 5478,
+          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.86574,
+            "unrealized_pl": 0.09,
+            "unrealized_pips": 9.4,
+            "distance_sl_pips": 17.0,
+            "distance_tp_pips": 5.8
+          },
+          "created_at": "2026-05-19 17:17:49"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
+        "signal_id": "546776a7a0b74e2eab55687e26610f69",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.12,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.9046,
+          "bias_since": "2026-05-18T11:03:39.064606+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.86668,
+          "stop_loss": 0.86744125,
+          "take_profit": 0.8651574999999999
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.03
+          },
+          "entry_price": 0.8667400000000001
+        },
+        "entry": {
+          "price": 0.86668,
+          "time": "2026-05-19T11:58:53.655068+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 0.86574,
+        "unrealized_pl": 0.09,
+        "unrealized_pips": 9.4,
+        "distance_sl_pips": 17.0,
+        "distance_tp_pips": 5.8
+      }
+    },
+    {
       "id": "19d47134619e4983abf6a61594b97e43",
       "stream": "llm",
       "instrument": "USD_CAD",
       "direction": "long",
       "entry_price": 1.37715,
-      "exit_price": null,
+      "exit_price": 1.37517,
       "stop_loss": 1.37568,
       "take_profit": 1.38009,
       "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": -0.1,
+      "pnl_pips": -19.8,
+      "status": "closed_sl",
       "opened_at": "2026-05-19T14:59:28.485707+00:00",
-      "closed_at": null,
+      "closed_at": "2026-05-19T16:44:27.263",
       "broker_deal_id": "000154c4-000c-111e-0000-000080f21192",
       "events": [
         {
@@ -62,6 +210,106 @@
             "source": "broker_sync"
           },
           "created_at": "2026-05-19 14:59:29"
+        },
+        {
+          "id": 5474,
+          "trade_id": "19d47134619e4983abf6a61594b97e43",
+          "event_type": "closed_sl",
+          "data": {
+            "exit_price": 1.37517,
+            "pnl": -0.1,
+            "pnl_pips": -19.8,
+            "actual_close_time": "2026-05-19T16:44:27.263",
+            "detection_time": "2026-05-19T17:17:34.419769+00:00"
+          },
+          "created_at": "2026-05-19 17:17:34"
+        },
+        {
+          "id": 5476,
+          "trade_id": "19d47134619e4983abf6a61594b97e43",
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-05-19T17:17:46.877696+00:00",
+            "market_price_at_detection": {
+              "bid": 1.37507,
+              "ask": 1.37527
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-05-19 08:00:00",
+                "o": 1.37497,
+                "h": 1.37606,
+                "l": 1.37496,
+                "c": 1.37603
+              },
+              {
+                "time": "2026-05-19 09:00:00",
+                "o": 1.37604,
+                "h": 1.37665,
+                "l": 1.37596,
+                "c": 1.37639
+              },
+              {
+                "time": "2026-05-19 10:00:00",
+                "o": 1.37641,
+                "h": 1.37721,
+                "l": 1.37603,
+                "c": 1.37624
+              },
+              {
+                "time": "2026-05-19 11:00:00",
+                "o": 1.37622,
+                "h": 1.37628,
+                "l": 1.37438,
+                "c": 1.37524
+              },
+              {
+                "time": "2026-05-19 12:00:00",
+                "o": 1.37526,
+                "h": 1.37742,
+                "l": 1.374555,
+                "c": 1.37652
+              },
+              {
+                "time": "2026-05-19 13:00:00",
+                "o": 1.37653,
+                "h": 1.37702,
+                "l": 1.37596,
+                "c": 1.3765
+              },
+              {
+                "time": "2026-05-19 14:00:00",
+                "o": 1.37651,
+                "h": 1.37723,
+                "l": 1.37582,
+                "c": 1.37706
+              },
+              {
+                "time": "2026-05-19 15:00:00",
+                "o": 1.37705,
+                "h": 1.37715,
+                "l": 1.37558,
+                "c": 1.37561
+              },
+              {
+                "time": "2026-05-19 16:00:00",
+                "o": 1.37559,
+                "h": 1.37618,
+                "l": 1.3747,
+                "c": 1.37493
+              },
+              {
+                "time": "2026-05-19 17:00:00",
+                "o": 1.37492,
+                "h": 1.37518,
+                "l": 1.37482,
+                "c": 1.37513
+              }
+            ],
+            "atr_14": 0.001193,
+            "trade_duration_hours": 2.3
+          },
+          "created_at": "2026-05-19 17:17:47"
         }
       ],
       "reasoning": "The recent news and market context suggest a bullish outlook for USD/CAD. The US-China trade truce uncertainty and potential tariffs may strengthen the USD. Additionally, the slump in oil prices could negatively impact the CAD, as Canada is a significant oil exporter. The Bank of America survey indicating a low probability of a hard landing also supports a positive USD outlook. However, the evidence is not overwhelming, and some headlines have ambiguous implications.",
@@ -178,7 +426,95 @@
           "price": 1.37715,
           "time": "2026-05-19T14:59:28.485707+00:00",
           "broker_deal_id": "000154c4-000c-111e-0000-000080f21192"
+        },
+        "exit": {
+          "price": 1.37517,
+          "time": "2026-05-19T16:44:27.263",
+          "pnl": -0.1,
+          "pnl_pips": -19.8,
+          "close_reason": null
         }
+      },
+      "close_context": {
+        "detection_time": "2026-05-19T17:17:46.877696+00:00",
+        "market_price_at_detection": {
+          "bid": 1.37507,
+          "ask": 1.37527
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-05-19 08:00:00",
+            "o": 1.37497,
+            "h": 1.37606,
+            "l": 1.37496,
+            "c": 1.37603
+          },
+          {
+            "time": "2026-05-19 09:00:00",
+            "o": 1.37604,
+            "h": 1.37665,
+            "l": 1.37596,
+            "c": 1.37639
+          },
+          {
+            "time": "2026-05-19 10:00:00",
+            "o": 1.37641,
+            "h": 1.37721,
+            "l": 1.37603,
+            "c": 1.37624
+          },
+          {
+            "time": "2026-05-19 11:00:00",
+            "o": 1.37622,
+            "h": 1.37628,
+            "l": 1.37438,
+            "c": 1.37524
+          },
+          {
+            "time": "2026-05-19 12:00:00",
+            "o": 1.37526,
+            "h": 1.37742,
+            "l": 1.374555,
+            "c": 1.37652
+          },
+          {
+            "time": "2026-05-19 13:00:00",
+            "o": 1.37653,
+            "h": 1.37702,
+            "l": 1.37596,
+            "c": 1.3765
+          },
+          {
+            "time": "2026-05-19 14:00:00",
+            "o": 1.37651,
+            "h": 1.37723,
+            "l": 1.37582,
+            "c": 1.37706
+          },
+          {
+            "time": "2026-05-19 15:00:00",
+            "o": 1.37705,
+            "h": 1.37715,
+            "l": 1.37558,
+            "c": 1.37561
+          },
+          {
+            "time": "2026-05-19 16:00:00",
+            "o": 1.37559,
+            "h": 1.37618,
+            "l": 1.3747,
+            "c": 1.37493
+          },
+          {
+            "time": "2026-05-19 17:00:00",
+            "o": 1.37492,
+            "h": 1.37518,
+            "l": 1.37482,
+            "c": 1.37513
+          }
+        ],
+        "atr_14": 0.001193,
+        "trade_duration_hours": 2.3
       }
     },
     {
@@ -187,15 +523,15 @@
       "instrument": "USD_CHF",
       "direction": "long",
       "entry_price": 0.79043,
-      "exit_price": null,
+      "exit_price": 0.78869,
       "stop_loss": 0.78912,
       "take_profit": 0.7930592857142855,
       "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": -0.15,
+      "pnl_pips": -17.4,
+      "status": "closed_sl",
       "opened_at": "2026-05-19T14:59:27.804771+00:00",
-      "closed_at": null,
+      "closed_at": "2026-05-19T17:27:39.026",
       "broker_deal_id": "000154c4-000c-819e-0000-000080cb031c",
       "events": [
         {
@@ -232,6 +568,106 @@
             "source": "broker_sync"
           },
           "created_at": "2026-05-19 14:59:29"
+        },
+        {
+          "id": 5475,
+          "trade_id": "2d704fb5ce374da9990db6ef5683a867",
+          "event_type": "closed_sl",
+          "data": {
+            "exit_price": 0.78869,
+            "pnl": -0.15,
+            "pnl_pips": -17.4,
+            "actual_close_time": "2026-05-19T17:27:39.026",
+            "detection_time": "2026-05-19T17:17:36.284278+00:00"
+          },
+          "created_at": "2026-05-19 17:17:36"
+        },
+        {
+          "id": 5477,
+          "trade_id": "2d704fb5ce374da9990db6ef5683a867",
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-05-19T17:17:47.845861+00:00",
+            "market_price_at_detection": {
+              "bid": 0.78863,
+              "ask": 0.78875
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-05-19 08:00:00",
+                "o": 0.785265,
+                "h": 0.787055,
+                "l": 0.78513,
+                "c": 0.78687
+              },
+              {
+                "time": "2026-05-19 09:00:00",
+                "o": 0.786875,
+                "h": 0.787485,
+                "l": 0.786845,
+                "c": 0.787155
+              },
+              {
+                "time": "2026-05-19 10:00:00",
+                "o": 0.78715,
+                "h": 0.788015,
+                "l": 0.78664,
+                "c": 0.78701
+              },
+              {
+                "time": "2026-05-19 11:00:00",
+                "o": 0.787005,
+                "h": 0.78771,
+                "l": 0.786965,
+                "c": 0.78766
+              },
+              {
+                "time": "2026-05-19 12:00:00",
+                "o": 0.787695,
+                "h": 0.787885,
+                "l": 0.787135,
+                "c": 0.78787
+              },
+              {
+                "time": "2026-05-19 13:00:00",
+                "o": 0.787895,
+                "h": 0.789625,
+                "l": 0.787845,
+                "c": 0.78894
+              },
+              {
+                "time": "2026-05-19 14:00:00",
+                "o": 0.788945,
+                "h": 0.79065,
+                "l": 0.78887,
+                "c": 0.79049
+              },
+              {
+                "time": "2026-05-19 15:00:00",
+                "o": 0.790475,
+                "h": 0.790485,
+                "l": 0.78951,
+                "c": 0.78972
+              },
+              {
+                "time": "2026-05-19 16:00:00",
+                "o": 0.789715,
+                "h": 0.790185,
+                "l": 0.788625,
+                "c": 0.78897
+              },
+              {
+                "time": "2026-05-19 17:00:00",
+                "o": 0.788975,
+                "h": 0.78898,
+                "l": 0.78856,
+                "c": 0.78858
+              }
+            ],
+            "atr_14": 0.00111,
+            "trade_duration_hours": 2.3
+          },
+          "created_at": "2026-05-19 17:17:48"
         }
       ],
       "reasoning": "The recent headlines suggest a decrease in geopolitical tensions which could lead to a decrease in safe-haven demand for the CHF, thereby strengthening the USD/CHF pair. The oil price slump following Trump's decision to call off the attack on Iran reduces the risk premium that had been supporting safe-haven currencies like the CHF. Multiple sources confirm the impact of these events on oil prices and global market sentiment.",
@@ -314,142 +750,95 @@
           "price": 0.79043,
           "time": "2026-05-19T14:59:27.804771+00:00",
           "broker_deal_id": "000154c4-000c-819e-0000-000080cb031c"
-        }
-      }
-    },
-    {
-      "id": "a40f4b41dd6c48c088833bca6a971c02",
-      "stream": "strategy:carry",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "entry_price": 0.86668,
-      "exit_price": null,
-      "stop_loss": 0.86744,
-      "take_profit": 0.86516,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-05-19T11:58:53.655068+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f",
-      "events": [
-        {
-          "id": 5456,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.86668,
-            "stop_loss": 0.86744125,
-            "take_profit": 0.8651574999999999,
-            "position_size": 100,
-            "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
-          },
-          "created_at": "2026-05-19 11:58:53"
         },
-        {
-          "id": 5460,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.86744125,
-            "new_value": 0.86744,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5461,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.8651574999999999,
-            "new_value": 0.86516,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5463,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8668,
-            "unrealized_pl": -0.01,
-            "unrealized_pips": -1.2,
-            "distance_sl_pips": 6.4,
-            "distance_tp_pips": 16.4
-          },
-          "created_at": "2026-05-19 14:18:25"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-        "signal_id": "546776a7a0b74e2eab55687e26610f69",
-        "instrument": "EUR_GBP",
-        "direction": "short",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.12,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.9046,
-          "bias_since": "2026-05-18T11:03:39.064606+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 0.86668,
-          "stop_loss": 0.86744125,
-          "take_profit": 0.8651574999999999
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 4.5,
-            "quote_rate": 5.25,
-            "differential": -0.75,
-            "vol_penalty": 0.03
-          },
-          "entry_price": 0.8667400000000001
-        },
-        "entry": {
-          "price": 0.86668,
-          "time": "2026-05-19T11:58:53.655068+00:00",
-          "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
+        "exit": {
+          "price": 0.78869,
+          "time": "2026-05-19T17:27:39.026",
+          "pnl": -0.15,
+          "pnl_pips": -17.4,
+          "close_reason": null
         }
       },
-      "latest_snapshot": {
-        "current_price": 0.8668,
-        "unrealized_pl": -0.01,
-        "unrealized_pips": -1.2,
-        "distance_sl_pips": 6.4,
-        "distance_tp_pips": 16.4
+      "close_context": {
+        "detection_time": "2026-05-19T17:17:47.845861+00:00",
+        "market_price_at_detection": {
+          "bid": 0.78863,
+          "ask": 0.78875
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-05-19 08:00:00",
+            "o": 0.785265,
+            "h": 0.787055,
+            "l": 0.78513,
+            "c": 0.78687
+          },
+          {
+            "time": "2026-05-19 09:00:00",
+            "o": 0.786875,
+            "h": 0.787485,
+            "l": 0.786845,
+            "c": 0.787155
+          },
+          {
+            "time": "2026-05-19 10:00:00",
+            "o": 0.78715,
+            "h": 0.788015,
+            "l": 0.78664,
+            "c": 0.78701
+          },
+          {
+            "time": "2026-05-19 11:00:00",
+            "o": 0.787005,
+            "h": 0.78771,
+            "l": 0.786965,
+            "c": 0.78766
+          },
+          {
+            "time": "2026-05-19 12:00:00",
+            "o": 0.787695,
+            "h": 0.787885,
+            "l": 0.787135,
+            "c": 0.78787
+          },
+          {
+            "time": "2026-05-19 13:00:00",
+            "o": 0.787895,
+            "h": 0.789625,
+            "l": 0.787845,
+            "c": 0.78894
+          },
+          {
+            "time": "2026-05-19 14:00:00",
+            "o": 0.788945,
+            "h": 0.79065,
+            "l": 0.78887,
+            "c": 0.79049
+          },
+          {
+            "time": "2026-05-19 15:00:00",
+            "o": 0.790475,
+            "h": 0.790485,
+            "l": 0.78951,
+            "c": 0.78972
+          },
+          {
+            "time": "2026-05-19 16:00:00",
+            "o": 0.789715,
+            "h": 0.790185,
+            "l": 0.788625,
+            "c": 0.78897
+          },
+          {
+            "time": "2026-05-19 17:00:00",
+            "o": 0.788975,
+            "h": 0.78898,
+            "l": 0.78856,
+            "c": 0.78858
+          }
+        ],
+        "atr_14": 0.00111,
+        "trade_duration_hours": 2.3
       }
     },
     {
