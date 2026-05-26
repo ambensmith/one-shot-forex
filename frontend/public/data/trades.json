@@ -1,6 +1,103 @@
 {
   "trades": [
     {
+      "id": "b0abfd5537b14ac29ee6f71faa110bf5",
+      "stream": "strategy:volatility_breakout",
+      "instrument": "EUR_USD",
+      "direction": "short",
+      "entry_price": 1.163085,
+      "exit_price": null,
+      "stop_loss": 1.16387,
+      "take_profit": 1.1615196428571426,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-05-26T04:59:19.942623+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-0055-311e-0000-000081ee156e",
+      "events": [
+        {
+          "id": 5806,
+          "trade_id": "b0abfd5537b14ac29ee6f71faa110bf5",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.163085,
+            "stop_loss": 1.1638676785714286,
+            "take_profit": 1.1615196428571426,
+            "position_size": 100,
+            "broker_deal_id": "00005552-0055-311e-0000-000081ee156e"
+          },
+          "created_at": "2026-05-26 04:59:19"
+        },
+        {
+          "id": 5807,
+          "trade_id": "b0abfd5537b14ac29ee6f71faa110bf5",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.1638676785714286,
+            "new_value": 1.16387,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-05-26 04:59:20"
+        }
+      ],
+      "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00053, avg_atr=0.00081, atr_ratio=0.65, recent_high=1.16475, recent_low=1.16304, contracted=True",
+      "source": "strategy:volatility_breakout",
+      "record": {
+        "trade_id": "b0abfd5537b14ac29ee6f71faa110bf5",
+        "signal_id": "4beef7027a2847a3ba730494715accb3",
+        "instrument": "EUR_USD",
+        "direction": "short",
+        "source": "strategy:volatility_breakout",
+        "signal": {
+          "confidence": 0.403,
+          "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00053, avg_atr=0.00081, atr_ratio=0.65, recent_high=1.16475, recent_low=1.16304, contracted=True",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.6532,
+          "bias_since": "2026-05-14T13:39:11.353960+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 1.163085,
+          "stop_loss": 1.1638676785714286,
+          "take_profit": 1.1615196428571426
+        },
+        "metadata": {
+          "parameters": {
+            "atr_period": 14,
+            "atr_contraction_threshold": 0.7,
+            "breakout_atr_multiplier": 1.0
+          },
+          "indicators": {
+            "atr": 0.00053,
+            "avg_atr": 0.00081,
+            "atr_ratio": 0.65,
+            "recent_high": 1.16475,
+            "recent_low": 1.16304,
+            "contracted": true
+          },
+          "entry_price": 1.163135
+        },
+        "entry": {
+          "price": 1.163085,
+          "time": "2026-05-26T04:59:19.942623+00:00",
+          "broker_deal_id": "00005552-0055-311e-0000-000081ee156e"
+        }
+      }
+    },
+    {
       "id": "9e911f14b0444b37ab754e66af89f298",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
@@ -71231,292 +71328,6 @@
           }
         ],
         "atr_14": 0.001149,
-        "trade_duration_hours": 0.7
-      }
-    },
-    {
-      "id": "b78042917c684f6e94176312cb2c2c4e",
-      "stream": "strategy:mean_reversion",
-      "instrument": "EUR_USD",
-      "direction": "long",
-      "entry_price": 1.1740949999999999,
-      "exit_price": 1.173945,
-      "stop_loss": 1.1727396428571428,
-      "take_profit": 1.17681,
-      "position_size": 100.0,
-      "pnl": -0.12,
-      "pnl_pips": -1.5,
-      "status": "closed_reconciled",
-      "opened_at": "2026-04-21T16:55:42.835079+00:00",
-      "closed_at": "2026-04-21T18:12:00.791",
-      "broker_deal_id": "00005552-0055-311e-0000-000081e5e231",
-      "events": [
-        {
-          "id": 3620,
-          "trade_id": "b78042917c684f6e94176312cb2c2c4e",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.1740949999999999,
-            "stop_loss": 1.1727396428571428,
-            "take_profit": 1.176805714285714,
-            "position_size": 100,
-            "broker_deal_id": "00005552-0055-311e-0000-000081e5e231"
-          },
-          "created_at": "2026-04-21 16:55:42"
-        },
-        {
-          "id": 3625,
-          "trade_id": "b78042917c684f6e94176312cb2c2c4e",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.176805714285714,
-            "new_value": 1.17681,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-04-21 16:55:44"
-        },
-        {
-          "id": 3627,
-          "trade_id": "b78042917c684f6e94176312cb2c2c4e",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 1.173945,
-            "pnl": -0.12,
-            "pnl_pips": -1.5,
-            "actual_close_time": "2026-04-21T18:12:00.791",
-            "detection_time": "2026-04-21T17:39:32.691516+00:00"
-          },
-          "created_at": "2026-04-21 17:39:32"
-        },
-        {
-          "id": 3629,
-          "trade_id": "b78042917c684f6e94176312cb2c2c4e",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-04-21T17:39:39.478230+00:00",
-            "market_price_at_detection": {
-              "bid": 1.17394,
-              "ask": 1.17401
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-04-21 08:00:00",
-                "o": 1.176445,
-                "h": 1.176695,
-                "l": 1.175705,
-                "c": 1.176525
-              },
-              {
-                "time": "2026-04-21 09:00:00",
-                "o": 1.176535,
-                "h": 1.176535,
-                "l": 1.175665,
-                "c": 1.175965
-              },
-              {
-                "time": "2026-04-21 10:00:00",
-                "o": 1.175975,
-                "h": 1.176155,
-                "l": 1.175665,
-                "c": 1.176115
-              },
-              {
-                "time": "2026-04-21 11:00:00",
-                "o": 1.176125,
-                "h": 1.176865,
-                "l": 1.175635,
-                "c": 1.176725
-              },
-              {
-                "time": "2026-04-21 12:00:00",
-                "o": 1.176735,
-                "h": 1.176835,
-                "l": 1.175415,
-                "c": 1.175925
-              },
-              {
-                "time": "2026-04-21 13:00:00",
-                "o": 1.175935,
-                "h": 1.177155,
-                "l": 1.175795,
-                "c": 1.176585
-              },
-              {
-                "time": "2026-04-21 14:00:00",
-                "o": 1.17663,
-                "h": 1.177615,
-                "l": 1.175205,
-                "c": 1.175255
-              },
-              {
-                "time": "2026-04-21 15:00:00",
-                "o": 1.175245,
-                "h": 1.175985,
-                "l": 1.174125,
-                "c": 1.175155
-              },
-              {
-                "time": "2026-04-21 16:00:00",
-                "o": 1.175165,
-                "h": 1.175575,
-                "l": 1.174055,
-                "c": 1.174165
-              },
-              {
-                "time": "2026-04-21 17:00:00",
-                "o": 1.174155,
-                "h": 1.174235,
-                "l": 1.172035,
-                "c": 1.173525
-              }
-            ],
-            "atr_14": 0.001325,
-            "trade_duration_hours": 0.7
-          },
-          "created_at": "2026-04-21 17:39:40"
-        }
-      ],
-      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.17955, bb_lower=1.17452, bb_mid=1.17704, rsi=25.96, pct_b=-0.038",
-      "source": "strategy:mean_reversion",
-      "record": {
-        "trade_id": "b78042917c684f6e94176312cb2c2c4e",
-        "signal_id": "0aae48f5a1b5449ab1f1b81c40334f5a",
-        "instrument": "EUR_USD",
-        "direction": "long",
-        "source": "strategy:mean_reversion",
-        "signal": {
-          "confidence": 0.895,
-          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.17955, bb_lower=1.17452, bb_mid=1.17704, rsi=25.96, pct_b=-0.038",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 0.801,
-          "bias_since": "2026-04-19T23:29:51.530804+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.1740949999999999,
-          "stop_loss": 1.1727396428571428,
-          "take_profit": 1.176805714285714
-        },
-        "metadata": {
-          "parameters": {
-            "bb_period": 20,
-            "bb_std": 2.0,
-            "rsi_period": 14,
-            "rsi_oversold": 30,
-            "rsi_overbought": 70
-          },
-          "indicators": {
-            "bb_upper": 1.17955,
-            "bb_lower": 1.17452,
-            "bb_mid": 1.17704,
-            "rsi": 25.96,
-            "pct_b": -0.038
-          },
-          "entry_price": 1.174325
-        },
-        "entry": {
-          "price": 1.1740949999999999,
-          "time": "2026-04-21T16:55:42.835079+00:00",
-          "broker_deal_id": "00005552-0055-311e-0000-000081e5e231"
-        },
-        "exit": {
-          "price": 1.173945,
-          "time": "2026-04-21T18:12:00.791",
-          "pnl": -0.12,
-          "pnl_pips": -1.5,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-04-21T17:39:39.478230+00:00",
-        "market_price_at_detection": {
-          "bid": 1.17394,
-          "ask": 1.17401
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-04-21 08:00:00",
-            "o": 1.176445,
-            "h": 1.176695,
-            "l": 1.175705,
-            "c": 1.176525
-          },
-          {
-            "time": "2026-04-21 09:00:00",
-            "o": 1.176535,
-            "h": 1.176535,
-            "l": 1.175665,
-            "c": 1.175965
-          },
-          {
-            "time": "2026-04-21 10:00:00",
-            "o": 1.175975,
-            "h": 1.176155,
-            "l": 1.175665,
-            "c": 1.176115
-          },
-          {
-            "time": "2026-04-21 11:00:00",
-            "o": 1.176125,
-            "h": 1.176865,
-            "l": 1.175635,
-            "c": 1.176725
-          },
-          {
-            "time": "2026-04-21 12:00:00",
-            "o": 1.176735,
-            "h": 1.176835,
-            "l": 1.175415,
-            "c": 1.175925
-          },
-          {
-            "time": "2026-04-21 13:00:00",
-            "o": 1.175935,
-            "h": 1.177155,
-            "l": 1.175795,
-            "c": 1.176585
-          },
-          {
-            "time": "2026-04-21 14:00:00",
-            "o": 1.17663,
-            "h": 1.177615,
-            "l": 1.175205,
-            "c": 1.175255
-          },
-          {
-            "time": "2026-04-21 15:00:00",
-            "o": 1.175245,
-            "h": 1.175985,
-            "l": 1.174125,
-            "c": 1.175155
-          },
-          {
-            "time": "2026-04-21 16:00:00",
-            "o": 1.175165,
-            "h": 1.175575,
-            "l": 1.174055,
-            "c": 1.174165
-          },
-          {
-            "time": "2026-04-21 17:00:00",
-            "o": 1.174155,
-            "h": 1.174235,
-            "l": 1.172035,
-            "c": 1.173525
-          }
-        ],
-        "atr_14": 0.001325,
         "trade_duration_hours": 0.7
       }
     }
