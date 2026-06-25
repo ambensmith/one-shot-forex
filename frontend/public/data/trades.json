@@ -1,163 +1,233 @@
 {
   "trades": [
     {
-      "id": "e26c071184ec4529b32401a0280d9b7a",
-      "stream": "llm",
-      "instrument": "USD_CAD",
-      "direction": "long",
-      "entry_price": 1.42058,
+      "id": "d476748c40744f509b3625d72908d55b",
+      "stream": "strategy:carry",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "entry_price": 0.6917800000000001,
       "exit_price": null,
-      "stop_loss": 1.41886,
-      "take_profit": 1.4240107142857144,
+      "stop_loss": 0.6934792857142857,
+      "take_profit": 0.68838,
       "position_size": 100.0,
       "pnl": null,
       "pnl_pips": null,
       "status": "open",
-      "opened_at": "2026-06-25T14:14:02.145538+00:00",
+      "opened_at": "2026-06-25T17:08:47.908970+00:00",
       "closed_at": null,
-      "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37",
+      "broker_deal_id": "00001544-0055-311e-0000-000080fc2d8f",
       "events": [
         {
-          "id": 7263,
-          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "id": 7284,
+          "trade_id": "d476748c40744f509b3625d72908d55b",
           "event_type": "opened",
           "data": {
-            "entry_price": 1.42058,
-            "stop_loss": 1.4188646428571428,
-            "take_profit": 1.4240107142857144,
-            "position_size": 114,
-            "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37"
+            "entry_price": 0.6917800000000001,
+            "stop_loss": 0.6934792857142857,
+            "take_profit": 0.6883814285714287,
+            "position_size": 164,
+            "broker_deal_id": "00001544-0055-311e-0000-000080fc2d8f"
           },
-          "created_at": "2026-06-25 14:14:02"
+          "created_at": "2026-06-25 17:08:47"
         },
         {
-          "id": 7264,
-          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
-          "event_type": "sl_updated",
+          "id": 7285,
+          "trade_id": "d476748c40744f509b3625d72908d55b",
+          "event_type": "tp_updated",
           "data": {
-            "old_value": 1.4188646428571428,
-            "new_value": 1.41886,
+            "old_value": 0.6883814285714287,
+            "new_value": 0.68838,
             "source": "broker_sync"
           },
-          "created_at": "2026-06-25 14:14:03"
+          "created_at": "2026-06-25 17:08:48"
         },
         {
-          "id": 7265,
-          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "id": 7286,
+          "trade_id": "d476748c40744f509b3625d72908d55b",
           "event_type": "size_adjusted",
           "data": {
-            "old_value": 114.0,
+            "old_value": 164.0,
             "new_value": 100.0,
             "source": "broker_sync"
           },
-          "created_at": "2026-06-25 14:14:03"
-        },
-        {
-          "id": 7279,
-          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.41923,
-            "unrealized_pl": -0.13,
-            "unrealized_pips": -13.5,
-            "distance_sl_pips": 3.7,
-            "distance_tp_pips": 47.8
-          },
-          "created_at": "2026-06-25 15:58:53"
+          "created_at": "2026-06-25 17:08:48"
         }
       ],
-      "reasoning": "The recent news and market context suggest a positive outlook for the USD/CAD pair. The strong opening of US stocks, led by Micron's earnings beat and guidance raise, is likely to support the US dollar. Additionally, the Federal Reserve's stress test results, which indicate that US banks can withstand significant losses, also support the USD. The earthquake in Venezuela and its potential economic impact may weigh on the CAD, further supporting the USD/CAD pair. However, the evidence is not overwhelming, and the recent trend has been ranging, which justifies a moderate confidence level.",
-      "source": "llm",
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.055",
+      "source": "strategy:carry",
       "record": {
-        "trade_id": "e26c071184ec4529b32401a0280d9b7a",
-        "signal_id": "f06e9824f4014b8ab5606bb11e84ab0b",
-        "instrument": "USD_CAD",
-        "direction": "long",
-        "source": "llm",
+        "trade_id": "d476748c40744f509b3625d72908d55b",
+        "signal_id": "3a1a44d5345d44c3bfd0c104b099e3a7",
+        "instrument": "AUD_USD",
+        "direction": "short",
+        "source": "strategy:carry",
         "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent news and market context suggest a positive outlook for the USD/CAD pair. The strong opening of US stocks, led by Micron's earnings beat and guidance raise, is likely to support the US dollar. Additionally, the Federal Reserve's stress test results, which indicate that US banks can withstand significant losses, also support the USD. The earthquake in Venezuela and its potential economic impact may weigh on the CAD, further supporting the USD/CAD pair. However, the evidence is not overwhelming, and the recent trend has been ranging, which justifies a moderate confidence level.",
-          "key_factors": [
-            "US stock market performance",
-            "Federal Reserve's stress test results",
-            "Venezuela earthquake and potential economic impact",
-            "Micron's earnings beat and guidance raise"
-          ],
-          "risk_factors": [
-            "Changes in global market sentiment",
-            "Unexpected economic data releases",
-            "Central bank interventions or policy changes"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
+          "confidence": 0.125,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.055",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
         },
-        "challenge": {
-          "counter_argument": "The strongest argument against this direction is that the positive factors cited (US stock market performance, Federal Reserve's stress test results, Venezuela earthquake) may already be priced into the market, given that the recent trend has been ranging. Moreover, the earthquake's impact on Venezuela's economy may have limited spillover effects on the CAD, and the stress test results were largely expected. Additionally, Micron's earnings beat and guidance raise may not be representative of the broader US economic landscape.",
-          "alternative_interpretation": "An alternative interpretation is that the recent US stock market performance and Micron's earnings beat may be driven by short-term factors, such as technical buying or optimism about a specific sector, rather than a fundamental shift in the US economy. Furthermore, the stress test results, while positive, do not necessarily imply a more dovish Federal Reserve stance, which could limit the USD's upside potential. The CAD, on the other hand, may benefit from a potential rebound in oil prices or improved trade relations with China.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this direction is that the positive factors cited (US stock market performance, Federal Reserve's stress test results, Venezuela earthquake) may already be priced into the market, given that the recent trend has been ranging. Moreover, the earthquake's impact on Venezuela's economy may have limited spillover effects on the CAD, and the stress test results were largely expected. Additionally, Micron's earnings beat and guidance raise may not be representative of the broader US economic landscape.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the recent US stock market performance and Micron's earnings beat may be driven by short-term factors, such as technical buying or optimism about a specific sector, rather than a fundamental shift in the US economy. Furthermore, the stress test results, while positive, do not necessarily imply a more dovish Federal Reserve stance, which could limit the USD's upside potential. The CAD, on the other hand, may benefit from a potential rebound in oil prices or improved trade relations with China.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "56c9f2b289c84e3a96d059bafe4f2f56",
-          "68dfe634c00d431daede51e6e27f9e20",
-          "14a55f7db55646178bac98d22c248466",
-          "79bd05b5bfd2444ebf66904a8197a41c",
-          "206a52af7e1742e1b38abb79fc1dbab8",
-          "206a52af7e1742e1b38abb79fc1dbab8",
-          "206a52af7e1742e1b38abb79fc1dbab8",
-          "e498efe66eec438aaa19b3a86f3618c0",
-          "e498efe66eec438aaa19b3a86f3618c0",
-          "e498efe66eec438aaa19b3a86f3618c0",
-          "2db7ddac0a1b49ffadea89bbdae5df92",
-          "2db7ddac0a1b49ffadea89bbdae5df92",
-          "4ca4f5aad8574e32ab7c79ac43ab694a",
-          "4ca4f5aad8574e32ab7c79ac43ab694a",
-          "f50e1ba8ec174c318b2e17059ad0e3ea",
-          "2dd5206d2ef94bb3b6f9f0258e882d59",
-          "2dd5206d2ef94bb3b6f9f0258e882d59",
-          "2dd5206d2ef94bb3b6f9f0258e882d59",
-          "2dd5206d2ef94bb3b6f9f0258e882d59",
-          "acd6b32f293a4be9b4ab6e7bab3c1174",
-          "22f728737e024c3983dfb17fd28141d8",
-          "f5808182f376409a8133b78b4de64cb2",
-          "f5808182f376409a8133b78b4de64cb2",
-          "f5808182f376409a8133b78b4de64cb2",
-          "3915b5331bc441c0b89aba6f4a84fa8c"
-        ],
-        "price_context": {
-          "current_price": 1.42068,
-          "daily_change_pct": -0.2781,
-          "trend": "ranging"
-        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
         "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 1.0,
-          "bias_since": "2026-06-17T20:06:15.910287+00:00"
+          "direction": "bearish",
+          "strength": 0.7917,
+          "bias_since": "2026-06-19T13:34:59.964914+00:00"
         },
         "risk_decision": {
           "approved": true,
-          "position_size": 114,
+          "position_size": 164,
           "rejection_reason": null,
-          "entry_price": 1.42058,
-          "stop_loss": 1.4188646428571428,
-          "take_profit": 1.4240107142857144
+          "entry_price": 0.6917800000000001,
+          "stop_loss": 0.6934792857142857,
+          "take_profit": 0.6883814285714287
         },
-        "metadata": null,
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.35,
+            "quote_rate": 5.25,
+            "differential": -0.9,
+            "vol_penalty": 0.055
+          },
+          "entry_price": 0.69167
+        },
         "entry": {
-          "price": 1.42058,
-          "time": "2026-06-25T14:14:02.145538+00:00",
-          "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37"
+          "price": 0.6917800000000001,
+          "time": "2026-06-25T17:08:47.908970+00:00",
+          "broker_deal_id": "00001544-0055-311e-0000-000080fc2d8f"
         }
-      },
-      "latest_snapshot": {
-        "current_price": 1.41923,
-        "unrealized_pl": -0.13,
-        "unrealized_pips": -13.5,
-        "distance_sl_pips": 3.7,
-        "distance_tp_pips": 47.8
+      }
+    },
+    {
+      "id": "60b566c029134332a50f3a0adef3528e",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.86149,
+      "exit_price": null,
+      "stop_loss": 0.86218,
+      "take_profit": 0.86012,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-06-25T17:08:47.040132+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080b30566",
+      "events": [
+        {
+          "id": 7283,
+          "trade_id": "60b566c029134332a50f3a0adef3528e",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.86149,
+            "stop_loss": 0.86217625,
+            "take_profit": 0.8601175,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080b30566"
+          },
+          "created_at": "2026-06-25 17:08:47"
+        },
+        {
+          "id": 7287,
+          "trade_id": "60b566c029134332a50f3a0adef3528e",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.86217625,
+            "new_value": 0.86218,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-25 17:08:48"
+        },
+        {
+          "id": 7288,
+          "trade_id": "60b566c029134332a50f3a0adef3528e",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8601175,
+            "new_value": 0.86012,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-25 17:08:48"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.01",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "60b566c029134332a50f3a0adef3528e",
+        "signal_id": "510f5ad5a7ba4e5b9e52981eeb55f24b",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.14,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.01",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 1.0,
+          "bias_since": "2026-06-19T20:26:09.377355+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.86149,
+          "stop_loss": 0.86217625,
+          "take_profit": 0.8601175
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.01
+          },
+          "entry_price": 0.86144
+        },
+        "entry": {
+          "price": 0.86149,
+          "time": "2026-06-25T17:08:47.040132+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080b30566"
+        }
       }
     },
     {
@@ -480,20 +550,200 @@
       }
     },
     {
+      "id": "e26c071184ec4529b32401a0280d9b7a",
+      "stream": "llm",
+      "instrument": "USD_CAD",
+      "direction": "long",
+      "entry_price": 1.42058,
+      "exit_price": 1.41902,
+      "stop_loss": 1.41886,
+      "take_profit": 1.4240107142857144,
+      "position_size": 100.0,
+      "pnl": -0.11,
+      "pnl_pips": -15.6,
+      "status": "closed_reconciled",
+      "opened_at": "2026-06-25T14:14:02.145538+00:00",
+      "closed_at": "2026-06-25T17:00:33.523",
+      "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37",
+      "events": [
+        {
+          "id": 7263,
+          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.42058,
+            "stop_loss": 1.4188646428571428,
+            "take_profit": 1.4240107142857144,
+            "position_size": 114,
+            "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37"
+          },
+          "created_at": "2026-06-25 14:14:02"
+        },
+        {
+          "id": 7264,
+          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 1.4188646428571428,
+            "new_value": 1.41886,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-25 14:14:03"
+        },
+        {
+          "id": 7265,
+          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 114.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-25 14:14:03"
+        },
+        {
+          "id": 7279,
+          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 1.41923,
+            "unrealized_pl": -0.13,
+            "unrealized_pips": -13.5,
+            "distance_sl_pips": 3.7,
+            "distance_tp_pips": 47.8
+          },
+          "created_at": "2026-06-25 15:58:53"
+        },
+        {
+          "id": 7289,
+          "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 1.41902,
+            "pnl": -0.11,
+            "pnl_pips": -15.6,
+            "actual_close_time": "2026-06-25T17:00:33.523",
+            "detection_time": "2026-06-25T17:08:50.346831+00:00"
+          },
+          "created_at": "2026-06-25 17:08:50"
+        }
+      ],
+      "reasoning": "The recent news and market context suggest a positive outlook for the USD/CAD pair. The strong opening of US stocks, led by Micron's earnings beat and guidance raise, is likely to support the US dollar. Additionally, the Federal Reserve's stress test results, which indicate that US banks can withstand significant losses, also support the USD. The earthquake in Venezuela and its potential economic impact may weigh on the CAD, further supporting the USD/CAD pair. However, the evidence is not overwhelming, and the recent trend has been ranging, which justifies a moderate confidence level.",
+      "source": "llm",
+      "record": {
+        "trade_id": "e26c071184ec4529b32401a0280d9b7a",
+        "signal_id": "f06e9824f4014b8ab5606bb11e84ab0b",
+        "instrument": "USD_CAD",
+        "direction": "long",
+        "source": "llm",
+        "signal": {
+          "confidence": 0.4,
+          "reasoning": "The recent news and market context suggest a positive outlook for the USD/CAD pair. The strong opening of US stocks, led by Micron's earnings beat and guidance raise, is likely to support the US dollar. Additionally, the Federal Reserve's stress test results, which indicate that US banks can withstand significant losses, also support the USD. The earthquake in Venezuela and its potential economic impact may weigh on the CAD, further supporting the USD/CAD pair. However, the evidence is not overwhelming, and the recent trend has been ranging, which justifies a moderate confidence level.",
+          "key_factors": [
+            "US stock market performance",
+            "Federal Reserve's stress test results",
+            "Venezuela earthquake and potential economic impact",
+            "Micron's earnings beat and guidance raise"
+          ],
+          "risk_factors": [
+            "Changes in global market sentiment",
+            "Unexpected economic data releases",
+            "Central bank interventions or policy changes"
+          ],
+          "prompt_version": "signal_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        "challenge": {
+          "counter_argument": "The strongest argument against this direction is that the positive factors cited (US stock market performance, Federal Reserve's stress test results, Venezuela earthquake) may already be priced into the market, given that the recent trend has been ranging. Moreover, the earthquake's impact on Venezuela's economy may have limited spillover effects on the CAD, and the stress test results were largely expected. Additionally, Micron's earnings beat and guidance raise may not be representative of the broader US economic landscape.",
+          "alternative_interpretation": "An alternative interpretation is that the recent US stock market performance and Micron's earnings beat may be driven by short-term factors, such as technical buying or optimism about a specific sector, rather than a fundamental shift in the US economy. Furthermore, the stress test results, while positive, do not necessarily imply a more dovish Federal Reserve stance, which could limit the USD's upside potential. The CAD, on the other hand, may benefit from a potential rebound in oil prices or improved trade relations with China.",
+          "conviction_after_challenge": 0.4,
+          "recommendation": "reduce_size",
+          "prompt_version": "challenge_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this direction is that the positive factors cited (US stock market performance, Federal Reserve's stress test results, Venezuela earthquake) may already be priced into the market, given that the recent trend has been ranging. Moreover, the earthquake's impact on Venezuela's economy may have limited spillover effects on the CAD, and the stress test results were largely expected. Additionally, Micron's earnings beat and guidance raise may not be representative of the broader US economic landscape.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the recent US stock market performance and Micron's earnings beat may be driven by short-term factors, such as technical buying or optimism about a specific sector, rather than a fundamental shift in the US economy. Furthermore, the stress test results, while positive, do not necessarily imply a more dovish Federal Reserve stance, which could limit the USD's upside potential. The CAD, on the other hand, may benefit from a potential rebound in oil prices or improved trade relations with China.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
+        },
+        "headlines_used": [
+          "56c9f2b289c84e3a96d059bafe4f2f56",
+          "68dfe634c00d431daede51e6e27f9e20",
+          "14a55f7db55646178bac98d22c248466",
+          "79bd05b5bfd2444ebf66904a8197a41c",
+          "206a52af7e1742e1b38abb79fc1dbab8",
+          "206a52af7e1742e1b38abb79fc1dbab8",
+          "206a52af7e1742e1b38abb79fc1dbab8",
+          "e498efe66eec438aaa19b3a86f3618c0",
+          "e498efe66eec438aaa19b3a86f3618c0",
+          "e498efe66eec438aaa19b3a86f3618c0",
+          "2db7ddac0a1b49ffadea89bbdae5df92",
+          "2db7ddac0a1b49ffadea89bbdae5df92",
+          "4ca4f5aad8574e32ab7c79ac43ab694a",
+          "4ca4f5aad8574e32ab7c79ac43ab694a",
+          "f50e1ba8ec174c318b2e17059ad0e3ea",
+          "2dd5206d2ef94bb3b6f9f0258e882d59",
+          "2dd5206d2ef94bb3b6f9f0258e882d59",
+          "2dd5206d2ef94bb3b6f9f0258e882d59",
+          "2dd5206d2ef94bb3b6f9f0258e882d59",
+          "acd6b32f293a4be9b4ab6e7bab3c1174",
+          "22f728737e024c3983dfb17fd28141d8",
+          "f5808182f376409a8133b78b4de64cb2",
+          "f5808182f376409a8133b78b4de64cb2",
+          "f5808182f376409a8133b78b4de64cb2",
+          "3915b5331bc441c0b89aba6f4a84fa8c"
+        ],
+        "price_context": {
+          "current_price": 1.42068,
+          "daily_change_pct": -0.2781,
+          "trend": "ranging"
+        },
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 1.0,
+          "bias_since": "2026-06-17T20:06:15.910287+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 114,
+          "rejection_reason": null,
+          "entry_price": 1.42058,
+          "stop_loss": 1.4188646428571428,
+          "take_profit": 1.4240107142857144
+        },
+        "metadata": null,
+        "entry": {
+          "price": 1.42058,
+          "time": "2026-06-25T14:14:02.145538+00:00",
+          "broker_deal_id": "000154c4-000c-111e-0000-000080fe0b37"
+        },
+        "exit": {
+          "price": 1.41902,
+          "time": "2026-06-25T17:00:33.523",
+          "pnl": -0.11,
+          "pnl_pips": -15.6,
+          "close_reason": null
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 1.41923,
+        "unrealized_pl": -0.13,
+        "unrealized_pips": -13.5,
+        "distance_sl_pips": 3.7,
+        "distance_tp_pips": 47.8
+      }
+    },
+    {
       "id": "48563ea2f116409d85f2aede015c66b1",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
       "direction": "short",
       "entry_price": 0.69047,
-      "exit_price": null,
+      "exit_price": 0.6917800000000001,
       "stop_loss": 0.69221,
       "take_profit": 0.68699,
       "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
+      "pnl": -0.16,
+      "pnl_pips": -13.1,
+      "status": "closed_reconciled",
       "opened_at": "2026-06-25T14:13:59.288189+00:00",
-      "closed_at": null,
+      "closed_at": "2026-06-25T17:01:10.099",
       "broker_deal_id": "00001544-0055-311e-0000-000080fc2d32",
       "events": [
         {
@@ -554,6 +804,19 @@
             "distance_tp_pips": 50.4
           },
           "created_at": "2026-06-25 15:58:54"
+        },
+        {
+          "id": 7290,
+          "trade_id": "48563ea2f116409d85f2aede015c66b1",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.6917800000000001,
+            "pnl": -0.16,
+            "pnl_pips": -13.1,
+            "actual_close_time": "2026-06-25T17:01:10.099",
+            "detection_time": "2026-06-25T17:08:51.823184+00:00"
+          },
+          "created_at": "2026-06-25 17:08:51"
         }
       ],
       "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.051",
@@ -615,6 +878,13 @@
           "price": 0.69047,
           "time": "2026-06-25T14:13:59.288189+00:00",
           "broker_deal_id": "00001544-0055-311e-0000-000080fc2d32"
+        },
+        "exit": {
+          "price": 0.6917800000000001,
+          "time": "2026-06-25T17:01:10.099",
+          "pnl": -0.16,
+          "pnl_pips": -13.1,
+          "close_reason": null
         }
       },
       "latest_snapshot": {
@@ -64950,446 +65220,6 @@
         ],
         "atr_14": 0.00111,
         "trade_duration_hours": 2.3
-      }
-    },
-    {
-      "id": "155f972d68df424182448bd43dd8618e",
-      "stream": "strategy:carry",
-      "instrument": "AUD_USD",
-      "direction": "short",
-      "entry_price": 0.7117899999999999,
-      "exit_price": 0.70848,
-      "stop_loss": 0.71329,
-      "take_profit": 0.7087996428571428,
-      "position_size": 100.0,
-      "pnl": 0.26,
-      "pnl_pips": 33.1,
-      "status": "closed_tp",
-      "opened_at": "2026-05-19T11:58:54.398384+00:00",
-      "closed_at": "2026-05-19T15:24:37.753",
-      "broker_deal_id": "00001544-0055-311e-0000-000080de26cf",
-      "events": [
-        {
-          "id": 5457,
-          "trade_id": "155f972d68df424182448bd43dd8618e",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.7117899999999999,
-            "stop_loss": 0.7132851785714285,
-            "take_profit": 0.7087996428571428,
-            "position_size": 163,
-            "broker_deal_id": "00001544-0055-311e-0000-000080de26cf"
-          },
-          "created_at": "2026-05-19 11:58:54"
-        },
-        {
-          "id": 5458,
-          "trade_id": "155f972d68df424182448bd43dd8618e",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.7132851785714285,
-            "new_value": 0.71329,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5459,
-          "trade_id": "155f972d68df424182448bd43dd8618e",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 163.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5462,
-          "trade_id": "155f972d68df424182448bd43dd8618e",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.70948,
-            "unrealized_pl": 0.23,
-            "unrealized_pips": 23.1,
-            "distance_sl_pips": 38.1,
-            "distance_tp_pips": 6.8
-          },
-          "created_at": "2026-05-19 14:18:25"
-        },
-        {
-          "id": 5472,
-          "trade_id": "155f972d68df424182448bd43dd8618e",
-          "event_type": "closed_tp",
-          "data": {
-            "exit_price": 0.70848,
-            "pnl": 0.26,
-            "pnl_pips": 33.1,
-            "actual_close_time": "2026-05-19T15:24:37.753",
-            "detection_time": "2026-05-19T14:59:30.243261+00:00"
-          },
-          "created_at": "2026-05-19 14:59:30"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.054",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "155f972d68df424182448bd43dd8618e",
-        "signal_id": "fbce9ebfdb864df6a0dbb7f2895be005",
-        "instrument": "AUD_USD",
-        "direction": "short",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.126,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.054",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 1.0,
-          "bias_since": "2026-05-14T13:56:38.095476+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 163,
-          "rejection_reason": null,
-          "entry_price": 0.7117899999999999,
-          "stop_loss": 0.7132851785714285,
-          "take_profit": 0.7087996428571428
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 4.35,
-            "quote_rate": 5.25,
-            "differential": -0.9,
-            "vol_penalty": 0.054
-          },
-          "entry_price": 0.7119
-        },
-        "entry": {
-          "price": 0.7117899999999999,
-          "time": "2026-05-19T11:58:54.398384+00:00",
-          "broker_deal_id": "00001544-0055-311e-0000-000080de26cf"
-        },
-        "exit": {
-          "price": 0.70848,
-          "time": "2026-05-19T15:24:37.753",
-          "pnl": 0.26,
-          "pnl_pips": 33.1,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.70948,
-        "unrealized_pl": 0.23,
-        "unrealized_pips": 23.1,
-        "distance_sl_pips": 38.1,
-        "distance_tp_pips": 6.8
-      }
-    },
-    {
-      "id": "a40f4b41dd6c48c088833bca6a971c02",
-      "stream": "strategy:carry",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "entry_price": 0.86668,
-      "exit_price": 0.8651,
-      "stop_loss": 0.86744,
-      "take_profit": 0.86516,
-      "position_size": 100.0,
-      "pnl": 0.16,
-      "pnl_pips": 15.8,
-      "status": "closed_tp",
-      "opened_at": "2026-05-19T11:58:53.655068+00:00",
-      "closed_at": "2026-05-20T14:46:09.844",
-      "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f",
-      "events": [
-        {
-          "id": 5456,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.86668,
-            "stop_loss": 0.86744125,
-            "take_profit": 0.8651574999999999,
-            "position_size": 100,
-            "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
-          },
-          "created_at": "2026-05-19 11:58:53"
-        },
-        {
-          "id": 5460,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.86744125,
-            "new_value": 0.86744,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5461,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.8651574999999999,
-            "new_value": 0.86516,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-19 11:58:55"
-        },
-        {
-          "id": 5463,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8668,
-            "unrealized_pl": -0.01,
-            "unrealized_pips": -1.2,
-            "distance_sl_pips": 6.4,
-            "distance_tp_pips": 16.4
-          },
-          "created_at": "2026-05-19 14:18:25"
-        },
-        {
-          "id": 5478,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86574,
-            "unrealized_pl": 0.09,
-            "unrealized_pips": 9.4,
-            "distance_sl_pips": 17.0,
-            "distance_tp_pips": 5.8
-          },
-          "created_at": "2026-05-19 17:17:49"
-        },
-        {
-          "id": 5488,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86593,
-            "unrealized_pl": 0.08,
-            "unrealized_pips": 7.5,
-            "distance_sl_pips": 15.1,
-            "distance_tp_pips": 7.7
-          },
-          "created_at": "2026-05-19 19:18:34"
-        },
-        {
-          "id": 5491,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8662,
-            "unrealized_pl": 0.05,
-            "unrealized_pips": 4.8,
-            "distance_sl_pips": 12.4,
-            "distance_tp_pips": 10.4
-          },
-          "created_at": "2026-05-19 20:52:53"
-        },
-        {
-          "id": 5494,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86635,
-            "unrealized_pl": 0.03,
-            "unrealized_pips": 3.3,
-            "distance_sl_pips": 10.9,
-            "distance_tp_pips": 11.9
-          },
-          "created_at": "2026-05-19 22:01:33"
-        },
-        {
-          "id": 5497,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86644,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 2.4,
-            "distance_sl_pips": 10.0,
-            "distance_tp_pips": 12.8
-          },
-          "created_at": "2026-05-19 23:05:54"
-        },
-        {
-          "id": 5500,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86661,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 0.7,
-            "distance_sl_pips": 8.3,
-            "distance_tp_pips": 14.5
-          },
-          "created_at": "2026-05-20 00:15:37"
-        },
-        {
-          "id": 5503,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86604,
-            "unrealized_pl": 0.06,
-            "unrealized_pips": 6.4,
-            "distance_sl_pips": 14.0,
-            "distance_tp_pips": 8.8
-          },
-          "created_at": "2026-05-20 04:36:49"
-        },
-        {
-          "id": 5506,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8659,
-            "unrealized_pl": 0.08,
-            "unrealized_pips": 7.8,
-            "distance_sl_pips": 15.4,
-            "distance_tp_pips": 7.4
-          },
-          "created_at": "2026-05-20 08:02:47"
-        },
-        {
-          "id": 5509,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86561,
-            "unrealized_pl": 0.11,
-            "unrealized_pips": 10.7,
-            "distance_sl_pips": 18.3,
-            "distance_tp_pips": 4.5
-          },
-          "created_at": "2026-05-20 11:13:40"
-        },
-        {
-          "id": 5512,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.86507,
-            "unrealized_pl": 0.16,
-            "unrealized_pips": 16.1,
-            "distance_sl_pips": 23.7,
-            "distance_tp_pips": -0.9
-          },
-          "created_at": "2026-05-20 13:46:09"
-        },
-        {
-          "id": 5525,
-          "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-          "event_type": "closed_tp",
-          "data": {
-            "exit_price": 0.8651,
-            "pnl": 0.16,
-            "pnl_pips": 15.8,
-            "actual_close_time": "2026-05-20T14:46:09.844",
-            "detection_time": "2026-05-20T14:52:20.712210+00:00"
-          },
-          "created_at": "2026-05-20 14:52:20"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "a40f4b41dd6c48c088833bca6a971c02",
-        "signal_id": "546776a7a0b74e2eab55687e26610f69",
-        "instrument": "EUR_GBP",
-        "direction": "short",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.12,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.03",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.9046,
-          "bias_since": "2026-05-18T11:03:39.064606+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 0.86668,
-          "stop_loss": 0.86744125,
-          "take_profit": 0.8651574999999999
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 4.5,
-            "quote_rate": 5.25,
-            "differential": -0.75,
-            "vol_penalty": 0.03
-          },
-          "entry_price": 0.8667400000000001
-        },
-        "entry": {
-          "price": 0.86668,
-          "time": "2026-05-19T11:58:53.655068+00:00",
-          "broker_deal_id": "00005552-001c-241e-0000-000080a70e1f"
-        },
-        "exit": {
-          "price": 0.8651,
-          "time": "2026-05-20T14:46:09.844",
-          "pnl": 0.16,
-          "pnl_pips": 15.8,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.86507,
-        "unrealized_pl": 0.16,
-        "unrealized_pips": 16.1,
-        "distance_sl_pips": 23.7,
-        "distance_tp_pips": -0.9
       }
     }
   ]
