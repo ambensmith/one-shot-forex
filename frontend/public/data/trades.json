@@ -1,104 +1,6 @@
 {
   "trades": [
     {
-      "id": "545a9829da7549a980ecb9964db4cc4e",
-      "stream": "strategy:mean_reversion",
-      "instrument": "GBP_USD",
-      "direction": "short",
-      "entry_price": 1.323315,
-      "exit_price": null,
-      "stop_loss": 1.324910357142857,
-      "take_profit": 1.32012,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-06-29T12:26:21.075189+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00007090-0055-311e-0000-0000813d0719",
-      "events": [
-        {
-          "id": 7423,
-          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.323315,
-            "stop_loss": 1.324910357142857,
-            "take_profit": 1.3201242857142859,
-            "position_size": 100,
-            "broker_deal_id": "00007090-0055-311e-0000-0000813d0719"
-          },
-          "created_at": "2026-06-29 12:26:21"
-        },
-        {
-          "id": 7424,
-          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.3201242857142859,
-            "new_value": 1.32012,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-29 12:26:21"
-        }
-      ],
-      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.32334, bb_lower=1.31833, bb_mid=1.32083, rsi=72.24, pct_b=1.027",
-      "source": "strategy:mean_reversion",
-      "record": {
-        "trade_id": "545a9829da7549a980ecb9964db4cc4e",
-        "signal_id": "08b392dc9e8b4cb28c1627b9bdb3750a",
-        "instrument": "GBP_USD",
-        "direction": "short",
-        "source": "strategy:mean_reversion",
-        "signal": {
-          "confidence": 0.935,
-          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.32334, bb_lower=1.31833, bb_mid=1.32083, rsi=72.24, pct_b=1.027",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.6662,
-          "bias_since": "2026-06-26T18:51:13.405427+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.323315,
-          "stop_loss": 1.324910357142857,
-          "take_profit": 1.3201242857142859
-        },
-        "metadata": {
-          "parameters": {
-            "bb_period": 20,
-            "bb_std": 2.0,
-            "rsi_period": 14,
-            "rsi_oversold": 30,
-            "rsi_overbought": 70
-          },
-          "indicators": {
-            "bb_upper": 1.32334,
-            "bb_lower": 1.31833,
-            "bb_mid": 1.32083,
-            "rsi": 72.24,
-            "pct_b": 1.027
-          },
-          "entry_price": 1.32348
-        },
-        "entry": {
-          "price": 1.323315,
-          "time": "2026-06-29T12:26:21.075189+00:00",
-          "broker_deal_id": "00007090-0055-311e-0000-0000813d0719"
-        }
-      }
-    },
-    {
       "id": "f835e2eadf3a4855a1e785c95b4e16d7",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
@@ -277,6 +179,19 @@
             "distance_tp_pips": 25.0
           },
           "created_at": "2026-06-29 11:56:15"
+        },
+        {
+          "id": 7429,
+          "trade_id": "f835e2eadf3a4855a1e785c95b4e16d7",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.68821,
+            "unrealized_pl": 0.22,
+            "unrealized_pips": 22.4,
+            "distance_sl_pips": 36.6,
+            "distance_tp_pips": 5.9
+          },
+          "created_at": "2026-06-29 15:26:33"
         }
       ],
       "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.038",
@@ -341,311 +256,11 @@
         }
       },
       "latest_snapshot": {
-        "current_price": 0.69012,
-        "unrealized_pl": 0.03,
-        "unrealized_pips": 3.3,
-        "distance_sl_pips": 17.5,
-        "distance_tp_pips": 25.0
-      }
-    },
-    {
-      "id": "3e846fadf3d24d1b8ca03ffece583d1d",
-      "stream": "llm",
-      "instrument": "USD_JPY",
-      "direction": "long",
-      "entry_price": 161.659,
-      "exit_price": null,
-      "stop_loss": 161.53,
-      "take_profit": 161.918,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-06-26T13:10:34.038247+00:00",
-      "closed_at": null,
-      "broker_deal_id": "000154c4-0029-065e-0000-000080f22423",
-      "events": [
-        {
-          "id": 7349,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 161.659,
-            "stop_loss": 161.52957142857142,
-            "take_profit": 161.91785714285714,
-            "position_size": 114,
-            "broker_deal_id": "000154c4-0029-065e-0000-000080f22423"
-          },
-          "created_at": "2026-06-26 13:10:34"
-        },
-        {
-          "id": 7356,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 161.52957142857142,
-            "new_value": 161.53,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-26 13:10:36"
-        },
-        {
-          "id": 7357,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 161.91785714285714,
-            "new_value": 161.918,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-26 13:10:36"
-        },
-        {
-          "id": 7358,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 114.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-26 13:10:36"
-        },
-        {
-          "id": 7365,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.657,
-            "unrealized_pl": -0.2,
-            "unrealized_pips": -0.2,
-            "distance_sl_pips": 12.7,
-            "distance_tp_pips": 26.1
-          },
-          "created_at": "2026-06-26 15:14:35"
-        },
-        {
-          "id": 7377,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.741,
-            "unrealized_pl": 8.2,
-            "unrealized_pips": 8.2,
-            "distance_sl_pips": 21.1,
-            "distance_tp_pips": 17.7
-          },
-          "created_at": "2026-06-26 17:11:09"
-        },
-        {
-          "id": 7385,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.731,
-            "unrealized_pl": 7.2,
-            "unrealized_pips": 7.2,
-            "distance_sl_pips": 20.1,
-            "distance_tp_pips": 18.7
-          },
-          "created_at": "2026-06-26 19:04:17"
-        },
-        {
-          "id": 7391,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.75,
-            "unrealized_pl": 9.1,
-            "unrealized_pips": 9.1,
-            "distance_sl_pips": 22.0,
-            "distance_tp_pips": 16.8
-          },
-          "created_at": "2026-06-26 20:52:02"
-        },
-        {
-          "id": 7398,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.749,
-            "unrealized_pl": 9.0,
-            "unrealized_pips": 9.0,
-            "distance_sl_pips": 21.9,
-            "distance_tp_pips": 16.9
-          },
-          "created_at": "2026-06-26 22:03:04"
-        },
-        {
-          "id": 7404,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.793,
-            "unrealized_pl": 13.4,
-            "unrealized_pips": 13.4,
-            "distance_sl_pips": 26.3,
-            "distance_tp_pips": 12.5
-          },
-          "created_at": "2026-06-28 22:55:31"
-        },
-        {
-          "id": 7408,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.769,
-            "unrealized_pl": 11.0,
-            "unrealized_pips": 11.0,
-            "distance_sl_pips": 23.9,
-            "distance_tp_pips": 14.9
-          },
-          "created_at": "2026-06-29 00:02:17"
-        },
-        {
-          "id": 7412,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.781,
-            "unrealized_pl": 12.2,
-            "unrealized_pips": 12.2,
-            "distance_sl_pips": 25.1,
-            "distance_tp_pips": 13.7
-          },
-          "created_at": "2026-06-29 02:03:08"
-        },
-        {
-          "id": 7416,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.786,
-            "unrealized_pl": 12.7,
-            "unrealized_pips": 12.7,
-            "distance_sl_pips": 25.6,
-            "distance_tp_pips": 13.2
-          },
-          "created_at": "2026-06-29 06:58:49"
-        },
-        {
-          "id": 7421,
-          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 161.829,
-            "unrealized_pl": 17.0,
-            "unrealized_pips": 17.0,
-            "distance_sl_pips": 29.9,
-            "distance_tp_pips": 8.9
-          },
-          "created_at": "2026-06-29 11:56:16"
-        }
-      ],
-      "reasoning": "The Tokyo CPI data released shows that inflation is rising, but still below the BoJ target. However, the core-core CPI measure is at 1.9%, indicating underlying inflationary pressures. With the recent increase in energy costs and supply concerns, there is a likelihood that the BoJ might adjust its stance on monetary policy, potentially weakening the JPY. Meanwhile, the US Fed's interest rate stance remains a factor, but the USD has been relatively stable. Given the current ranging trend and recent economic indicators, a long position on USD/JPY seems reasonable as the US-Japan interest rate differential might continue to support the USD.",
-      "source": "llm",
-      "record": {
-        "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
-        "signal_id": "c3ed886e34544a1fa08934913d2154b8",
-        "instrument": "USD_JPY",
-        "direction": "long",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The Tokyo CPI data released shows that inflation is rising, but still below the BoJ target. However, the core-core CPI measure is at 1.9%, indicating underlying inflationary pressures. With the recent increase in energy costs and supply concerns, there is a likelihood that the BoJ might adjust its stance on monetary policy, potentially weakening the JPY. Meanwhile, the US Fed's interest rate stance remains a factor, but the USD has been relatively stable. Given the current ranging trend and recent economic indicators, a long position on USD/JPY seems reasonable as the US-Japan interest rate differential might continue to support the USD.",
-          "key_factors": [
-            "Tokyo CPI data",
-            "Core-core CPI measure",
-            "Energy costs and supply concerns",
-            "BoJ monetary policy",
-            "US-Japan interest rate differential"
-          ],
-          "risk_factors": [
-            "Unexpected BoJ policy change",
-            "Shift in US Fed interest rate expectations",
-            "Escalation of global supply chain disruptions",
-            "Significant changes in oil prices"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this trade is that the BoJ's stance on monetary policy might not change as quickly as expected, despite rising inflationary pressures. The BoJ has historically prioritized economic growth and stability over inflation targets, and with Japan's economic recovery still fragile, they might maintain their accommodative policy. This could limit the JPY's weakness and make the trade less profitable.",
-          "alternative_interpretation": "An alternative interpretation is that the rising core-core CPI measure could lead to a more hawkish BoJ, but this might already be priced into the market. Moreover, the US Fed's interest rate stance, although stable now, could shift rapidly if US inflation or economic indicators change. This could lead to a decrease in the US-Japan interest rate differential, weakening the USD instead.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the BoJ's stance on monetary policy might not change as quickly as expected, despite rising inflationary pressures. The BoJ has historically prioritized economic growth and stability over inflation targets, and with Japan's economic recovery still fragile, they might maintain their accommodative policy. This could limit the JPY's weakness and make the trade less profitable.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the rising core-core CPI measure could lead to a more hawkish BoJ, but this might already be priced into the market. Moreover, the US Fed's interest rate stance, although stable now, could shift rapidly if US inflation or economic indicators change. This could lead to a decrease in the US-Japan interest rate differential, weakening the USD instead.\",\n  \"market_conditions_for_failure\": \"Market conditions that could make this trade fail quickly include a sudden and significant change in global risk sentiment, leading to a flight to safety in JPY, or an unexpected intervention by the BoJ to strengthen the JPY. Additionally, if US economic indicators deteriorate rapidly, the US Fed might shift to a more dovish stance, reducing the interest rate differential and causing the USD to weaken.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "7cfffae4d0424798abf89c800d1f01e9",
-          "7cfffae4d0424798abf89c800d1f01e9",
-          "7cfffae4d0424798abf89c800d1f01e9",
-          "7cfffae4d0424798abf89c800d1f01e9",
-          "55e62bcdd8b74644bdf218fa6d2ae1c9",
-          "55e62bcdd8b74644bdf218fa6d2ae1c9",
-          "55e62bcdd8b74644bdf218fa6d2ae1c9",
-          "23ae7b15c1654601bf7a998cfda57ca8",
-          "647e8e2521e74be08a90d9b90b8e8b14",
-          "bb9540022afb43feb4d56ba31a1b2261",
-          "bb9540022afb43feb4d56ba31a1b2261",
-          "d5254c22beba42738c816049381c9762",
-          "277eef0a97a041f0a58e3f196ae054c4",
-          "277eef0a97a041f0a58e3f196ae054c4",
-          "fd1e0033a9fe473596d71db2c4fca993",
-          "62548bcb715e45b3831ae57c9b09f5ec",
-          "f97a9c2da2ef4f6daf76e8dad46115f2",
-          "7f6bd2575b4b4a7e9abf9bf112887c89",
-          "89cd27966ce34cecb47eb8d1c4d424cc",
-          "a90601a44d124f78bd63f6cee92f35c7",
-          "a90601a44d124f78bd63f6cee92f35c7",
-          "69924c20ee754715b936079e1de037cf",
-          "69924c20ee754715b936079e1de037cf",
-          "9463e767881a43a29580cb6026443b4a",
-          "69924c20ee754715b936079e1de037cf",
-          "9463e767881a43a29580cb6026443b4a",
-          "164fb462f25c42018064ec1342573e79",
-          "82a11f78fbc04a8e8c72fa94d1033db8",
-          "4b0b4324ecb943619e370eaaccca05e1",
-          "4b0b4324ecb943619e370eaaccca05e1",
-          "ce965ccdce2641c8aadb47296c21ea34",
-          "ce965ccdce2641c8aadb47296c21ea34",
-          "ce965ccdce2641c8aadb47296c21ea34",
-          "79bd05b5bfd2444ebf66904a8197a41c",
-          "20fb0c3ce2ae40c59d5cb2e43b46bc78"
-        ],
-        "price_context": {
-          "current_price": 161.662,
-          "daily_change_pct": -0.0501,
-          "trend": "ranging"
-        },
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 1.0,
-          "bias_since": "2026-05-01T06:22:06.669217+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 114,
-          "rejection_reason": null,
-          "entry_price": 161.659,
-          "stop_loss": 161.52957142857142,
-          "take_profit": 161.91785714285714
-        },
-        "metadata": null,
-        "entry": {
-          "price": 161.659,
-          "time": "2026-06-26T13:10:34.038247+00:00",
-          "broker_deal_id": "000154c4-0029-065e-0000-000080f22423"
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 161.829,
-        "unrealized_pl": 17.0,
-        "unrealized_pips": 17.0,
-        "distance_sl_pips": 29.9,
-        "distance_tp_pips": 8.9
+        "current_price": 0.68821,
+        "unrealized_pl": 0.22,
+        "unrealized_pips": 22.4,
+        "distance_sl_pips": 36.6,
+        "distance_tp_pips": 5.9
       }
     },
     {
@@ -922,6 +537,19 @@
             "distance_tp_pips": 26.6
           },
           "created_at": "2026-06-29 11:56:16"
+        },
+        {
+          "id": 7430,
+          "trade_id": "f6899c600cce41a7a7104f51f7beef8c",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.68821,
+            "unrealized_pl": 0.26,
+            "unrealized_pips": 25.9,
+            "distance_sl_pips": 42.6,
+            "distance_tp_pips": 7.5
+          },
+          "created_at": "2026-06-29 15:26:34"
         }
       ],
       "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.055",
@@ -986,11 +614,297 @@
         }
       },
       "latest_snapshot": {
-        "current_price": 0.69012,
-        "unrealized_pl": 0.07,
-        "unrealized_pips": 6.8,
-        "distance_sl_pips": 23.5,
-        "distance_tp_pips": 26.6
+        "current_price": 0.68821,
+        "unrealized_pl": 0.26,
+        "unrealized_pips": 25.9,
+        "distance_sl_pips": 42.6,
+        "distance_tp_pips": 7.5
+      }
+    },
+    {
+      "id": "545a9829da7549a980ecb9964db4cc4e",
+      "stream": "strategy:mean_reversion",
+      "instrument": "GBP_USD",
+      "direction": "short",
+      "entry_price": 1.323315,
+      "exit_price": 1.324765,
+      "stop_loss": 1.324910357142857,
+      "take_profit": 1.32012,
+      "position_size": 100.0,
+      "pnl": -0.15,
+      "pnl_pips": -14.5,
+      "status": "closed_reconciled",
+      "opened_at": "2026-06-29T12:26:21.075189+00:00",
+      "closed_at": "2026-06-29T16:02:50.664",
+      "broker_deal_id": "00007090-0055-311e-0000-0000813d0719",
+      "events": [
+        {
+          "id": 7423,
+          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 1.323315,
+            "stop_loss": 1.324910357142857,
+            "take_profit": 1.3201242857142859,
+            "position_size": 100,
+            "broker_deal_id": "00007090-0055-311e-0000-0000813d0719"
+          },
+          "created_at": "2026-06-29 12:26:21"
+        },
+        {
+          "id": 7424,
+          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 1.3201242857142859,
+            "new_value": 1.32012,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-29 12:26:21"
+        },
+        {
+          "id": 7425,
+          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 1.324765,
+            "pnl": -0.15,
+            "pnl_pips": -14.5,
+            "actual_close_time": "2026-06-29T16:02:50.664",
+            "detection_time": "2026-06-29T15:26:28.382722+00:00"
+          },
+          "created_at": "2026-06-29 15:26:28"
+        },
+        {
+          "id": 7427,
+          "trade_id": "545a9829da7549a980ecb9964db4cc4e",
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-06-29T15:26:32.340815+00:00",
+            "market_price_at_detection": {
+              "bid": 1.3247,
+              "ask": 1.32483
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-06-29 06:00:00",
+                "o": 1.321055,
+                "h": 1.322805,
+                "l": 1.320905,
+                "c": 1.322565
+              },
+              {
+                "time": "2026-06-29 07:00:00",
+                "o": 1.322545,
+                "h": 1.322815,
+                "l": 1.321175,
+                "c": 1.321345
+              },
+              {
+                "time": "2026-06-29 08:00:00",
+                "o": 1.321335,
+                "h": 1.321705,
+                "l": 1.320325,
+                "c": 1.320715
+              },
+              {
+                "time": "2026-06-29 09:00:00",
+                "o": 1.320705,
+                "h": 1.321875,
+                "l": 1.320635,
+                "c": 1.321815
+              },
+              {
+                "time": "2026-06-29 10:00:00",
+                "o": 1.321825,
+                "h": 1.322675,
+                "l": 1.320995,
+                "c": 1.322285
+              },
+              {
+                "time": "2026-06-29 11:00:00",
+                "o": 1.322295,
+                "h": 1.323485,
+                "l": 1.322285,
+                "c": 1.323155
+              },
+              {
+                "time": "2026-06-29 12:00:00",
+                "o": 1.323165,
+                "h": 1.324025,
+                "l": 1.322815,
+                "c": 1.323355
+              },
+              {
+                "time": "2026-06-29 13:00:00",
+                "o": 1.323365,
+                "h": 1.324715,
+                "l": 1.323355,
+                "c": 1.323675
+              },
+              {
+                "time": "2026-06-29 14:00:00",
+                "o": 1.323685,
+                "h": 1.324825,
+                "l": 1.322795,
+                "c": 1.324485
+              },
+              {
+                "time": "2026-06-29 15:00:00",
+                "o": 1.324495,
+                "h": 1.324855,
+                "l": 1.324265,
+                "c": 1.324465
+              }
+            ],
+            "atr_14": 0.001291,
+            "trade_duration_hours": 3.0
+          },
+          "created_at": "2026-06-29 15:26:33"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.32334, bb_lower=1.31833, bb_mid=1.32083, rsi=72.24, pct_b=1.027",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "545a9829da7549a980ecb9964db4cc4e",
+        "signal_id": "08b392dc9e8b4cb28c1627b9bdb3750a",
+        "instrument": "GBP_USD",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.935,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=1.32334, bb_lower=1.31833, bb_mid=1.32083, rsi=72.24, pct_b=1.027",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.6662,
+          "bias_since": "2026-06-26T18:51:13.405427+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 1.323315,
+          "stop_loss": 1.324910357142857,
+          "take_profit": 1.3201242857142859
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 1.32334,
+            "bb_lower": 1.31833,
+            "bb_mid": 1.32083,
+            "rsi": 72.24,
+            "pct_b": 1.027
+          },
+          "entry_price": 1.32348
+        },
+        "entry": {
+          "price": 1.323315,
+          "time": "2026-06-29T12:26:21.075189+00:00",
+          "broker_deal_id": "00007090-0055-311e-0000-0000813d0719"
+        },
+        "exit": {
+          "price": 1.324765,
+          "time": "2026-06-29T16:02:50.664",
+          "pnl": -0.15,
+          "pnl_pips": -14.5,
+          "close_reason": null
+        }
+      },
+      "close_context": {
+        "detection_time": "2026-06-29T15:26:32.340815+00:00",
+        "market_price_at_detection": {
+          "bid": 1.3247,
+          "ask": 1.32483
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-06-29 06:00:00",
+            "o": 1.321055,
+            "h": 1.322805,
+            "l": 1.320905,
+            "c": 1.322565
+          },
+          {
+            "time": "2026-06-29 07:00:00",
+            "o": 1.322545,
+            "h": 1.322815,
+            "l": 1.321175,
+            "c": 1.321345
+          },
+          {
+            "time": "2026-06-29 08:00:00",
+            "o": 1.321335,
+            "h": 1.321705,
+            "l": 1.320325,
+            "c": 1.320715
+          },
+          {
+            "time": "2026-06-29 09:00:00",
+            "o": 1.320705,
+            "h": 1.321875,
+            "l": 1.320635,
+            "c": 1.321815
+          },
+          {
+            "time": "2026-06-29 10:00:00",
+            "o": 1.321825,
+            "h": 1.322675,
+            "l": 1.320995,
+            "c": 1.322285
+          },
+          {
+            "time": "2026-06-29 11:00:00",
+            "o": 1.322295,
+            "h": 1.323485,
+            "l": 1.322285,
+            "c": 1.323155
+          },
+          {
+            "time": "2026-06-29 12:00:00",
+            "o": 1.323165,
+            "h": 1.324025,
+            "l": 1.322815,
+            "c": 1.323355
+          },
+          {
+            "time": "2026-06-29 13:00:00",
+            "o": 1.323365,
+            "h": 1.324715,
+            "l": 1.323355,
+            "c": 1.323675
+          },
+          {
+            "time": "2026-06-29 14:00:00",
+            "o": 1.323685,
+            "h": 1.324825,
+            "l": 1.322795,
+            "c": 1.324485
+          },
+          {
+            "time": "2026-06-29 15:00:00",
+            "o": 1.324495,
+            "h": 1.324855,
+            "l": 1.324265,
+            "c": 1.324465
+          }
+        ],
+        "atr_14": 0.001291,
+        "trade_duration_hours": 3.0
       }
     },
     {
@@ -2195,6 +2109,498 @@
         "unrealized_pips": 25.3,
         "distance_sl_pips": 39.0,
         "distance_tp_pips": 2.1
+      }
+    },
+    {
+      "id": "3e846fadf3d24d1b8ca03ffece583d1d",
+      "stream": "llm",
+      "instrument": "USD_JPY",
+      "direction": "long",
+      "entry_price": 161.659,
+      "exit_price": 161.935,
+      "stop_loss": 161.53,
+      "take_profit": 161.918,
+      "position_size": 100.0,
+      "pnl": 0.13,
+      "pnl_pips": 27.6,
+      "status": "closed_tp",
+      "opened_at": "2026-06-26T13:10:34.038247+00:00",
+      "closed_at": "2026-06-29T14:22:50.885",
+      "broker_deal_id": "000154c4-0029-065e-0000-000080f22423",
+      "events": [
+        {
+          "id": 7349,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 161.659,
+            "stop_loss": 161.52957142857142,
+            "take_profit": 161.91785714285714,
+            "position_size": 114,
+            "broker_deal_id": "000154c4-0029-065e-0000-000080f22423"
+          },
+          "created_at": "2026-06-26 13:10:34"
+        },
+        {
+          "id": 7356,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 161.52957142857142,
+            "new_value": 161.53,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-26 13:10:36"
+        },
+        {
+          "id": 7357,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 161.91785714285714,
+            "new_value": 161.918,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-26 13:10:36"
+        },
+        {
+          "id": 7358,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 114.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-06-26 13:10:36"
+        },
+        {
+          "id": 7365,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.657,
+            "unrealized_pl": -0.2,
+            "unrealized_pips": -0.2,
+            "distance_sl_pips": 12.7,
+            "distance_tp_pips": 26.1
+          },
+          "created_at": "2026-06-26 15:14:35"
+        },
+        {
+          "id": 7377,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.741,
+            "unrealized_pl": 8.2,
+            "unrealized_pips": 8.2,
+            "distance_sl_pips": 21.1,
+            "distance_tp_pips": 17.7
+          },
+          "created_at": "2026-06-26 17:11:09"
+        },
+        {
+          "id": 7385,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.731,
+            "unrealized_pl": 7.2,
+            "unrealized_pips": 7.2,
+            "distance_sl_pips": 20.1,
+            "distance_tp_pips": 18.7
+          },
+          "created_at": "2026-06-26 19:04:17"
+        },
+        {
+          "id": 7391,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.75,
+            "unrealized_pl": 9.1,
+            "unrealized_pips": 9.1,
+            "distance_sl_pips": 22.0,
+            "distance_tp_pips": 16.8
+          },
+          "created_at": "2026-06-26 20:52:02"
+        },
+        {
+          "id": 7398,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.749,
+            "unrealized_pl": 9.0,
+            "unrealized_pips": 9.0,
+            "distance_sl_pips": 21.9,
+            "distance_tp_pips": 16.9
+          },
+          "created_at": "2026-06-26 22:03:04"
+        },
+        {
+          "id": 7404,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.793,
+            "unrealized_pl": 13.4,
+            "unrealized_pips": 13.4,
+            "distance_sl_pips": 26.3,
+            "distance_tp_pips": 12.5
+          },
+          "created_at": "2026-06-28 22:55:31"
+        },
+        {
+          "id": 7408,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.769,
+            "unrealized_pl": 11.0,
+            "unrealized_pips": 11.0,
+            "distance_sl_pips": 23.9,
+            "distance_tp_pips": 14.9
+          },
+          "created_at": "2026-06-29 00:02:17"
+        },
+        {
+          "id": 7412,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.781,
+            "unrealized_pl": 12.2,
+            "unrealized_pips": 12.2,
+            "distance_sl_pips": 25.1,
+            "distance_tp_pips": 13.7
+          },
+          "created_at": "2026-06-29 02:03:08"
+        },
+        {
+          "id": 7416,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.786,
+            "unrealized_pl": 12.7,
+            "unrealized_pips": 12.7,
+            "distance_sl_pips": 25.6,
+            "distance_tp_pips": 13.2
+          },
+          "created_at": "2026-06-29 06:58:49"
+        },
+        {
+          "id": 7421,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 161.829,
+            "unrealized_pl": 17.0,
+            "unrealized_pips": 17.0,
+            "distance_sl_pips": 29.9,
+            "distance_tp_pips": 8.9
+          },
+          "created_at": "2026-06-29 11:56:16"
+        },
+        {
+          "id": 7426,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "closed_tp",
+          "data": {
+            "exit_price": 161.935,
+            "pnl": 0.13,
+            "pnl_pips": 27.6,
+            "actual_close_time": "2026-06-29T14:22:50.885",
+            "detection_time": "2026-06-29T15:26:29.944362+00:00"
+          },
+          "created_at": "2026-06-29 15:26:29"
+        },
+        {
+          "id": 7428,
+          "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+          "event_type": "close_context",
+          "data": {
+            "detection_time": "2026-06-29T15:26:33.001945+00:00",
+            "market_price_at_detection": {
+              "bid": 161.931,
+              "ask": 161.943
+            },
+            "last_10_candles": [
+              {
+                "time": "2026-06-29 06:00:00",
+                "o": 161.802,
+                "h": 161.851,
+                "l": 161.78,
+                "c": 161.792
+              },
+              {
+                "time": "2026-06-29 07:00:00",
+                "o": 161.794,
+                "h": 161.832,
+                "l": 161.79,
+                "c": 161.826
+              },
+              {
+                "time": "2026-06-29 08:00:00",
+                "o": 161.825,
+                "h": 161.858,
+                "l": 161.804,
+                "c": 161.854
+              },
+              {
+                "time": "2026-06-29 09:00:00",
+                "o": 161.853,
+                "h": 161.899,
+                "l": 161.833,
+                "c": 161.886
+              },
+              {
+                "time": "2026-06-29 10:00:00",
+                "o": 161.887,
+                "h": 161.901,
+                "l": 161.848,
+                "c": 161.858
+              },
+              {
+                "time": "2026-06-29 11:00:00",
+                "o": 161.859,
+                "h": 161.864,
+                "l": 161.816,
+                "c": 161.839
+              },
+              {
+                "time": "2026-06-29 12:00:00",
+                "o": 161.84,
+                "h": 161.903,
+                "l": 161.835,
+                "c": 161.895
+              },
+              {
+                "time": "2026-06-29 13:00:00",
+                "o": 161.894,
+                "h": 161.964,
+                "l": 161.887,
+                "c": 161.957
+              },
+              {
+                "time": "2026-06-29 14:00:00",
+                "o": 161.958,
+                "h": 161.958,
+                "l": 161.835,
+                "c": 161.929
+              },
+              {
+                "time": "2026-06-29 15:00:00",
+                "o": 161.928,
+                "h": 161.948,
+                "l": 161.922,
+                "c": 161.942
+              }
+            ],
+            "atr_14": 0.054692,
+            "trade_duration_hours": 74.3,
+            "max_favorable_pips": 17.0,
+            "max_adverse_pips": -0.2
+          },
+          "created_at": "2026-06-29 15:26:33"
+        }
+      ],
+      "reasoning": "The Tokyo CPI data released shows that inflation is rising, but still below the BoJ target. However, the core-core CPI measure is at 1.9%, indicating underlying inflationary pressures. With the recent increase in energy costs and supply concerns, there is a likelihood that the BoJ might adjust its stance on monetary policy, potentially weakening the JPY. Meanwhile, the US Fed's interest rate stance remains a factor, but the USD has been relatively stable. Given the current ranging trend and recent economic indicators, a long position on USD/JPY seems reasonable as the US-Japan interest rate differential might continue to support the USD.",
+      "source": "llm",
+      "record": {
+        "trade_id": "3e846fadf3d24d1b8ca03ffece583d1d",
+        "signal_id": "c3ed886e34544a1fa08934913d2154b8",
+        "instrument": "USD_JPY",
+        "direction": "long",
+        "source": "llm",
+        "signal": {
+          "confidence": 0.4,
+          "reasoning": "The Tokyo CPI data released shows that inflation is rising, but still below the BoJ target. However, the core-core CPI measure is at 1.9%, indicating underlying inflationary pressures. With the recent increase in energy costs and supply concerns, there is a likelihood that the BoJ might adjust its stance on monetary policy, potentially weakening the JPY. Meanwhile, the US Fed's interest rate stance remains a factor, but the USD has been relatively stable. Given the current ranging trend and recent economic indicators, a long position on USD/JPY seems reasonable as the US-Japan interest rate differential might continue to support the USD.",
+          "key_factors": [
+            "Tokyo CPI data",
+            "Core-core CPI measure",
+            "Energy costs and supply concerns",
+            "BoJ monetary policy",
+            "US-Japan interest rate differential"
+          ],
+          "risk_factors": [
+            "Unexpected BoJ policy change",
+            "Shift in US Fed interest rate expectations",
+            "Escalation of global supply chain disruptions",
+            "Significant changes in oil prices"
+          ],
+          "prompt_version": "signal_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
+        },
+        "challenge": {
+          "counter_argument": "The strongest argument against this trade is that the BoJ's stance on monetary policy might not change as quickly as expected, despite rising inflationary pressures. The BoJ has historically prioritized economic growth and stability over inflation targets, and with Japan's economic recovery still fragile, they might maintain their accommodative policy. This could limit the JPY's weakness and make the trade less profitable.",
+          "alternative_interpretation": "An alternative interpretation is that the rising core-core CPI measure could lead to a more hawkish BoJ, but this might already be priced into the market. Moreover, the US Fed's interest rate stance, although stable now, could shift rapidly if US inflation or economic indicators change. This could lead to a decrease in the US-Japan interest rate differential, weakening the USD instead.",
+          "conviction_after_challenge": 0.4,
+          "recommendation": "reduce_size",
+          "prompt_version": "challenge_v1/v1",
+          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the BoJ's stance on monetary policy might not change as quickly as expected, despite rising inflationary pressures. The BoJ has historically prioritized economic growth and stability over inflation targets, and with Japan's economic recovery still fragile, they might maintain their accommodative policy. This could limit the JPY's weakness and make the trade less profitable.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the rising core-core CPI measure could lead to a more hawkish BoJ, but this might already be priced into the market. Moreover, the US Fed's interest rate stance, although stable now, could shift rapidly if US inflation or economic indicators change. This could lead to a decrease in the US-Japan interest rate differential, weakening the USD instead.\",\n  \"market_conditions_for_failure\": \"Market conditions that could make this trade fail quickly include a sudden and significant change in global risk sentiment, leading to a flight to safety in JPY, or an unexpected intervention by the BoJ to strengthen the JPY. Additionally, if US economic indicators deteriorate rapidly, the US Fed might shift to a more dovish stance, reducing the interest rate differential and causing the USD to weaken.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
+        },
+        "headlines_used": [
+          "7cfffae4d0424798abf89c800d1f01e9",
+          "7cfffae4d0424798abf89c800d1f01e9",
+          "7cfffae4d0424798abf89c800d1f01e9",
+          "7cfffae4d0424798abf89c800d1f01e9",
+          "55e62bcdd8b74644bdf218fa6d2ae1c9",
+          "55e62bcdd8b74644bdf218fa6d2ae1c9",
+          "55e62bcdd8b74644bdf218fa6d2ae1c9",
+          "23ae7b15c1654601bf7a998cfda57ca8",
+          "647e8e2521e74be08a90d9b90b8e8b14",
+          "bb9540022afb43feb4d56ba31a1b2261",
+          "bb9540022afb43feb4d56ba31a1b2261",
+          "d5254c22beba42738c816049381c9762",
+          "277eef0a97a041f0a58e3f196ae054c4",
+          "277eef0a97a041f0a58e3f196ae054c4",
+          "fd1e0033a9fe473596d71db2c4fca993",
+          "62548bcb715e45b3831ae57c9b09f5ec",
+          "f97a9c2da2ef4f6daf76e8dad46115f2",
+          "7f6bd2575b4b4a7e9abf9bf112887c89",
+          "89cd27966ce34cecb47eb8d1c4d424cc",
+          "a90601a44d124f78bd63f6cee92f35c7",
+          "a90601a44d124f78bd63f6cee92f35c7",
+          "69924c20ee754715b936079e1de037cf",
+          "69924c20ee754715b936079e1de037cf",
+          "9463e767881a43a29580cb6026443b4a",
+          "69924c20ee754715b936079e1de037cf",
+          "9463e767881a43a29580cb6026443b4a",
+          "164fb462f25c42018064ec1342573e79",
+          "82a11f78fbc04a8e8c72fa94d1033db8",
+          "4b0b4324ecb943619e370eaaccca05e1",
+          "4b0b4324ecb943619e370eaaccca05e1",
+          "ce965ccdce2641c8aadb47296c21ea34",
+          "ce965ccdce2641c8aadb47296c21ea34",
+          "ce965ccdce2641c8aadb47296c21ea34",
+          "79bd05b5bfd2444ebf66904a8197a41c",
+          "20fb0c3ce2ae40c59d5cb2e43b46bc78"
+        ],
+        "price_context": {
+          "current_price": 161.662,
+          "daily_change_pct": -0.0501,
+          "trend": "ranging"
+        },
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 1.0,
+          "bias_since": "2026-05-01T06:22:06.669217+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 114,
+          "rejection_reason": null,
+          "entry_price": 161.659,
+          "stop_loss": 161.52957142857142,
+          "take_profit": 161.91785714285714
+        },
+        "metadata": null,
+        "entry": {
+          "price": 161.659,
+          "time": "2026-06-26T13:10:34.038247+00:00",
+          "broker_deal_id": "000154c4-0029-065e-0000-000080f22423"
+        },
+        "exit": {
+          "price": 161.935,
+          "time": "2026-06-29T14:22:50.885",
+          "pnl": 0.13,
+          "pnl_pips": 27.6,
+          "close_reason": null
+        }
+      },
+      "close_context": {
+        "detection_time": "2026-06-29T15:26:33.001945+00:00",
+        "market_price_at_detection": {
+          "bid": 161.931,
+          "ask": 161.943
+        },
+        "last_10_candles": [
+          {
+            "time": "2026-06-29 06:00:00",
+            "o": 161.802,
+            "h": 161.851,
+            "l": 161.78,
+            "c": 161.792
+          },
+          {
+            "time": "2026-06-29 07:00:00",
+            "o": 161.794,
+            "h": 161.832,
+            "l": 161.79,
+            "c": 161.826
+          },
+          {
+            "time": "2026-06-29 08:00:00",
+            "o": 161.825,
+            "h": 161.858,
+            "l": 161.804,
+            "c": 161.854
+          },
+          {
+            "time": "2026-06-29 09:00:00",
+            "o": 161.853,
+            "h": 161.899,
+            "l": 161.833,
+            "c": 161.886
+          },
+          {
+            "time": "2026-06-29 10:00:00",
+            "o": 161.887,
+            "h": 161.901,
+            "l": 161.848,
+            "c": 161.858
+          },
+          {
+            "time": "2026-06-29 11:00:00",
+            "o": 161.859,
+            "h": 161.864,
+            "l": 161.816,
+            "c": 161.839
+          },
+          {
+            "time": "2026-06-29 12:00:00",
+            "o": 161.84,
+            "h": 161.903,
+            "l": 161.835,
+            "c": 161.895
+          },
+          {
+            "time": "2026-06-29 13:00:00",
+            "o": 161.894,
+            "h": 161.964,
+            "l": 161.887,
+            "c": 161.957
+          },
+          {
+            "time": "2026-06-29 14:00:00",
+            "o": 161.958,
+            "h": 161.958,
+            "l": 161.835,
+            "c": 161.929
+          },
+          {
+            "time": "2026-06-29 15:00:00",
+            "o": 161.928,
+            "h": 161.948,
+            "l": 161.922,
+            "c": 161.942
+          }
+        ],
+        "atr_14": 0.054692,
+        "trade_duration_hours": 74.3,
+        "max_favorable_pips": 17.0,
+        "max_adverse_pips": -0.2
+      },
+      "latest_snapshot": {
+        "current_price": 161.829,
+        "unrealized_pl": 17.0,
+        "unrealized_pips": 17.0,
+        "distance_sl_pips": 29.9,
+        "distance_tp_pips": 8.9
       }
     },
     {
