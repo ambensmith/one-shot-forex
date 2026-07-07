@@ -1,6 +1,121 @@
 {
   "trades": [
     {
+      "id": "3db185fd85f4496591819d4b4455caa0",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.85419,
+      "exit_price": null,
+      "stop_loss": 0.85488,
+      "take_profit": 0.85282,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-07-07T00:03:14.727274+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080b90555",
+      "events": [
+        {
+          "id": 7809,
+          "trade_id": "3db185fd85f4496591819d4b4455caa0",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.85419,
+            "stop_loss": 0.8548757142857143,
+            "take_profit": 0.8528185714285714,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080b90555"
+          },
+          "created_at": "2026-07-07 00:03:14"
+        },
+        {
+          "id": 7810,
+          "trade_id": "3db185fd85f4496591819d4b4455caa0",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8548757142857143,
+            "new_value": 0.85488,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-07 00:03:15"
+        },
+        {
+          "id": 7811,
+          "trade_id": "3db185fd85f4496591819d4b4455caa0",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8528185714285714,
+            "new_value": 0.85282,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-07 00:03:15"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.013",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "3db185fd85f4496591819d4b4455caa0",
+        "signal_id": "9355ba42c08e4d9d9109bf38f85b403d",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.137,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.013",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 1.0,
+          "bias_since": "2026-06-29T16:35:59.694416+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.85419,
+          "stop_loss": 0.8548757142857143,
+          "take_profit": 0.8528185714285714
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.013
+          },
+          "entry_price": 0.85423
+        },
+        "entry": {
+          "price": 0.85419,
+          "time": "2026-07-07T00:03:14.727274+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080b90555"
+        }
+      }
+    },
+    {
       "id": "dffbecfc7d7646af8106c6446c29ab1d",
       "stream": "strategy:carry",
       "instrument": "USD_CHF",
@@ -67352,281 +67467,6 @@
         "unrealized_pips": 11.0,
         "distance_sl_pips": 25.0,
         "distance_tp_pips": 17.1
-      }
-    },
-    {
-      "id": "e968332d67f341869d7e6d95a351570f",
-      "stream": "llm",
-      "instrument": "USD_JPY",
-      "direction": "long",
-      "entry_price": 159.516,
-      "exit_price": 159.439,
-      "stop_loss": 159.388,
-      "take_profit": 159.772,
-      "position_size": 100.0,
-      "pnl": -0.07,
-      "pnl_pips": -7.7,
-      "status": "closed_reconciled",
-      "opened_at": "2026-05-27T16:35:31.998496+00:00",
-      "closed_at": "2026-05-28T10:20:51.905",
-      "broker_deal_id": "000154c4-0029-065e-0000-000080e90d3c",
-      "events": [
-        {
-          "id": 5903,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 159.516,
-            "stop_loss": 159.38817857142857,
-            "take_profit": 159.77164285714284,
-            "position_size": 116,
-            "broker_deal_id": "000154c4-0029-065e-0000-000080e90d3c"
-          },
-          "created_at": "2026-05-27 16:35:31"
-        },
-        {
-          "id": 5910,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 159.38817857142857,
-            "new_value": 159.388,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-27 16:35:34"
-        },
-        {
-          "id": 5911,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 159.77164285714284,
-            "new_value": 159.772,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-27 16:35:34"
-        },
-        {
-          "id": 5912,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 116.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-05-27 16:35:34"
-        },
-        {
-          "id": 5919,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.492,
-            "unrealized_pl": -2.4,
-            "unrealized_pips": -2.4,
-            "distance_sl_pips": 10.4,
-            "distance_tp_pips": 28.0
-          },
-          "created_at": "2026-05-27 16:52:02"
-        },
-        {
-          "id": 5925,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.505,
-            "unrealized_pl": -1.1,
-            "unrealized_pips": -1.1,
-            "distance_sl_pips": 11.7,
-            "distance_tp_pips": 26.7
-          },
-          "created_at": "2026-05-27 19:08:53"
-        },
-        {
-          "id": 5931,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.459,
-            "unrealized_pl": -5.7,
-            "unrealized_pips": -5.7,
-            "distance_sl_pips": 7.1,
-            "distance_tp_pips": 31.3
-          },
-          "created_at": "2026-05-27 21:06:59"
-        },
-        {
-          "id": 5937,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.507,
-            "unrealized_pl": -0.9,
-            "unrealized_pips": -0.9,
-            "distance_sl_pips": 11.9,
-            "distance_tp_pips": 26.5
-          },
-          "created_at": "2026-05-27 22:48:10"
-        },
-        {
-          "id": 5943,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.555,
-            "unrealized_pl": 3.9,
-            "unrealized_pips": 3.9,
-            "distance_sl_pips": 16.7,
-            "distance_tp_pips": 21.7
-          },
-          "created_at": "2026-05-27 23:49:17"
-        },
-        {
-          "id": 5949,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.552,
-            "unrealized_pl": 3.6,
-            "unrealized_pips": 3.6,
-            "distance_sl_pips": 16.4,
-            "distance_tp_pips": 22.0
-          },
-          "created_at": "2026-05-28 01:26:40"
-        },
-        {
-          "id": 5963,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.546,
-            "unrealized_pl": 3.0,
-            "unrealized_pips": 3.0,
-            "distance_sl_pips": 15.8,
-            "distance_tp_pips": 22.6
-          },
-          "created_at": "2026-05-28 05:41:31"
-        },
-        {
-          "id": 5979,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 159.456,
-            "unrealized_pl": -6.0,
-            "unrealized_pips": -6.0,
-            "distance_sl_pips": 6.8,
-            "distance_tp_pips": 31.6
-          },
-          "created_at": "2026-05-28 09:02:35"
-        },
-        {
-          "id": 5983,
-          "trade_id": "e968332d67f341869d7e6d95a351570f",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 159.439,
-            "pnl": -0.07,
-            "pnl_pips": -7.7,
-            "actual_close_time": "2026-05-28T10:20:51.905",
-            "detection_time": "2026-05-28T10:52:40.102471+00:00"
-          },
-          "created_at": "2026-05-28 10:52:40"
-        }
-      ],
-      "reasoning": "The recent news and market context suggest a bullish outlook for USD/JPY. The Bank of Japan's (BoJ) indication of potential rate hikes and loose monetary conditions, as mentioned in the headlines, could lead to a stronger JPY. However, the overall sentiment seems to favor a stronger USD. The US-Iran conflict and its potential impact on USD pairs could lead to a safe-haven demand for the USD, supporting the USD/JPY pair. Additionally, Nvidia's $150 billion spending plans and their impact on Taiwan chip stocks may have a ripple effect on the market, potentially influencing USD/JPY. The current price and recent trend suggest a ranging market, but the fundamental factors point towards a bullish bias.",
-      "source": "llm",
-      "record": {
-        "trade_id": "e968332d67f341869d7e6d95a351570f",
-        "signal_id": "e7566f9ae829440d8c7d1900982b29ea",
-        "instrument": "USD_JPY",
-        "direction": "long",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent news and market context suggest a bullish outlook for USD/JPY. The Bank of Japan's (BoJ) indication of potential rate hikes and loose monetary conditions, as mentioned in the headlines, could lead to a stronger JPY. However, the overall sentiment seems to favor a stronger USD. The US-Iran conflict and its potential impact on USD pairs could lead to a safe-haven demand for the USD, supporting the USD/JPY pair. Additionally, Nvidia's $150 billion spending plans and their impact on Taiwan chip stocks may have a ripple effect on the market, potentially influencing USD/JPY. The current price and recent trend suggest a ranging market, but the fundamental factors point towards a bullish bias.",
-          "key_factors": [
-            "BoJ's potential rate hikes and loose monetary conditions",
-            "US-Iran conflict and safe-haven demand for USD",
-            "Nvidia's spending plans and impact on chip stocks",
-            "RBNZ's hold and potential impact on NZD and JPY"
-          ],
-          "risk_factors": [
-            "Escalation of US-Iran conflict leading to increased market volatility",
-            "BoJ's unexpected policy decisions",
-            "Weak US economic data",
-            "Intervention by Japanese authorities to influence JPY"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this direction is that the BoJ's indication of potential rate hikes could actually lead to a stronger JPY, which would negatively impact the USD/JPY pair. While the US-Iran conflict may drive safe-haven demand for the USD, it's not a guaranteed outcome, and the market may already be pricing in this risk. Furthermore, Nvidia's spending plans and their impact on chip stocks may not have a direct or significant effect on USD/JPY.",
-          "alternative_interpretation": "An alternative interpretation is that the BoJ's potential rate hikes could be a response to a weakening JPY, which would limit the upside potential for USD/JPY. Additionally, the US-Iran conflict may lead to a flight to safety in other assets, such as Treasuries or gold, rather than the USD. The Nvidia news could also be seen as a positive for the global economy, which could lead to a stronger JPY as investors become more risk-tolerant.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this direction is that the BoJ's indication of potential rate hikes could actually lead to a stronger JPY, which would negatively impact the USD/JPY pair. While the US-Iran conflict may drive safe-haven demand for the USD, it's not a guaranteed outcome, and the market may already be pricing in this risk. Furthermore, Nvidia's spending plans and their impact on chip stocks may not have a direct or significant effect on USD/JPY.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the BoJ's potential rate hikes could be a response to a weakening JPY, which would limit the upside potential for USD/JPY. Additionally, the US-Iran conflict may lead to a flight to safety in other assets, such as Treasuries or gold, rather than the USD. The Nvidia news could also be seen as a positive for the global economy, which could lead to a stronger JPY as investors become more risk-tolerant.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "01be1f8827474bdca29322676be1cae6",
-          "69efe1724adc4c7eb05dccd6be853e44",
-          "b6826be0a49543a89ad3a33a4b68a400",
-          "b6826be0a49543a89ad3a33a4b68a400",
-          "b6826be0a49543a89ad3a33a4b68a400",
-          "f73bced733cc4d04a604ac32fad5f85b",
-          "178c49e5aa024848a5ad0282be7e18a7",
-          "178c49e5aa024848a5ad0282be7e18a7",
-          "86c4d2c5b6964e65a5c32925ebb4d099",
-          "86c4d2c5b6964e65a5c32925ebb4d099",
-          "43c256b7dfcd4b6b819c5f108327454b",
-          "364979ec9f4a43a0b4388ea28085d4d4",
-          "364979ec9f4a43a0b4388ea28085d4d4",
-          "6578fae460c341e2ab6f38c2f3858e8f",
-          "ae0c2507a4ef4e13b7c51b534b803578",
-          "0ad85666c5124935af342e1ddc5e7b60",
-          "bfa0774849ef47e58377b71f72580216"
-        ],
-        "price_context": {
-          "current_price": 159.516,
-          "daily_change_pct": 0.123,
-          "trend": "ranging"
-        },
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 1.0,
-          "bias_since": "2026-05-01T06:22:06.669217+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 116,
-          "rejection_reason": null,
-          "entry_price": 159.516,
-          "stop_loss": 159.38817857142857,
-          "take_profit": 159.77164285714284
-        },
-        "metadata": null,
-        "entry": {
-          "price": 159.516,
-          "time": "2026-05-27T16:35:31.998496+00:00",
-          "broker_deal_id": "000154c4-0029-065e-0000-000080e90d3c"
-        },
-        "exit": {
-          "price": 159.439,
-          "time": "2026-05-28T10:20:51.905",
-          "pnl": -0.07,
-          "pnl_pips": -7.7,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 159.456,
-        "unrealized_pl": -6.0,
-        "unrealized_pips": -6.0,
-        "distance_sl_pips": 6.8,
-        "distance_tp_pips": 31.6
       }
     }
   ]
