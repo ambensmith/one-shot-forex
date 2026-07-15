@@ -1,6 +1,126 @@
 {
   "trades": [
     {
+      "id": "f25255d3150e4c76bc41a9990f1eadc5",
+      "stream": "strategy:mean_reversion",
+      "instrument": "USD_CHF",
+      "direction": "long",
+      "entry_price": 0.8061750000000001,
+      "exit_price": null,
+      "stop_loss": 0.80487,
+      "take_profit": 0.80879,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-07-15T17:11:57.054740+00:00",
+      "closed_at": null,
+      "broker_deal_id": "000154c4-000c-819e-0000-000080e31ed9",
+      "events": [
+        {
+          "id": 8373,
+          "trade_id": "f25255d3150e4c76bc41a9990f1eadc5",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.8061750000000001,
+            "stop_loss": 0.8048689285714287,
+            "take_profit": 0.8087871428571429,
+            "position_size": 114,
+            "broker_deal_id": "000154c4-000c-819e-0000-000080e31ed9"
+          },
+          "created_at": "2026-07-15 17:11:57"
+        },
+        {
+          "id": 8374,
+          "trade_id": "f25255d3150e4c76bc41a9990f1eadc5",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8048689285714287,
+            "new_value": 0.80487,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-15 17:11:58"
+        },
+        {
+          "id": 8375,
+          "trade_id": "f25255d3150e4c76bc41a9990f1eadc5",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8087871428571429,
+            "new_value": 0.80879,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-15 17:11:58"
+        },
+        {
+          "id": 8376,
+          "trade_id": "f25255d3150e4c76bc41a9990f1eadc5",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 114.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-15 17:11:58"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.81137, bb_lower=0.80638, bb_mid=0.80887, rsi=29.72, pct_b=-0.031",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "f25255d3150e4c76bc41a9990f1eadc5",
+        "signal_id": "1412c92d94444b189f9297535ca5af97",
+        "instrument": "USD_CHF",
+        "direction": "long",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.964,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.81137, bb_lower=0.80638, bb_mid=0.80887, rsi=29.72, pct_b=-0.031",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.8386,
+          "bias_since": "2026-07-03T00:00:52.626444+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 114,
+          "rejection_reason": null,
+          "entry_price": 0.8061750000000001,
+          "stop_loss": 0.8048689285714287,
+          "take_profit": 0.8087871428571429
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.81137,
+            "bb_lower": 0.80638,
+            "bb_mid": 0.80887,
+            "rsi": 29.72,
+            "pct_b": -0.031
+          },
+          "entry_price": 0.806225
+        },
+        "entry": {
+          "price": 0.8061750000000001,
+          "time": "2026-07-15T17:11:57.054740+00:00",
+          "broker_deal_id": "000154c4-000c-819e-0000-000080e31ed9"
+        }
+      }
+    },
+    {
       "id": "b25bc210e2604a19916f5b7b3bd30496",
       "stream": "llm",
       "instrument": "USD_CAD",
@@ -67183,119 +67303,6 @@
         "unrealized_pips": 17.7,
         "distance_sl_pips": 38.5,
         "distance_tp_pips": 22.4
-      }
-    },
-    {
-      "id": "a1ae150719a146c58c499e00e4b540e9",
-      "stream": "llm",
-      "instrument": "AUD_USD",
-      "direction": "short",
-      "entry_price": 0.7070000000000001,
-      "exit_price": 0.70696,
-      "stop_loss": 0.7090287500000001,
-      "take_profit": 0.7029425,
-      "position_size": 163.0,
-      "pnl": 0.01,
-      "pnl_pips": 0.4,
-      "status": "closed_reconciled",
-      "opened_at": "2026-06-08T13:02:15.565205+00:00",
-      "closed_at": "2026-06-08T13:02:17.619695+00:00",
-      "broker_deal_id": "o_c5398e76-1d7e-416b-8170-77c89397528d",
-      "events": [
-        {
-          "id": 6437,
-          "trade_id": "a1ae150719a146c58c499e00e4b540e9",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.7070000000000001,
-            "stop_loss": 0.7090287500000001,
-            "take_profit": 0.7029425,
-            "position_size": 163,
-            "broker_deal_id": "o_c5398e76-1d7e-416b-8170-77c89397528d"
-          },
-          "created_at": "2026-06-08 13:02:15"
-        },
-        {
-          "id": 6438,
-          "trade_id": "a1ae150719a146c58c499e00e4b540e9",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 0.70696,
-            "pnl": 0.01,
-            "pnl_pips": 0.4,
-            "actual_close_time": null,
-            "detection_time": "2026-06-08T13:02:17.621235+00:00"
-          },
-          "created_at": "2026-06-08 13:02:17"
-        }
-      ],
-      "reasoning": "The recent news about Hong Kong's IPO boom developing a performance problem may have a negative impact on the AUD/USD pair. As Hong Kong is a significant financial hub in the Asia-Pacific region, any issues with its IPO market can have a ripple effect on the Australian economy, which is already showing a bearish trend. The current price of 0.70701 and a 24h change of -0.4597% indicate a short-term bearish momentum. However, the evidence from a single headline is not strong, and other factors may influence the market.",
-      "source": "llm",
-      "record": {
-        "trade_id": "a1ae150719a146c58c499e00e4b540e9",
-        "signal_id": "daa92fdc774640c7824915f7d44356ec",
-        "instrument": "AUD_USD",
-        "direction": "short",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent news about Hong Kong's IPO boom developing a performance problem may have a negative impact on the AUD/USD pair. As Hong Kong is a significant financial hub in the Asia-Pacific region, any issues with its IPO market can have a ripple effect on the Australian economy, which is already showing a bearish trend. The current price of 0.70701 and a 24h change of -0.4597% indicate a short-term bearish momentum. However, the evidence from a single headline is not strong, and other factors may influence the market.",
-          "key_factors": [
-            "Hong Kong IPO market performance",
-            "Australian economy",
-            "Bearish trend"
-          ],
-          "risk_factors": [
-            "Other economic news from Australia or the US that could contradict this view",
-            "Multiple confirming sources of negative news about Hong Kong's IPO market",
-            "Technical indicators that suggest a reversal in the bearish trend"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this trade is that the connection between Hong Kong's IPO market performance and the Australian economy, as it relates to the AUD/USD pair, is tenuous and not directly supported by strong, recent economic data. The Australian economy's trends and the AUD/USD exchange rate are influenced by a broad range of factors including commodity prices, domestic economic indicators, and US economic data, which seem to be overlooked in this analysis.",
-          "alternative_interpretation": "An alternative interpretation is that the news about Hong Kong's IPO market could have a minimal direct impact on the AUD/USD pair. Instead, one could focus on Australia's economic resilience, its commodity exports, and any recent positive developments that might counterbalance the bearish trend. Additionally, technical analysis might suggest that the current price level presents a support zone that could lead to a reversal rather than a continuation of the bearish trend.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the connection between Hong Kong's IPO market performance and the Australian economy, as it relates to the AUD/USD pair, is tenuous and not directly supported by strong, recent economic data. The Australian economy's trends and the AUD/USD exchange rate are influenced by a broad range of factors including commodity prices, domestic economic indicators, and US economic data, which seem to be overlooked in this analysis.\",\n  \n  \"alternative_interpretation\": \"An alternative interpretation is that the news about Hong Kong's IPO market could have a minimal direct impact on the AUD/USD pair. Instead, one could focus on Australia's economic resilience, its commodity exports, and any recent positive developments that might counterbalance the bearish trend. Additionally, technical analysis might suggest that the current price level presents a support zone that could lead to a reversal rather than a continuation of the bearish trend.\",\n  \n  \"conviction_after_challenge\": 0.4,\n  \n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "e030fca22ed04ff0a647ffec9b5ffebf"
-        ],
-        "price_context": {
-          "current_price": 0.70701,
-          "daily_change_pct": -0.4597,
-          "trend": "bearish"
-        },
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 1.0,
-          "bias_since": "2026-06-01T15:52:52.508372+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 163,
-          "rejection_reason": null,
-          "entry_price": 0.7070000000000001,
-          "stop_loss": 0.7090287500000001,
-          "take_profit": 0.7029425
-        },
-        "metadata": null,
-        "entry": {
-          "price": 0.7070000000000001,
-          "time": "2026-06-08T13:02:15.565205+00:00",
-          "broker_deal_id": "o_c5398e76-1d7e-416b-8170-77c89397528d"
-        },
-        "exit": {
-          "price": 0.70696,
-          "time": "2026-06-08T13:02:17.619695+00:00",
-          "pnl": 0.01,
-          "pnl_pips": 0.4,
-          "close_reason": null
-        }
       }
     }
   ]
