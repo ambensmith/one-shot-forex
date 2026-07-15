@@ -1,6 +1,415 @@
 {
   "signals": [
     {
+      "id": "08cc5bb0356649e3a06dffd3ae43573f",
+      "stream": "strategy:volatility_breakout",
+      "source": "strategy:volatility_breakout",
+      "instrument": "USD_CAD",
+      "direction": "long",
+      "confidence": 0.204,
+      "reasoning": "Volatility Breakout (Alizadeh 2002) \u2014 trades breakouts after ATR contraction. Indicators: atr=0.00081, avg_atr=0.00125, atr_ratio=0.648, recent_high=1.407, recent_low=1.40397, contracted=True",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "atr_period": 14,
+          "atr_contraction_threshold": 0.7,
+          "breakout_atr_multiplier": 1.0
+        },
+        "indicators": {
+          "atr": 0.00081,
+          "avg_atr": 0.00125,
+          "atr_ratio": 0.648,
+          "recent_high": 1.407,
+          "recent_low": 1.40397,
+          "contracted": true
+        },
+        "entry_price": 1.40666
+      },
+      "created_at": "2026-07-15T11:28:03.862633+00:00"
+    },
+    {
+      "id": "837d446f9ccf46cfbdb9c31db67bcca5",
+      "stream": "strategy:carry",
+      "source": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "confidence": 0.125,
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.025",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "rate_data": "manual",
+          "min_differential": 0.5,
+          "rates": {
+            "USD": 5.25,
+            "EUR": 4.5,
+            "GBP": 5.25,
+            "JPY": 0.1,
+            "CHF": 1.75,
+            "AUD": 4.35,
+            "CAD": 5.0,
+            "NZD": 5.5
+          }
+        },
+        "indicators": {
+          "base_rate": 4.5,
+          "quote_rate": 5.25,
+          "differential": -0.75,
+          "vol_penalty": 0.025
+        },
+        "entry_price": 0.85213
+      },
+      "created_at": "2026-07-15T11:28:03.783815+00:00"
+    },
+    {
+      "id": "8c7236f4c36b44a2a0a8df08ff82b0f2",
+      "stream": "strategy:carry",
+      "source": "strategy:carry",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "confidence": 0.146,
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.034",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "rate_data": "manual",
+          "min_differential": 0.5,
+          "rates": {
+            "USD": 5.25,
+            "EUR": 4.5,
+            "GBP": 5.25,
+            "JPY": 0.1,
+            "CHF": 1.75,
+            "AUD": 4.35,
+            "CAD": 5.0,
+            "NZD": 5.5
+          }
+        },
+        "indicators": {
+          "base_rate": 4.35,
+          "quote_rate": 5.25,
+          "differential": -0.9,
+          "vol_penalty": 0.034
+        },
+        "entry_price": 0.69834
+      },
+      "created_at": "2026-07-15T11:28:03.778456+00:00"
+    },
+    {
+      "id": "822dc9566dff42c287aa364ae66366ab",
+      "stream": "strategy:carry",
+      "source": "strategy:carry",
+      "instrument": "USD_CHF",
+      "direction": "long",
+      "confidence": 0.669,
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.031",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "rate_data": "manual",
+          "min_differential": 0.5,
+          "rates": {
+            "USD": 5.25,
+            "EUR": 4.5,
+            "GBP": 5.25,
+            "JPY": 0.1,
+            "CHF": 1.75,
+            "AUD": 4.35,
+            "CAD": 5.0,
+            "NZD": 5.5
+          }
+        },
+        "indicators": {
+          "base_rate": 5.25,
+          "quote_rate": 1.75,
+          "differential": 3.5,
+          "vol_penalty": 0.031
+        },
+        "entry_price": 0.8107800000000001
+      },
+      "created_at": "2026-07-15T11:28:03.692226+00:00"
+    },
+    {
+      "id": "5c541e53fc4f4b5d9136d30a863fee9a",
+      "stream": "strategy:carry",
+      "source": "strategy:carry",
+      "instrument": "USD_JPY",
+      "direction": "long",
+      "confidence": 0.982,
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=0.1, differential=5.15, vol_penalty=0.018",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "rate_data": "manual",
+          "min_differential": 0.5,
+          "rates": {
+            "USD": 5.25,
+            "EUR": 4.5,
+            "GBP": 5.25,
+            "JPY": 0.1,
+            "CHF": 1.75,
+            "AUD": 4.35,
+            "CAD": 5.0,
+            "NZD": 5.5
+          }
+        },
+        "indicators": {
+          "base_rate": 5.25,
+          "quote_rate": 0.1,
+          "differential": 5.15,
+          "vol_penalty": 0.018
+        },
+        "entry_price": 162.364
+      },
+      "created_at": "2026-07-15T11:28:03.685827+00:00"
+    },
+    {
+      "id": "fad8edcc82204a2884a346b4df2acc3d",
+      "stream": "strategy:carry",
+      "source": "strategy:carry",
+      "instrument": "EUR_USD",
+      "direction": "short",
+      "confidence": 0.125,
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.025",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "rate_data": "manual",
+          "min_differential": 0.5,
+          "rates": {
+            "USD": 5.25,
+            "EUR": 4.5,
+            "GBP": 5.25,
+            "JPY": 0.1,
+            "CHF": 1.75,
+            "AUD": 4.35,
+            "CAD": 5.0,
+            "NZD": 5.5
+          }
+        },
+        "indicators": {
+          "base_rate": 4.5,
+          "quote_rate": 5.25,
+          "differential": -0.75,
+          "vol_penalty": 0.025
+        },
+        "entry_price": 1.1417950000000001
+      },
+      "created_at": "2026-07-15T11:28:03.680626+00:00"
+    },
+    {
+      "id": "502cab5ecae947d1ad49dd3aa790e569",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "XAU_USD",
+      "direction": "short",
+      "confidence": 0.372,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.02373, short_return=-0.01085, combined_signal=-0.01858",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": -0.02373,
+          "short_return": -0.01085,
+          "combined_signal": -0.01858
+        },
+        "entry_price": 4030.105
+      },
+      "created_at": "2026-07-15T11:28:03.677574+00:00"
+    },
+    {
+      "id": "f0611f9da7a147fe834dee8adbad648a",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "confidence": 0.076,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.005, short_return=-0.00197, combined_signal=-0.00379",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": -0.005,
+          "short_return": -0.00197,
+          "combined_signal": -0.00379
+        },
+        "entry_price": 0.85213
+      },
+      "created_at": "2026-07-15T11:28:03.674675+00:00"
+    },
+    {
+      "id": "6463d2ce024e492db5d2afc9f8c1814c",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "USD_CAD",
+      "direction": "short",
+      "confidence": 0.078,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.007, short_return=0.00068, combined_signal=-0.00392",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": -0.007,
+          "short_return": 0.00068,
+          "combined_signal": -0.00392
+        },
+        "entry_price": 1.40666
+      },
+      "created_at": "2026-07-15T11:28:03.671742+00:00"
+    },
+    {
+      "id": "9173a78bfaba4dfcb0b1bd3ad2fb8ebf",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "AUD_USD",
+      "direction": "long",
+      "confidence": 0.074,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00644, short_return=-0.00047, combined_signal=0.00368",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": 0.00644,
+          "short_return": -0.00047,
+          "combined_signal": 0.00368
+        },
+        "entry_price": 0.69834
+      },
+      "created_at": "2026-07-15T11:28:03.668868+00:00"
+    },
+    {
+      "id": "e38602156b384b78a39fdfa0186e3538",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "USD_CHF",
+      "direction": "long",
+      "confidence": 0.156,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.0104, short_return=0.00393, combined_signal=0.00781",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": 0.0104,
+          "short_return": 0.00393,
+          "combined_signal": 0.00781
+        },
+        "entry_price": 0.8107800000000001
+      },
+      "created_at": "2026-07-15T11:28:03.666186+00:00"
+    },
+    {
+      "id": "1312adf6350746ad9ac6f2120021721f",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "USD_JPY",
+      "direction": "long",
+      "confidence": 0.111,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00766, short_return=0.00243, combined_signal=0.00557",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": 0.00766,
+          "short_return": 0.00243,
+          "combined_signal": 0.00557
+        },
+        "entry_price": 162.364
+      },
+      "created_at": "2026-07-15T11:28:03.663288+00:00"
+    },
+    {
+      "id": "5f3db93f0c154cf2aa316f8ccbb27d50",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "GBP_USD",
+      "direction": "long",
+      "confidence": 0.027,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00255, short_return=-0.00045, combined_signal=0.00135",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": 0.00255,
+          "short_return": -0.00045,
+          "combined_signal": 0.00135
+        },
+        "entry_price": 1.339915
+      },
+      "created_at": "2026-07-15T11:28:03.659962+00:00"
+    },
+    {
+      "id": "53399f27eb024d4fb7aebbe1f6e24273",
+      "stream": "strategy:momentum",
+      "source": "strategy:momentum",
+      "instrument": "EUR_USD",
+      "direction": "short",
+      "confidence": 0.049,
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.00247, short_return=-0.00239, combined_signal=-0.00244",
+      "was_traded": false,
+      "rejection_reason": null,
+      "is_comparison": false,
+      "metadata": {
+        "parameters": {
+          "lookback_months": 12,
+          "rebalance_frequency": "weekly"
+        },
+        "indicators": {
+          "lookback_return": -0.00247,
+          "short_return": -0.00239,
+          "combined_signal": -0.00244
+        },
+        "entry_price": 1.1417950000000001
+      },
+      "created_at": "2026-07-15T11:28:03.590674+00:00"
+    },
+    {
       "id": "871e56b87342404bb36a4943a824aaaf",
       "stream": "strategy:volatility_breakout",
       "source": "strategy:volatility_breakout",
@@ -5373,369 +5782,6 @@
       "is_comparison": false,
       "metadata": null,
       "created_at": "2026-07-14T13:20:17.969508+00:00"
-    },
-    {
-      "id": "ca414877f79a44d2afacaddd0cc515bd",
-      "stream": "llm",
-      "source": "llm",
-      "instrument": "GBP_USD",
-      "direction": "long",
-      "confidence": 0.4,
-      "reasoning": "The recent news and market context suggest a bullish outlook for GBP/USD. The US dollar is experiencing broad-based losses, and the upcoming US CPI data may show a decline in headline inflation due to falling gas prices. However, the core rate is expected to remain high, which could limit the Fed's ability to relax its monetary policy. On the UK side, consumer spending remains resilient despite risks building, which could support the GBP. The US-Iran conflict and its potential impact on global markets also add uncertainty, which might favor a long GBP/USD position as a safe-haven play. The current price and recent trend are also considered.",
-      "was_traded": true,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": null,
-      "created_at": "2026-07-14T13:20:16.372962+00:00"
-    },
-    {
-      "id": "a756d383a0934b7e8ea9bf95077d6b77",
-      "stream": "llm",
-      "source": "llm",
-      "instrument": "EUR_USD",
-      "direction": "long",
-      "confidence": 0.4,
-      "reasoning": "The recent news and market context suggest a slightly bullish outlook for EUR/USD. The USD is showing mixed performance against other currencies, and the ECB's digital euro pilot and comments from ECB members may provide some support for the EUR. Additionally, the US CPI data and Fed testimony could lead to a dovish tone from the Fed, which might weigh on the USD. However, the evidence is not strongly conclusive, and there are potential risks to this view.",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": null,
-      "created_at": "2026-07-14T13:20:15.452093+00:00"
-    },
-    {
-      "id": "91750a7c75bb4157bb58a071b36718ea",
-      "stream": "llm",
-      "source": "llm",
-      "instrument": "EUR_GBP",
-      "direction": "neutral",
-      "confidence": 0.4,
-      "reasoning": "The recent news headlines and market context for EUR/GBP suggest a neutral stance. The ECB's digital euro pilot (1) may have long-term implications for monetary policy, but its immediate impact on EUR/GBP is unclear. Germany's wholesale prices dropping further in June (2-5) could indicate easing inflationary pressures, which might lead to a dovish ECB stance, potentially weakening EUR/GBP. However, the US June CPI preview (6-8) suggests that the Fed is unlikely to relax its policy, which could support the USD and, in turn, affect EUR/GBP. The UK-Switzerland deal (10) and Volkswagen's job cuts (9) have limited direct impact on EUR/GBP. The current price and recent trend (ranging) also suggest a neutral stance.",
-      "was_traded": false,
-      "rejection_reason": "LLM had no directional conviction",
-      "is_comparison": false,
-      "metadata": null,
-      "created_at": "2026-07-14T13:20:14.066526+00:00"
-    },
-    {
-      "id": "4b58ddb910da4339a06aa6ce2873adac",
-      "stream": "llm",
-      "source": "llm",
-      "instrument": "AUD_USD",
-      "direction": "long",
-      "confidence": 0.4,
-      "reasoning": "The recent news and market context suggest a positive outlook for AUD/USD. China's strong trade data, with export growth surging 27% y/y, indicates a robust demand for Australian commodities, which is a significant factor for Australia's economy. Additionally, the improvement in Australian business mood in June, despite missing expectations due to new oil spikes, shows resilience. The global investor sentiment is at its highest since February, with a record 54% of fund managers expecting 'no landing' for the global economy, which supports risk currencies like AUD. However, the US June CPI data, which is expected to show a decline in headline inflation but stable core inflation, may influence the Fed's policy stance and impact AUD/USD.",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": null,
-      "created_at": "2026-07-14T13:20:12.912862+00:00"
-    },
-    {
-      "id": "8dbf1b17b2c44c8b8bfee016ad67fdbb",
-      "stream": "strategy:breakout",
-      "source": "strategy:breakout",
-      "instrument": "USD_CAD",
-      "direction": "short",
-      "confidence": 0.54,
-      "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.41748, asian_low=1.41287, asian_range=0.00461, buffer=0.001",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "asian_start": "22:00",
-          "asian_end": "6:00",
-          "breakout_buffer_pips": 10
-        },
-        "indicators": {
-          "asian_high": 1.41748,
-          "asian_low": 1.41287,
-          "asian_range": 0.00461,
-          "buffer": 0.001
-        },
-        "entry_price": 1.41126
-      },
-      "created_at": "2026-07-14T11:23:55.983869+00:00"
-    },
-    {
-      "id": "2a1cb6f5e1b1427aa065192d5e42e56f",
-      "stream": "strategy:carry",
-      "source": "strategy:carry",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "confidence": 0.14,
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.01",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "rate_data": "manual",
-          "min_differential": 0.5,
-          "rates": {
-            "USD": 5.25,
-            "EUR": 4.5,
-            "GBP": 5.25,
-            "JPY": 0.1,
-            "CHF": 1.75,
-            "AUD": 4.35,
-            "CAD": 5.0,
-            "NZD": 5.5
-          }
-        },
-        "indicators": {
-          "base_rate": 4.5,
-          "quote_rate": 5.25,
-          "differential": -0.75,
-          "vol_penalty": 0.01
-        },
-        "entry_price": 0.85202
-      },
-      "created_at": "2026-07-14T11:23:55.964696+00:00"
-    },
-    {
-      "id": "f3c30ce4ec3f4aec8500f333ce64f8a2",
-      "stream": "strategy:carry",
-      "source": "strategy:carry",
-      "instrument": "AUD_USD",
-      "direction": "short",
-      "confidence": 0.142,
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.038",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "rate_data": "manual",
-          "min_differential": 0.5,
-          "rates": {
-            "USD": 5.25,
-            "EUR": 4.5,
-            "GBP": 5.25,
-            "JPY": 0.1,
-            "CHF": 1.75,
-            "AUD": 4.35,
-            "CAD": 5.0,
-            "NZD": 5.5
-          }
-        },
-        "indicators": {
-          "base_rate": 4.35,
-          "quote_rate": 5.25,
-          "differential": -0.9,
-          "vol_penalty": 0.038
-        },
-        "entry_price": 0.69392
-      },
-      "created_at": "2026-07-14T11:23:55.958761+00:00"
-    },
-    {
-      "id": "1222c7becdba4a37ad47ad97a09a00ba",
-      "stream": "strategy:carry",
-      "source": "strategy:carry",
-      "instrument": "USD_CHF",
-      "direction": "long",
-      "confidence": 0.66,
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.04",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "rate_data": "manual",
-          "min_differential": 0.5,
-          "rates": {
-            "USD": 5.25,
-            "EUR": 4.5,
-            "GBP": 5.25,
-            "JPY": 0.1,
-            "CHF": 1.75,
-            "AUD": 4.35,
-            "CAD": 5.0,
-            "NZD": 5.5
-          }
-        },
-        "indicators": {
-          "base_rate": 5.25,
-          "quote_rate": 1.75,
-          "differential": 3.5,
-          "vol_penalty": 0.04
-        },
-        "entry_price": 0.812505
-      },
-      "created_at": "2026-07-14T11:23:55.955340+00:00"
-    },
-    {
-      "id": "f6f1e047d15f461899f41b9935adff74",
-      "stream": "strategy:carry",
-      "source": "strategy:carry",
-      "instrument": "USD_JPY",
-      "direction": "long",
-      "confidence": 0.986,
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=0.1, differential=5.15, vol_penalty=0.014",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "rate_data": "manual",
-          "min_differential": 0.5,
-          "rates": {
-            "USD": 5.25,
-            "EUR": 4.5,
-            "GBP": 5.25,
-            "JPY": 0.1,
-            "CHF": 1.75,
-            "AUD": 4.35,
-            "CAD": 5.0,
-            "NZD": 5.5
-          }
-        },
-        "indicators": {
-          "base_rate": 5.25,
-          "quote_rate": 0.1,
-          "differential": 5.15,
-          "vol_penalty": 0.014
-        },
-        "entry_price": 162.2475
-      },
-      "created_at": "2026-07-14T11:23:55.951797+00:00"
-    },
-    {
-      "id": "d796a420494c40f480d5ec0e632fa166",
-      "stream": "strategy:carry",
-      "source": "strategy:carry",
-      "instrument": "EUR_USD",
-      "direction": "short",
-      "confidence": 0.129,
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.021",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "rate_data": "manual",
-          "min_differential": 0.5,
-          "rates": {
-            "USD": 5.25,
-            "EUR": 4.5,
-            "GBP": 5.25,
-            "JPY": 0.1,
-            "CHF": 1.75,
-            "AUD": 4.35,
-            "CAD": 5.0,
-            "NZD": 5.5
-          }
-        },
-        "indicators": {
-          "base_rate": 4.5,
-          "quote_rate": 5.25,
-          "differential": -0.75,
-          "vol_penalty": 0.021
-        },
-        "entry_price": 1.139375
-      },
-      "created_at": "2026-07-14T11:23:55.945914+00:00"
-    },
-    {
-      "id": "c2ee23ad5ca24941a9ed13970f7e9b0f",
-      "stream": "strategy:momentum",
-      "source": "strategy:momentum",
-      "instrument": "XAU_USD",
-      "direction": "short",
-      "confidence": 0.241,
-      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.01364, short_return=-0.00963, combined_signal=-0.01204",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "lookback_months": 12,
-          "rebalance_frequency": "weekly"
-        },
-        "indicators": {
-          "lookback_return": -0.01364,
-          "short_return": -0.00963,
-          "combined_signal": -0.01204
-        },
-        "entry_price": 4023.0699999999997
-      },
-      "created_at": "2026-07-14T11:23:55.942199+00:00"
-    },
-    {
-      "id": "28403a75e88244dc85568436fa2e78cc",
-      "stream": "strategy:momentum",
-      "source": "strategy:momentum",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "confidence": 0.073,
-      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.00566, short_return=-0.00062, combined_signal=-0.00364",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "lookback_months": 12,
-          "rebalance_frequency": "weekly"
-        },
-        "indicators": {
-          "lookback_return": -0.00566,
-          "short_return": -0.00062,
-          "combined_signal": -0.00364
-        },
-        "entry_price": 0.85202
-      },
-      "created_at": "2026-07-14T11:23:55.938821+00:00"
-    },
-    {
-      "id": "7078ef2302f04b3f92a28a5816355ea5",
-      "stream": "strategy:momentum",
-      "source": "strategy:momentum",
-      "instrument": "USD_CAD",
-      "direction": "short",
-      "confidence": 0.103,
-      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=-0.00717, short_return=-0.00215, combined_signal=-0.00516",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "lookback_months": 12,
-          "rebalance_frequency": "weekly"
-        },
-        "indicators": {
-          "lookback_return": -0.00717,
-          "short_return": -0.00215,
-          "combined_signal": -0.00516
-        },
-        "entry_price": 1.41126
-      },
-      "created_at": "2026-07-14T11:23:55.935540+00:00"
-    },
-    {
-      "id": "c05f34bac9184a2e905bf2480051689b",
-      "stream": "strategy:momentum",
-      "source": "strategy:momentum",
-      "instrument": "AUD_USD",
-      "direction": "long",
-      "confidence": 0.081,
-      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00648, short_return=0.00046, combined_signal=0.00407",
-      "was_traded": false,
-      "rejection_reason": null,
-      "is_comparison": false,
-      "metadata": {
-        "parameters": {
-          "lookback_months": 12,
-          "rebalance_frequency": "weekly"
-        },
-        "indicators": {
-          "lookback_return": 0.00648,
-          "short_return": 0.00046,
-          "combined_signal": 0.00407
-        },
-        "entry_price": 0.69392
-      },
-      "created_at": "2026-07-14T11:23:55.932048+00:00"
     }
   ]
 }
