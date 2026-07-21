@@ -1,6 +1,104 @@
 {
   "trades": [
     {
+      "id": "bcf03919c5884e20bdb4f142bc59e164",
+      "stream": "strategy:mean_reversion",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.85284,
+      "exit_price": null,
+      "stop_loss": 0.85364,
+      "take_profit": 0.8512307142857143,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-07-21T13:25:11.335648+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080b91223",
+      "events": [
+        {
+          "id": 8694,
+          "trade_id": "bcf03919c5884e20bdb4f142bc59e164",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.85284,
+            "stop_loss": 0.8536446428571429,
+            "take_profit": 0.8512307142857143,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080b91223"
+          },
+          "created_at": "2026-07-21 13:25:11"
+        },
+        {
+          "id": 8695,
+          "trade_id": "bcf03919c5884e20bdb4f142bc59e164",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8536446428571429,
+            "new_value": 0.85364,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-21 13:25:12"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85228, bb_lower=0.84815, bb_mid=0.85022, rsi=76.06, pct_b=1.056",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "bcf03919c5884e20bdb4f142bc59e164",
+        "signal_id": "5d5e43a923f24b919aa26e3aeec55eee",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.842,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85228, bb_lower=0.84815, bb_mid=0.85022, rsi=76.06, pct_b=1.056",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.5998,
+          "bias_since": "2026-07-20T12:11:59.803269+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.85284,
+          "stop_loss": 0.8536446428571429,
+          "take_profit": 0.8512307142857143
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.85228,
+            "bb_lower": 0.84815,
+            "bb_mid": 0.85022,
+            "rsi": 76.06,
+            "pct_b": 1.056
+          },
+          "entry_price": 0.85251
+        },
+        "entry": {
+          "price": 0.85284,
+          "time": "2026-07-21T13:25:11.335648+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080b91223"
+        }
+      }
+    },
+    {
       "id": "eea89c1a05eb49b1a51c9e4f4bd527bc",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
@@ -68834,542 +68932,6 @@
         "unrealized_pips": 1.1,
         "distance_sl_pips": 22.2,
         "distance_tp_pips": 41.0
-      }
-    },
-    {
-      "id": "743b190c79e54af087e979e8f61facf0",
-      "stream": "strategy:breakout",
-      "instrument": "EUR_USD",
-      "direction": "long",
-      "entry_price": 1.1577600000000001,
-      "exit_price": 1.1489449999999999,
-      "stop_loss": 1.15521,
-      "take_profit": 1.16287,
-      "position_size": 100.0,
-      "pnl": -0.24,
-      "pnl_pips": -88.2,
-      "status": "closed_sl",
-      "opened_at": "2026-06-11T21:57:10.567170+00:00",
-      "closed_at": "2026-06-17T19:00:44.459",
-      "broker_deal_id": "00005552-0055-311e-0000-000082009734",
-      "events": [
-        {
-          "id": 6660,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.1577600000000001,
-            "stop_loss": 1.1552073214285716,
-            "take_profit": 1.162865357142857,
-            "position_size": 100,
-            "broker_deal_id": "00005552-0055-311e-0000-000082009734"
-          },
-          "created_at": "2026-06-11 21:57:10"
-        },
-        {
-          "id": 6665,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.1552073214285716,
-            "new_value": 1.15521,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-11 21:57:12"
-        },
-        {
-          "id": 6666,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.162865357142857,
-            "new_value": 1.16287,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-11 21:57:12"
-        },
-        {
-          "id": 6668,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157945,
-            "unrealized_pl": 0.02,
-            "unrealized_pips": 1.8,
-            "distance_sl_pips": 27.3,
-            "distance_tp_pips": 49.3
-          },
-          "created_at": "2026-06-11 22:06:05"
-        },
-        {
-          "id": 6671,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157635,
-            "unrealized_pl": -0.01,
-            "unrealized_pips": -1.3,
-            "distance_sl_pips": 24.2,
-            "distance_tp_pips": 52.4
-          },
-          "created_at": "2026-06-11 23:47:48"
-        },
-        {
-          "id": 6674,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.156395,
-            "unrealized_pl": -0.14,
-            "unrealized_pips": -13.7,
-            "distance_sl_pips": 11.8,
-            "distance_tp_pips": 64.8
-          },
-          "created_at": "2026-06-12 02:00:33"
-        },
-        {
-          "id": 6677,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157225,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -5.4,
-            "distance_sl_pips": 20.1,
-            "distance_tp_pips": 56.5
-          },
-          "created_at": "2026-06-12 03:59:57"
-        },
-        {
-          "id": 6680,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.158315,
-            "unrealized_pl": 0.06,
-            "unrealized_pips": 5.5,
-            "distance_sl_pips": 31.0,
-            "distance_tp_pips": 45.6
-          },
-          "created_at": "2026-06-12 08:39:07"
-        },
-        {
-          "id": 6683,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157095,
-            "unrealized_pl": -0.07,
-            "unrealized_pips": -6.7,
-            "distance_sl_pips": 18.8,
-            "distance_tp_pips": 57.8
-          },
-          "created_at": "2026-06-12 12:02:12"
-        },
-        {
-          "id": 6690,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.158055,
-            "unrealized_pl": 0.03,
-            "unrealized_pips": 2.9,
-            "distance_sl_pips": 28.4,
-            "distance_tp_pips": 48.2
-          },
-          "created_at": "2026-06-12 15:34:57"
-        },
-        {
-          "id": 6693,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157505,
-            "unrealized_pl": -0.03,
-            "unrealized_pips": -2.6,
-            "distance_sl_pips": 22.9,
-            "distance_tp_pips": 53.7
-          },
-          "created_at": "2026-06-12 17:52:01"
-        },
-        {
-          "id": 6696,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.157165,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -6.0,
-            "distance_sl_pips": 19.5,
-            "distance_tp_pips": 57.1
-          },
-          "created_at": "2026-06-12 19:53:21"
-        },
-        {
-          "id": 6699,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.15671,
-            "unrealized_pl": -0.11,
-            "unrealized_pips": -10.5,
-            "distance_sl_pips": 15.0,
-            "distance_tp_pips": 61.6
-          },
-          "created_at": "2026-06-12 21:27:03"
-        },
-        {
-          "id": 6702,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.15671,
-            "unrealized_pl": -0.11,
-            "unrealized_pips": -10.5,
-            "distance_sl_pips": 15.0,
-            "distance_tp_pips": 61.6
-          },
-          "created_at": "2026-06-12 22:57:47"
-        },
-        {
-          "id": 6708,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.160905,
-            "unrealized_pl": 0.31,
-            "unrealized_pips": 31.4,
-            "distance_sl_pips": 57.0,
-            "distance_tp_pips": 19.6
-          },
-          "created_at": "2026-06-14 22:59:50"
-        },
-        {
-          "id": 6723,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.161065,
-            "unrealized_pl": 0.33,
-            "unrealized_pips": 33.0,
-            "distance_sl_pips": 58.5,
-            "distance_tp_pips": 18.1
-          },
-          "created_at": "2026-06-15 00:14:42"
-        },
-        {
-          "id": 6727,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.159545,
-            "unrealized_pl": 0.18,
-            "unrealized_pips": 17.8,
-            "distance_sl_pips": 43.3,
-            "distance_tp_pips": 33.3
-          },
-          "created_at": "2026-06-15 02:13:10"
-        },
-        {
-          "id": 6737,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.160685,
-            "unrealized_pl": 0.29,
-            "unrealized_pips": 29.2,
-            "distance_sl_pips": 54.7,
-            "distance_tp_pips": 21.9
-          },
-          "created_at": "2026-06-15 07:37:02"
-        },
-        {
-          "id": 6742,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.161645,
-            "unrealized_pl": 0.39,
-            "unrealized_pips": 38.8,
-            "distance_sl_pips": 64.3,
-            "distance_tp_pips": 12.3
-          },
-          "created_at": "2026-06-15 13:34:52"
-        },
-        {
-          "id": 6755,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.160185,
-            "unrealized_pl": 0.24,
-            "unrealized_pips": 24.2,
-            "distance_sl_pips": 49.7,
-            "distance_tp_pips": 26.9
-          },
-          "created_at": "2026-06-15 18:11:31"
-        },
-        {
-          "id": 6760,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.15913,
-            "unrealized_pl": 0.14,
-            "unrealized_pips": 13.7,
-            "distance_sl_pips": 39.2,
-            "distance_tp_pips": 37.4
-          },
-          "created_at": "2026-06-15 21:19:08"
-        },
-        {
-          "id": 6763,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.159075,
-            "unrealized_pl": 0.13,
-            "unrealized_pips": 13.1,
-            "distance_sl_pips": 38.7,
-            "distance_tp_pips": 37.9
-          },
-          "created_at": "2026-06-15 23:10:54"
-        },
-        {
-          "id": 6766,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.158875,
-            "unrealized_pl": 0.11,
-            "unrealized_pips": 11.1,
-            "distance_sl_pips": 36.7,
-            "distance_tp_pips": 39.9
-          },
-          "created_at": "2026-06-16 01:44:44"
-        },
-        {
-          "id": 6769,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.158945,
-            "unrealized_pl": 0.12,
-            "unrealized_pips": 11.8,
-            "distance_sl_pips": 37.4,
-            "distance_tp_pips": 39.2
-          },
-          "created_at": "2026-06-16 07:06:24"
-        },
-        {
-          "id": 6779,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.159635,
-            "unrealized_pl": 0.19,
-            "unrealized_pips": 18.7,
-            "distance_sl_pips": 44.2,
-            "distance_tp_pips": 32.4
-          },
-          "created_at": "2026-06-16 12:19:12"
-        },
-        {
-          "id": 6785,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.161195,
-            "unrealized_pl": 0.34,
-            "unrealized_pips": 34.3,
-            "distance_sl_pips": 59.8,
-            "distance_tp_pips": 16.8
-          },
-          "created_at": "2026-06-16 17:23:31"
-        },
-        {
-          "id": 6792,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.160965,
-            "unrealized_pl": 0.32,
-            "unrealized_pips": 32.0,
-            "distance_sl_pips": 57.5,
-            "distance_tp_pips": 19.1
-          },
-          "created_at": "2026-06-16 20:20:34"
-        },
-        {
-          "id": 6795,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.16108,
-            "unrealized_pl": 0.33,
-            "unrealized_pips": 33.2,
-            "distance_sl_pips": 58.7,
-            "distance_tp_pips": 17.9
-          },
-          "created_at": "2026-06-16 22:23:45"
-        },
-        {
-          "id": 6798,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.16119,
-            "unrealized_pl": 0.34,
-            "unrealized_pips": 34.3,
-            "distance_sl_pips": 59.8,
-            "distance_tp_pips": 16.8
-          },
-          "created_at": "2026-06-16 23:51:36"
-        },
-        {
-          "id": 6801,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.161265,
-            "unrealized_pl": 0.35,
-            "unrealized_pips": 35.0,
-            "distance_sl_pips": 60.5,
-            "distance_tp_pips": 16.1
-          },
-          "created_at": "2026-06-17 02:07:33"
-        },
-        {
-          "id": 6804,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.161205,
-            "unrealized_pl": 0.34,
-            "unrealized_pips": 34.4,
-            "distance_sl_pips": 59.9,
-            "distance_tp_pips": 16.7
-          },
-          "created_at": "2026-06-17 07:23:58"
-        },
-        {
-          "id": 6807,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.159085,
-            "unrealized_pl": 0.13,
-            "unrealized_pips": 13.2,
-            "distance_sl_pips": 38.7,
-            "distance_tp_pips": 37.9
-          },
-          "created_at": "2026-06-17 11:59:12"
-        },
-        {
-          "id": 6819,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.159355,
-            "unrealized_pl": 0.16,
-            "unrealized_pips": 15.9,
-            "distance_sl_pips": 41.4,
-            "distance_tp_pips": 35.2
-          },
-          "created_at": "2026-06-17 15:19:25"
-        },
-        {
-          "id": 6825,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.15788,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 1.2,
-            "distance_sl_pips": 26.7,
-            "distance_tp_pips": 49.9
-          },
-          "created_at": "2026-06-17 18:00:08"
-        },
-        {
-          "id": 6829,
-          "trade_id": "743b190c79e54af087e979e8f61facf0",
-          "event_type": "closed_sl",
-          "data": {
-            "exit_price": 1.1489449999999999,
-            "pnl": -0.24,
-            "pnl_pips": -88.2,
-            "actual_close_time": "2026-06-17T19:00:44.459",
-            "detection_time": "2026-06-17T20:06:23.883379+00:00"
-          },
-          "created_at": "2026-06-17 20:06:23"
-        }
-      ],
-      "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.15562, asian_low=1.15257, asian_range=0.00305, buffer=0.001",
-      "source": "strategy:breakout",
-      "record": {
-        "trade_id": "743b190c79e54af087e979e8f61facf0",
-        "signal_id": "332db7ad2f834c338b26bb09fce5dc2a",
-        "instrument": "EUR_USD",
-        "direction": "long",
-        "source": "strategy:breakout",
-        "signal": {
-          "confidence": 0.681,
-          "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.15562, asian_low=1.15257, asian_range=0.00305, buffer=0.001",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 0.6506,
-          "bias_since": "2026-06-11T19:30:34.960729+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.1577600000000001,
-          "stop_loss": 1.1552073214285716,
-          "take_profit": 1.162865357142857
-        },
-        "metadata": {
-          "parameters": {
-            "asian_start": "22:00",
-            "asian_end": "6:00",
-            "breakout_buffer_pips": 10
-          },
-          "indicators": {
-            "asian_high": 1.15562,
-            "asian_low": 1.15257,
-            "asian_range": 0.00305,
-            "buffer": 0.001
-          },
-          "entry_price": 1.1577700000000002
-        },
-        "entry": {
-          "price": 1.1577600000000001,
-          "time": "2026-06-11T21:57:10.567170+00:00",
-          "broker_deal_id": "00005552-0055-311e-0000-000082009734"
-        },
-        "exit": {
-          "price": 1.1489449999999999,
-          "time": "2026-06-17T19:00:44.459",
-          "pnl": -0.24,
-          "pnl_pips": -88.2,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 1.15788,
-        "unrealized_pl": 0.01,
-        "unrealized_pips": 1.2,
-        "distance_sl_pips": 26.7,
-        "distance_tp_pips": 49.9
       }
     }
   ]
