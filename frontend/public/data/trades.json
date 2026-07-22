@@ -1,6 +1,121 @@
 {
   "trades": [
     {
+      "id": "bb75c130e092404fb2ec999ba9079825",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.85284,
+      "exit_price": null,
+      "stop_loss": 0.85354,
+      "take_profit": 0.85144,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-07-22T11:04:56.067234+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080b91472",
+      "events": [
+        {
+          "id": 8756,
+          "trade_id": "bb75c130e092404fb2ec999ba9079825",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.85284,
+            "stop_loss": 0.85354125,
+            "take_profit": 0.8514375000000001,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080b91472"
+          },
+          "created_at": "2026-07-22 11:04:56"
+        },
+        {
+          "id": 8757,
+          "trade_id": "bb75c130e092404fb2ec999ba9079825",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.85354125,
+            "new_value": 0.85354,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-22 11:04:56"
+        },
+        {
+          "id": 8758,
+          "trade_id": "bb75c130e092404fb2ec999ba9079825",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8514375000000001,
+            "new_value": 0.85144,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-22 11:04:57"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.014",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "bb75c130e092404fb2ec999ba9079825",
+        "signal_id": "4009c2848b364823bca663c96ece14b0",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.136,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.014",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.9431,
+          "bias_since": "2026-07-22T08:17:37.326395+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.85284,
+          "stop_loss": 0.85354125,
+          "take_profit": 0.8514375000000001
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.014
+          },
+          "entry_price": 0.85292
+        },
+        "entry": {
+          "price": 0.85284,
+          "time": "2026-07-22T11:04:56.067234+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080b91472"
+        }
+      }
+    },
+    {
       "id": "84aefaf65af64270919578062c747cc6",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
@@ -68717,320 +68832,6 @@
         "unrealized_pips": 18.2,
         "distance_sl_pips": 30.9,
         "distance_tp_pips": 7.2
-      }
-    },
-    {
-      "id": "282df8433d2e408d9c75bd26898247c6",
-      "stream": "llm",
-      "instrument": "USD_CAD",
-      "direction": "long",
-      "entry_price": 1.39677,
-      "exit_price": 1.39785,
-      "stop_loss": 1.39525,
-      "take_profit": 1.39982,
-      "position_size": 100.0,
-      "pnl": -0.1,
-      "pnl_pips": 10.8,
-      "status": "closed_reconciled",
-      "opened_at": "2026-06-15T03:34:30.391558+00:00",
-      "closed_at": "2026-06-15T06:13:13.313",
-      "broker_deal_id": "000154c4-000c-111e-0000-000080fb021f",
-      "events": [
-        {
-          "id": 6728,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.39677,
-            "stop_loss": 1.395245892857143,
-            "take_profit": 1.3998182142857143,
-            "position_size": 116,
-            "broker_deal_id": "000154c4-000c-111e-0000-000080fb021f"
-          },
-          "created_at": "2026-06-15 03:34:30"
-        },
-        {
-          "id": 6729,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.395245892857143,
-            "new_value": 1.39525,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-15 03:34:31"
-        },
-        {
-          "id": 6730,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.3998182142857143,
-            "new_value": 1.39982,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-15 03:34:31"
-        },
-        {
-          "id": 6731,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 116.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-15 03:34:31"
-        },
-        {
-          "id": 6732,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 1.39785,
-            "pnl": -0.1,
-            "pnl_pips": 10.8,
-            "actual_close_time": "2026-06-15T06:13:13.313",
-            "detection_time": "2026-06-15T07:36:58.594501+00:00"
-          },
-          "created_at": "2026-06-15 07:36:58"
-        },
-        {
-          "id": 6733,
-          "trade_id": "282df8433d2e408d9c75bd26898247c6",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-06-15T07:36:59.938396+00:00",
-            "market_price_at_detection": {
-              "bid": 1.39776,
-              "ask": 1.39796
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-06-14 22:00:00",
-                "o": 1.39682,
-                "h": 1.397445,
-                "l": 1.3956,
-                "c": 1.39607
-              },
-              {
-                "time": "2026-06-14 23:00:00",
-                "o": 1.39608,
-                "h": 1.39661,
-                "l": 1.39596,
-                "c": 1.39644
-              },
-              {
-                "time": "2026-06-15 00:00:00",
-                "o": 1.39643,
-                "h": 1.39709,
-                "l": 1.39574,
-                "c": 1.39708
-              },
-              {
-                "time": "2026-06-15 01:00:00",
-                "o": 1.39707,
-                "h": 1.39769,
-                "l": 1.39706,
-                "c": 1.39731
-              },
-              {
-                "time": "2026-06-15 02:00:00",
-                "o": 1.39733,
-                "h": 1.39763,
-                "l": 1.39692,
-                "c": 1.39695
-              },
-              {
-                "time": "2026-06-15 03:00:00",
-                "o": 1.39693,
-                "h": 1.3971,
-                "l": 1.39649,
-                "c": 1.39668
-              },
-              {
-                "time": "2026-06-15 04:00:00",
-                "o": 1.39667,
-                "h": 1.39681,
-                "l": 1.39611,
-                "c": 1.39613
-              },
-              {
-                "time": "2026-06-15 05:00:00",
-                "o": 1.39612,
-                "h": 1.39614,
-                "l": 1.39508,
-                "c": 1.39581
-              },
-              {
-                "time": "2026-06-15 06:00:00",
-                "o": 1.39583,
-                "h": 1.39781,
-                "l": 1.39579,
-                "c": 1.39723
-              },
-              {
-                "time": "2026-06-15 07:00:00",
-                "o": 1.39719,
-                "h": 1.39791,
-                "l": 1.39716,
-                "c": 1.39762
-              }
-            ],
-            "atr_14": 0.001175,
-            "trade_duration_hours": 4.0
-          },
-          "created_at": "2026-06-15 07:37:00"
-        }
-      ],
-      "reasoning": "The recent news about oil prices sliding due to a deal between the US and Iran, facilitated by Pakistan, could lead to a decrease in the Canadian dollar (CAD) value since Canada is a significant oil exporter. A weaker CAD would make USD/CAD rise. Given that the current price is 1.39677 and the recent trend is ranging, if the oil price continues to slide, it could push USD/CAD upwards, suggesting a long position. However, the confidence is not extremely high (0.6) because the market is currently ranging, and there might be other factors at play that are not considered here.",
-      "source": "llm",
-      "record": {
-        "trade_id": "282df8433d2e408d9c75bd26898247c6",
-        "signal_id": "9a867a8bef2a4e149a2c44d995ffb463",
-        "instrument": "USD_CAD",
-        "direction": "long",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.3,
-          "reasoning": "The recent news about oil prices sliding due to a deal between the US and Iran, facilitated by Pakistan, could lead to a decrease in the Canadian dollar (CAD) value since Canada is a significant oil exporter. A weaker CAD would make USD/CAD rise. Given that the current price is 1.39677 and the recent trend is ranging, if the oil price continues to slide, it could push USD/CAD upwards, suggesting a long position. However, the confidence is not extremely high (0.6) because the market is currently ranging, and there might be other factors at play that are not considered here.",
-          "key_factors": [
-            "Oil prices",
-            "USD/CAD exchange rate",
-            "Canada's role as an oil exporter"
-          ],
-          "risk_factors": [
-            "Other economic indicators from Canada or the US that could affect the exchange rate",
-            "Geopolitical tensions that could affect oil production or global economic stability",
-            "Intervention by central banks (BOC or FED) to influence their respective currencies"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this direction is that the market has already priced in the news about oil prices sliding. Given that the recent trend is ranging, it's possible that the USD/CAD exchange rate has already adjusted to reflect the current oil price dynamics. Furthermore, Canada's economy and trade balance might be less sensitive to oil price fluctuations than assumed, especially if other commodities or sectors compensate for the potential losses in oil exports.",
-          "alternative_interpretation": "An alternative interpretation is that the deal between the US and Iran could lead to increased geopolitical stability, which might boost investor confidence and lead to a stronger CAD due to increased investment in Canada or a decrease in safe-haven demand for USD. Additionally, if the oil price slide is temporary or not as severe as anticipated, the CAD might not weaken as expected.",
-          "conviction_after_challenge": 0.3,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this direction is that the market has already priced in the news about oil prices sliding. Given that the recent trend is ranging, it's possible that the USD/CAD exchange rate has already adjusted to reflect the current oil price dynamics. Furthermore, Canada's economy and trade balance might be less sensitive to oil price fluctuations than assumed, especially if other commodities or sectors compensate for the potential losses in oil exports.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the deal between the US and Iran could lead to increased geopolitical stability, which might boost investor confidence and lead to a stronger CAD due to increased investment in Canada or a decrease in safe-haven demand for USD. Additionally, if the oil price slide is temporary or not as severe as anticipated, the CAD might not weaken as expected.\",\n  \"conviction_after_challenge\": 0.3,\n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "0e012e81051741b1b4b171717f54c1fd"
-        ],
-        "price_context": {
-          "current_price": 1.39677,
-          "daily_change_pct": -0.0329,
-          "trend": "ranging"
-        },
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 1.0,
-          "bias_since": "2026-06-11T12:39:28.855670+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 116,
-          "rejection_reason": null,
-          "entry_price": 1.39677,
-          "stop_loss": 1.395245892857143,
-          "take_profit": 1.3998182142857143
-        },
-        "metadata": null,
-        "entry": {
-          "price": 1.39677,
-          "time": "2026-06-15T03:34:30.391558+00:00",
-          "broker_deal_id": "000154c4-000c-111e-0000-000080fb021f"
-        },
-        "exit": {
-          "price": 1.39785,
-          "time": "2026-06-15T06:13:13.313",
-          "pnl": -0.1,
-          "pnl_pips": 10.8,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-06-15T07:36:59.938396+00:00",
-        "market_price_at_detection": {
-          "bid": 1.39776,
-          "ask": 1.39796
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-06-14 22:00:00",
-            "o": 1.39682,
-            "h": 1.397445,
-            "l": 1.3956,
-            "c": 1.39607
-          },
-          {
-            "time": "2026-06-14 23:00:00",
-            "o": 1.39608,
-            "h": 1.39661,
-            "l": 1.39596,
-            "c": 1.39644
-          },
-          {
-            "time": "2026-06-15 00:00:00",
-            "o": 1.39643,
-            "h": 1.39709,
-            "l": 1.39574,
-            "c": 1.39708
-          },
-          {
-            "time": "2026-06-15 01:00:00",
-            "o": 1.39707,
-            "h": 1.39769,
-            "l": 1.39706,
-            "c": 1.39731
-          },
-          {
-            "time": "2026-06-15 02:00:00",
-            "o": 1.39733,
-            "h": 1.39763,
-            "l": 1.39692,
-            "c": 1.39695
-          },
-          {
-            "time": "2026-06-15 03:00:00",
-            "o": 1.39693,
-            "h": 1.3971,
-            "l": 1.39649,
-            "c": 1.39668
-          },
-          {
-            "time": "2026-06-15 04:00:00",
-            "o": 1.39667,
-            "h": 1.39681,
-            "l": 1.39611,
-            "c": 1.39613
-          },
-          {
-            "time": "2026-06-15 05:00:00",
-            "o": 1.39612,
-            "h": 1.39614,
-            "l": 1.39508,
-            "c": 1.39581
-          },
-          {
-            "time": "2026-06-15 06:00:00",
-            "o": 1.39583,
-            "h": 1.39781,
-            "l": 1.39579,
-            "c": 1.39723
-          },
-          {
-            "time": "2026-06-15 07:00:00",
-            "o": 1.39719,
-            "h": 1.39791,
-            "l": 1.39716,
-            "c": 1.39762
-          }
-        ],
-        "atr_14": 0.001175,
-        "trade_duration_hours": 4.0
       }
     }
   ]
