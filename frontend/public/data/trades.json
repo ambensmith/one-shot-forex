@@ -1,6 +1,121 @@
 {
   "trades": [
     {
+      "id": "ab16a29c43d3488187bc8b466bbf3282",
+      "stream": "strategy:carry",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.85411,
+      "exit_price": null,
+      "stop_loss": 0.85465,
+      "take_profit": 0.85304,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-07-24T08:27:29.175710+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00005552-001c-241e-0000-000080bc0076",
+      "events": [
+        {
+          "id": 8906,
+          "trade_id": "ab16a29c43d3488187bc8b466bbf3282",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.85411,
+            "stop_loss": 0.85464625,
+            "take_profit": 0.8530375,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080bc0076"
+          },
+          "created_at": "2026-07-24 08:27:29"
+        },
+        {
+          "id": 8907,
+          "trade_id": "ab16a29c43d3488187bc8b466bbf3282",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.85464625,
+            "new_value": 0.85465,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-24 08:27:30"
+        },
+        {
+          "id": 8908,
+          "trade_id": "ab16a29c43d3488187bc8b466bbf3282",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8530375,
+            "new_value": 0.85304,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-07-24 08:27:30"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.018",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "ab16a29c43d3488187bc8b466bbf3282",
+        "signal_id": "d2f97902d37c4153942c7156a0e48dbf",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.132,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.018",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.7874,
+          "bias_since": "2026-07-22T08:17:37.326395+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.85411,
+          "stop_loss": 0.85464625,
+          "take_profit": 0.8530375
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.5,
+            "quote_rate": 5.25,
+            "differential": -0.75,
+            "vol_penalty": 0.018
+          },
+          "entry_price": 0.85405
+        },
+        "entry": {
+          "price": 0.85411,
+          "time": "2026-07-24T08:27:29.175710+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080bc0076"
+        }
+      }
+    },
+    {
       "id": "129b717cf1c14b7382f2829d479c9d9f",
       "stream": "strategy:breakout",
       "instrument": "USD_JPY",
@@ -67476,409 +67591,6 @@
         "unrealized_pips": 15.6,
         "distance_sl_pips": 36.0,
         "distance_tp_pips": 25.2
-      }
-    },
-    {
-      "id": "3ec26b5d928e49a19ae0a762c89c31d6",
-      "stream": "llm",
-      "instrument": "GBP_USD",
-      "direction": "short",
-      "entry_price": 1.323675,
-      "exit_price": 1.323335,
-      "stop_loss": 1.32684,
-      "take_profit": 1.3173492857142854,
-      "position_size": 100.0,
-      "pnl": 0.55,
-      "pnl_pips": 3.4,
-      "status": "closed_reconciled",
-      "opened_at": "2026-06-18T14:01:08.942485+00:00",
-      "closed_at": "2026-06-19T05:47:32.383",
-      "broker_deal_id": "00007090-0055-311e-0000-0000813a04ec",
-      "events": [
-        {
-          "id": 6861,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.323675,
-            "stop_loss": 1.3268378571428572,
-            "take_profit": 1.3173492857142854,
-            "position_size": 100,
-            "broker_deal_id": "00007090-0055-311e-0000-0000813a04ec"
-          },
-          "created_at": "2026-06-18 14:01:08"
-        },
-        {
-          "id": 6862,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.3268378571428572,
-            "new_value": 1.32684,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-06-18 14:01:09"
-        },
-        {
-          "id": 6875,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.323995,
-            "unrealized_pl": -0.03,
-            "unrealized_pips": -3.2,
-            "distance_sl_pips": 28.4,
-            "distance_tp_pips": 66.5
-          },
-          "created_at": "2026-06-18 14:19:28"
-        },
-        {
-          "id": 6883,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.322375,
-            "unrealized_pl": 0.13,
-            "unrealized_pips": 13.0,
-            "distance_sl_pips": 44.6,
-            "distance_tp_pips": 50.3
-          },
-          "created_at": "2026-06-18 17:32:29"
-        },
-        {
-          "id": 6888,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.320045,
-            "unrealized_pl": 0.36,
-            "unrealized_pips": 36.3,
-            "distance_sl_pips": 68.0,
-            "distance_tp_pips": 27.0
-          },
-          "created_at": "2026-06-18 19:40:12"
-        },
-        {
-          "id": 6898,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.320695,
-            "unrealized_pl": 0.3,
-            "unrealized_pips": 29.8,
-            "distance_sl_pips": 61.5,
-            "distance_tp_pips": 33.5
-          },
-          "created_at": "2026-06-18 21:35:40"
-        },
-        {
-          "id": 6904,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.320345,
-            "unrealized_pl": 0.33,
-            "unrealized_pips": 33.3,
-            "distance_sl_pips": 64.9,
-            "distance_tp_pips": 30.0
-          },
-          "created_at": "2026-06-18 23:20:55"
-        },
-        {
-          "id": 6910,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.319455,
-            "unrealized_pl": 0.42,
-            "unrealized_pips": 42.2,
-            "distance_sl_pips": 73.8,
-            "distance_tp_pips": 21.1
-          },
-          "created_at": "2026-06-19 02:08:41"
-        },
-        {
-          "id": 6922,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.318565,
-            "unrealized_pl": 0.51,
-            "unrealized_pips": 51.1,
-            "distance_sl_pips": 82.8,
-            "distance_tp_pips": 12.2
-          },
-          "created_at": "2026-06-19 04:19:20"
-        },
-        {
-          "id": 6924,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 1.323335,
-            "pnl": 0.55,
-            "pnl_pips": 3.4,
-            "actual_close_time": "2026-06-19T05:47:32.383",
-            "detection_time": "2026-06-19T09:16:54.012430+00:00"
-          },
-          "created_at": "2026-06-19 09:16:54"
-        },
-        {
-          "id": 6926,
-          "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-06-19T09:17:03.854965+00:00",
-            "market_price_at_detection": {
-              "bid": 1.3232,
-              "ask": 1.32333
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-06-19 00:00:00",
-                "o": 1.320175,
-                "h": 1.321145,
-                "l": 1.320135,
-                "c": 1.320925
-              },
-              {
-                "time": "2026-06-19 01:00:00",
-                "o": 1.320945,
-                "h": 1.321075,
-                "l": 1.319475,
-                "c": 1.319565
-              },
-              {
-                "time": "2026-06-19 02:00:00",
-                "o": 1.319555,
-                "h": 1.320565,
-                "l": 1.319355,
-                "c": 1.320155
-              },
-              {
-                "time": "2026-06-19 03:00:00",
-                "o": 1.320145,
-                "h": 1.320185,
-                "l": 1.318605,
-                "c": 1.318725
-              },
-              {
-                "time": "2026-06-19 04:00:00",
-                "o": 1.318735,
-                "h": 1.318815,
-                "l": 1.316835,
-                "c": 1.317005
-              },
-              {
-                "time": "2026-06-19 05:00:00",
-                "o": 1.317015,
-                "h": 1.319965,
-                "l": 1.316325,
-                "c": 1.31926
-              },
-              {
-                "time": "2026-06-19 06:00:00",
-                "o": 1.3193,
-                "h": 1.319985,
-                "l": 1.318445,
-                "c": 1.319855
-              },
-              {
-                "time": "2026-06-19 07:00:00",
-                "o": 1.319865,
-                "h": 1.320815,
-                "l": 1.319125,
-                "c": 1.319555
-              },
-              {
-                "time": "2026-06-19 08:00:00",
-                "o": 1.319565,
-                "h": 1.323305,
-                "l": 1.319555,
-                "c": 1.323255
-              },
-              {
-                "time": "2026-06-19 09:00:00",
-                "o": 1.323265,
-                "h": 1.323385,
-                "l": 1.322735,
-                "c": 1.323045
-              }
-            ],
-            "atr_14": 0.001699,
-            "trade_duration_hours": 19.3,
-            "max_favorable_pips": 51.1,
-            "max_adverse_pips": -3.2
-          },
-          "created_at": "2026-06-19 09:17:04"
-        }
-      ],
-      "reasoning": "The recent headlines and market context suggest a bearish outlook for GBP/USD. The Bank of England's decision to hold interest rates, as expected, has been influenced by the upheaval in the Middle East and high energy prices. This has likely contributed to the recent depreciation of the British pound. Additionally, the steady UK inflation data and the acceleration of Euro area inflation have likely affected the GBP/USD exchange rate. With a current bearish trend and a 24-hour change of -1.2591%, the evidence suggests a short position.",
-      "source": "llm",
-      "record": {
-        "trade_id": "3ec26b5d928e49a19ae0a762c89c31d6",
-        "signal_id": "b7070813564f409b9b6f47c97266665c",
-        "instrument": "GBP_USD",
-        "direction": "short",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent headlines and market context suggest a bearish outlook for GBP/USD. The Bank of England's decision to hold interest rates, as expected, has been influenced by the upheaval in the Middle East and high energy prices. This has likely contributed to the recent depreciation of the British pound. Additionally, the steady UK inflation data and the acceleration of Euro area inflation have likely affected the GBP/USD exchange rate. With a current bearish trend and a 24-hour change of -1.2591%, the evidence suggests a short position.",
-          "key_factors": [
-            "Bank of England's interest rate decision",
-            "High energy prices",
-            "UK inflation data",
-            "Euro area inflation data",
-            "Recent bearish trend"
-          ],
-          "risk_factors": [
-            "Unexpected changes in interest rates",
-            "Significant shifts in global economic conditions",
-            "Unforeseen events impacting energy prices"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this short GBP/USD trade is that the recent depreciation of the British pound might already be priced into the market. The 24-hour change of -1.2591% and the bearish trend suggest a significant reaction to the mentioned factors. A contrarian view could argue that the market has overreacted, and a rebound is due, especially if the Bank of England's decision to hold interest rates is seen as a sign of economic stability.",
-          "alternative_interpretation": "An alternative interpretation is that the steady UK inflation data and the acceleration of Euro area inflation could actually strengthen the GBP/USD in the long run. High inflation in the Euro area might lead to a more hawkish European Central Bank (ECB), potentially strengthening the EUR and indirectly supporting the GBP/USD. Additionally, the impact of high energy prices on the UK economy might be less severe than anticipated, given potential government interventions or hedges against such risks.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this short GBP/USD trade is that the recent depreciation of the British pound might already be priced into the market. The 24-hour change of -1.2591% and the bearish trend suggest a significant reaction to the mentioned factors. A contrarian view could argue that the market has overreacted, and a rebound is due, especially if the Bank of England's decision to hold interest rates is seen as a sign of economic stability.\",\n  \n  \"alternative_interpretation\": \"An alternative interpretation is that the steady UK inflation data and the acceleration of Euro area inflation could actually strengthen the GBP/USD in the long run. High inflation in the Euro area might lead to a more hawkish European Central Bank (ECB), potentially strengthening the EUR and indirectly supporting the GBP/USD. Additionally, the impact of high energy prices on the UK economy might be less severe than anticipated, given potential government interventions or hedges against such risks.\",\n  \n  \"conviction_after_challenge\": 0.4,\n  \n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "2fb634b16c5e4845814cc93d9674b9f6",
-          "5532f70d260d4345930078628a9d311e",
-          "f8dcb9e9717d46118814ca41e1d5f781",
-          "f8dcb9e9717d46118814ca41e1d5f781",
-          "f8dcb9e9717d46118814ca41e1d5f781",
-          "f8dcb9e9717d46118814ca41e1d5f781",
-          "00c408bcad8046f4970e6dd04af64593",
-          "a120fd2a6fd84a9b96563b5585b7df82"
-        ],
-        "price_context": {
-          "current_price": 1.323685,
-          "daily_change_pct": -1.2591,
-          "trend": "bearish"
-        },
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 1.0,
-          "bias_since": "2026-06-18T00:13:16.148358+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.323675,
-          "stop_loss": 1.3268378571428572,
-          "take_profit": 1.3173492857142854
-        },
-        "metadata": null,
-        "entry": {
-          "price": 1.323675,
-          "time": "2026-06-18T14:01:08.942485+00:00",
-          "broker_deal_id": "00007090-0055-311e-0000-0000813a04ec"
-        },
-        "exit": {
-          "price": 1.323335,
-          "time": "2026-06-19T05:47:32.383",
-          "pnl": 0.55,
-          "pnl_pips": 3.4,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-06-19T09:17:03.854965+00:00",
-        "market_price_at_detection": {
-          "bid": 1.3232,
-          "ask": 1.32333
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-06-19 00:00:00",
-            "o": 1.320175,
-            "h": 1.321145,
-            "l": 1.320135,
-            "c": 1.320925
-          },
-          {
-            "time": "2026-06-19 01:00:00",
-            "o": 1.320945,
-            "h": 1.321075,
-            "l": 1.319475,
-            "c": 1.319565
-          },
-          {
-            "time": "2026-06-19 02:00:00",
-            "o": 1.319555,
-            "h": 1.320565,
-            "l": 1.319355,
-            "c": 1.320155
-          },
-          {
-            "time": "2026-06-19 03:00:00",
-            "o": 1.320145,
-            "h": 1.320185,
-            "l": 1.318605,
-            "c": 1.318725
-          },
-          {
-            "time": "2026-06-19 04:00:00",
-            "o": 1.318735,
-            "h": 1.318815,
-            "l": 1.316835,
-            "c": 1.317005
-          },
-          {
-            "time": "2026-06-19 05:00:00",
-            "o": 1.317015,
-            "h": 1.319965,
-            "l": 1.316325,
-            "c": 1.31926
-          },
-          {
-            "time": "2026-06-19 06:00:00",
-            "o": 1.3193,
-            "h": 1.319985,
-            "l": 1.318445,
-            "c": 1.319855
-          },
-          {
-            "time": "2026-06-19 07:00:00",
-            "o": 1.319865,
-            "h": 1.320815,
-            "l": 1.319125,
-            "c": 1.319555
-          },
-          {
-            "time": "2026-06-19 08:00:00",
-            "o": 1.319565,
-            "h": 1.323305,
-            "l": 1.319555,
-            "c": 1.323255
-          },
-          {
-            "time": "2026-06-19 09:00:00",
-            "o": 1.323265,
-            "h": 1.323385,
-            "l": 1.322735,
-            "c": 1.323045
-          }
-        ],
-        "atr_14": 0.001699,
-        "trade_duration_hours": 19.3,
-        "max_favorable_pips": 51.1,
-        "max_adverse_pips": -3.2
-      },
-      "latest_snapshot": {
-        "current_price": 1.318565,
-        "unrealized_pl": 0.51,
-        "unrealized_pips": 51.1,
-        "distance_sl_pips": 82.8,
-        "distance_tp_pips": 12.2
       }
     }
   ]
