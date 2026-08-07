@@ -141,135 +141,6 @@
       }
     },
     {
-      "id": "107984e82dad49a39fddffa5228645dd",
-      "stream": "strategy:mean_reversion",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "entry_price": 0.85768,
-      "exit_price": null,
-      "stop_loss": 0.85802,
-      "take_profit": 0.85701,
-      "position_size": 100.0,
-      "pnl": null,
-      "pnl_pips": null,
-      "status": "open",
-      "opened_at": "2026-08-07T10:00:32.936434+00:00",
-      "closed_at": null,
-      "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2",
-      "events": [
-        {
-          "id": 9551,
-          "trade_id": "107984e82dad49a39fddffa5228645dd",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.85768,
-            "stop_loss": 0.8580164285714286,
-            "take_profit": 0.8570071428571429,
-            "position_size": 100,
-            "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2"
-          },
-          "created_at": "2026-08-07 10:00:32"
-        },
-        {
-          "id": 9556,
-          "trade_id": "107984e82dad49a39fddffa5228645dd",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.8580164285714286,
-            "new_value": 0.85802,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-08-07 10:00:34"
-        },
-        {
-          "id": 9557,
-          "trade_id": "107984e82dad49a39fddffa5228645dd",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.8570071428571429,
-            "new_value": 0.85701,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-08-07 10:00:34"
-        },
-        {
-          "id": 9559,
-          "trade_id": "107984e82dad49a39fddffa5228645dd",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8579,
-            "unrealized_pl": -0.02,
-            "unrealized_pips": -2.2,
-            "distance_sl_pips": 1.2,
-            "distance_tp_pips": 8.9
-          },
-          "created_at": "2026-08-07 10:32:54"
-        }
-      ],
-      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85717, bb_lower=0.85594, bb_mid=0.85656, rsi=81.28, pct_b=1.442",
-      "source": "strategy:mean_reversion",
-      "record": {
-        "trade_id": "107984e82dad49a39fddffa5228645dd",
-        "signal_id": "da0aa03f2e1c4d9da9e4d1ef5108b772",
-        "instrument": "EUR_GBP",
-        "direction": "short",
-        "source": "strategy:mean_reversion",
-        "signal": {
-          "confidence": 0.37,
-          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85717, bb_lower=0.85594, bb_mid=0.85656, rsi=81.28, pct_b=1.442",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.9631,
-          "bias_since": "2026-08-07T02:35:01.458743+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 0.85768,
-          "stop_loss": 0.8580164285714286,
-          "take_profit": 0.8570071428571429
-        },
-        "metadata": {
-          "parameters": {
-            "bb_period": 20,
-            "bb_std": 2.0,
-            "rsi_period": 14,
-            "rsi_oversold": 30,
-            "rsi_overbought": 70
-          },
-          "indicators": {
-            "bb_upper": 0.85717,
-            "bb_lower": 0.85594,
-            "bb_mid": 0.85656,
-            "rsi": 81.28,
-            "pct_b": 1.442
-          },
-          "entry_price": 0.85771
-        },
-        "entry": {
-          "price": 0.85768,
-          "time": "2026-08-07T10:00:32.936434+00:00",
-          "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2"
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.8579,
-        "unrealized_pl": -0.02,
-        "unrealized_pips": -2.2,
-        "distance_sl_pips": 1.2,
-        "distance_tp_pips": 8.9
-      }
-    },
-    {
       "id": "e197817e722d40dfbedece90a4c69aea",
       "stream": "strategy:carry",
       "instrument": "AUD_USD",
@@ -482,6 +353,155 @@
         "unrealized_pips": 2.5,
         "distance_sl_pips": 11.7,
         "distance_tp_pips": 15.9
+      }
+    },
+    {
+      "id": "107984e82dad49a39fddffa5228645dd",
+      "stream": "strategy:mean_reversion",
+      "instrument": "EUR_GBP",
+      "direction": "short",
+      "entry_price": 0.85768,
+      "exit_price": 0.85781,
+      "stop_loss": 0.85802,
+      "take_profit": 0.85701,
+      "position_size": 100.0,
+      "pnl": -0.05,
+      "pnl_pips": -1.3,
+      "status": "closed_reconciled",
+      "opened_at": "2026-08-07T10:00:32.936434+00:00",
+      "closed_at": "2026-08-07T11:33:18.524",
+      "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2",
+      "events": [
+        {
+          "id": 9551,
+          "trade_id": "107984e82dad49a39fddffa5228645dd",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.85768,
+            "stop_loss": 0.8580164285714286,
+            "take_profit": 0.8570071428571429,
+            "position_size": 100,
+            "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2"
+          },
+          "created_at": "2026-08-07 10:00:32"
+        },
+        {
+          "id": 9556,
+          "trade_id": "107984e82dad49a39fddffa5228645dd",
+          "event_type": "sl_updated",
+          "data": {
+            "old_value": 0.8580164285714286,
+            "new_value": 0.85802,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-07 10:00:34"
+        },
+        {
+          "id": 9557,
+          "trade_id": "107984e82dad49a39fddffa5228645dd",
+          "event_type": "tp_updated",
+          "data": {
+            "old_value": 0.8570071428571429,
+            "new_value": 0.85701,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-07 10:00:34"
+        },
+        {
+          "id": 9559,
+          "trade_id": "107984e82dad49a39fddffa5228645dd",
+          "event_type": "snapshot",
+          "data": {
+            "current_price": 0.8579,
+            "unrealized_pl": -0.02,
+            "unrealized_pips": -2.2,
+            "distance_sl_pips": 1.2,
+            "distance_tp_pips": 8.9
+          },
+          "created_at": "2026-08-07 10:32:54"
+        },
+        {
+          "id": 9561,
+          "trade_id": "107984e82dad49a39fddffa5228645dd",
+          "event_type": "closed_reconciled",
+          "data": {
+            "exit_price": 0.85781,
+            "pnl": -0.05,
+            "pnl_pips": -1.3,
+            "actual_close_time": "2026-08-07T11:33:18.524",
+            "detection_time": "2026-08-07T11:01:16.757821+00:00"
+          },
+          "created_at": "2026-08-07 11:01:16"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85717, bb_lower=0.85594, bb_mid=0.85656, rsi=81.28, pct_b=1.442",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "107984e82dad49a39fddffa5228645dd",
+        "signal_id": "da0aa03f2e1c4d9da9e4d1ef5108b772",
+        "instrument": "EUR_GBP",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.37,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.85717, bb_lower=0.85594, bb_mid=0.85656, rsi=81.28, pct_b=1.442",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.9631,
+          "bias_since": "2026-08-07T02:35:01.458743+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.85768,
+          "stop_loss": 0.8580164285714286,
+          "take_profit": 0.8570071428571429
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.85717,
+            "bb_lower": 0.85594,
+            "bb_mid": 0.85656,
+            "rsi": 81.28,
+            "pct_b": 1.442
+          },
+          "entry_price": 0.85771
+        },
+        "entry": {
+          "price": 0.85768,
+          "time": "2026-08-07T10:00:32.936434+00:00",
+          "broker_deal_id": "00005552-001c-241e-0000-000080bc08f2"
+        },
+        "exit": {
+          "price": 0.85781,
+          "time": "2026-08-07T11:33:18.524",
+          "pnl": -0.05,
+          "pnl_pips": -1.3,
+          "close_reason": null
+        }
+      },
+      "latest_snapshot": {
+        "current_price": 0.8579,
+        "unrealized_pl": -0.02,
+        "unrealized_pips": -2.2,
+        "distance_sl_pips": 1.2,
+        "distance_tp_pips": 8.9
       }
     },
     {
