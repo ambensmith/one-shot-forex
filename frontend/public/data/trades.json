@@ -1,6 +1,104 @@
 {
   "trades": [
     {
+      "id": "4ad765f808c544f78b085276e33bf3da",
+      "stream": "strategy:mean_reversion",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "entry_price": 0.70926,
+      "exit_price": null,
+      "stop_loss": 0.7100164285714285,
+      "take_profit": 0.7077471428571429,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-14T15:49:45.288357+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5b87-a1e2-0469-1c770015549e",
+      "events": [
+        {
+          "id": 10030,
+          "trade_id": "4ad765f808c544f78b085276e33bf3da",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.70926,
+            "stop_loss": 0.7100164285714285,
+            "take_profit": 0.7077471428571429,
+            "position_size": 163,
+            "broker_deal_id": "00000000-5b87-a1e2-0469-1c770015549e"
+          },
+          "created_at": "2026-08-14 15:49:45"
+        },
+        {
+          "id": 10031,
+          "trade_id": "4ad765f808c544f78b085276e33bf3da",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 163.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-14 15:49:46"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.70903, bb_lower=0.70488, bb_mid=0.70696, rsi=88.41, pct_b=1.021",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "4ad765f808c544f78b085276e33bf3da",
+        "signal_id": "13b1f1581ff14868be0bfffab8dd9924",
+        "instrument": "AUD_USD",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.673,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.70903, bb_lower=0.70488, bb_mid=0.70696, rsi=88.41, pct_b=1.021",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.6036,
+          "bias_since": "2026-08-11T22:35:59.146358+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 163,
+          "rejection_reason": null,
+          "entry_price": 0.70926,
+          "stop_loss": 0.7100164285714285,
+          "take_profit": 0.7077471428571429
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.70903,
+            "bb_lower": 0.70488,
+            "bb_mid": 0.70696,
+            "rsi": 88.41,
+            "pct_b": 1.021
+          },
+          "entry_price": 0.70912
+        },
+        "entry": {
+          "price": 0.70926,
+          "time": "2026-08-14T15:49:45.288357+00:00",
+          "broker_deal_id": "00000000-5b87-a1e2-0469-1c770015549e"
+        }
+      }
+    },
+    {
       "id": "96164a8ddf664c91921dfcdc6d50d467",
       "stream": "strategy:breakout",
       "instrument": "USD_CAD",
@@ -67832,481 +67930,6 @@
         ],
         "atr_14": 0.001608,
         "trade_duration_hours": 1.5
-      }
-    },
-    {
-      "id": "f529be02c804463a8bb1f659321142c1",
-      "stream": "llm",
-      "instrument": "AUD_USD",
-      "direction": "short",
-      "entry_price": 0.6926399999999999,
-      "exit_price": 0.69377,
-      "stop_loss": 0.69411,
-      "take_profit": 0.68971,
-      "position_size": 100.0,
-      "pnl": -0.13,
-      "pnl_pips": -11.3,
-      "status": "closed_reconciled",
-      "opened_at": "2026-07-08T12:22:57.858576+00:00",
-      "closed_at": "2026-07-09T07:00:31.706",
-      "broker_deal_id": "00001544-0055-311e-0000-0000810214e5",
-      "events": [
-        {
-          "id": 7909,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.6926399999999999,
-            "stop_loss": 0.6941062499999999,
-            "take_profit": 0.6897074999999999,
-            "position_size": 165,
-            "broker_deal_id": "00001544-0055-311e-0000-0000810214e5"
-          },
-          "created_at": "2026-07-08 12:22:57"
-        },
-        {
-          "id": 7910,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.6941062499999999,
-            "new_value": 0.69411,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-08 12:22:58"
-        },
-        {
-          "id": 7911,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.6897074999999999,
-            "new_value": 0.68971,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-08 12:22:58"
-        },
-        {
-          "id": 7912,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 165.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-08 12:22:58"
-        },
-        {
-          "id": 7919,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69298,
-            "unrealized_pl": -0.03,
-            "unrealized_pips": -3.4,
-            "distance_sl_pips": 11.3,
-            "distance_tp_pips": 32.7
-          },
-          "created_at": "2026-07-08 12:51:19"
-        },
-        {
-          "id": 7926,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69182,
-            "unrealized_pl": 0.08,
-            "unrealized_pips": 8.2,
-            "distance_sl_pips": 22.9,
-            "distance_tp_pips": 21.1
-          },
-          "created_at": "2026-07-08 15:01:58"
-        },
-        {
-          "id": 7940,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69226,
-            "unrealized_pl": 0.04,
-            "unrealized_pips": 3.8,
-            "distance_sl_pips": 18.5,
-            "distance_tp_pips": 25.5
-          },
-          "created_at": "2026-07-08 16:43:01"
-        },
-        {
-          "id": 7951,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69312,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -4.8,
-            "distance_sl_pips": 9.9,
-            "distance_tp_pips": 34.1
-          },
-          "created_at": "2026-07-08 18:05:46"
-        },
-        {
-          "id": 7963,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69356,
-            "unrealized_pl": -0.09,
-            "unrealized_pips": -9.2,
-            "distance_sl_pips": 5.5,
-            "distance_tp_pips": 38.5
-          },
-          "created_at": "2026-07-08 19:48:37"
-        },
-        {
-          "id": 7968,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69309,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -4.5,
-            "distance_sl_pips": 10.2,
-            "distance_tp_pips": 33.8
-          },
-          "created_at": "2026-07-08 20:47:36"
-        },
-        {
-          "id": 7974,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69287,
-            "unrealized_pl": -0.02,
-            "unrealized_pips": -2.3,
-            "distance_sl_pips": 12.4,
-            "distance_tp_pips": 31.6
-          },
-          "created_at": "2026-07-08 21:49:08"
-        },
-        {
-          "id": 7982,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69311,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -4.7,
-            "distance_sl_pips": 10.0,
-            "distance_tp_pips": 34.0
-          },
-          "created_at": "2026-07-08 22:45:51"
-        },
-        {
-          "id": 7986,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69359,
-            "unrealized_pl": -0.1,
-            "unrealized_pips": -9.5,
-            "distance_sl_pips": 5.2,
-            "distance_tp_pips": 38.8
-          },
-          "created_at": "2026-07-08 23:45:45"
-        },
-        {
-          "id": 7995,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69305,
-            "unrealized_pl": -0.04,
-            "unrealized_pips": -4.1,
-            "distance_sl_pips": 10.6,
-            "distance_tp_pips": 33.4
-          },
-          "created_at": "2026-07-09 01:15:55"
-        },
-        {
-          "id": 8000,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69357,
-            "unrealized_pl": -0.09,
-            "unrealized_pips": -9.3,
-            "distance_sl_pips": 5.4,
-            "distance_tp_pips": 38.6
-          },
-          "created_at": "2026-07-09 05:06:25"
-        },
-        {
-          "id": 8002,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 0.69377,
-            "pnl": -0.13,
-            "pnl_pips": -11.3,
-            "actual_close_time": "2026-07-09T07:00:31.706",
-            "detection_time": "2026-07-09T08:41:17.352496+00:00"
-          },
-          "created_at": "2026-07-09 08:41:17"
-        },
-        {
-          "id": 8004,
-          "trade_id": "f529be02c804463a8bb1f659321142c1",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-07-09T08:41:31.156302+00:00",
-            "market_price_at_detection": {
-              "bid": 0.69378,
-              "ask": 0.69384
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-07-08 23:00:00",
-                "o": 0.69301,
-                "h": 0.69366,
-                "l": 0.69292,
-                "c": 0.6936
-              },
-              {
-                "time": "2026-07-09 00:00:00",
-                "o": 0.69363,
-                "h": 0.69404,
-                "l": 0.69298,
-                "c": 0.69333
-              },
-              {
-                "time": "2026-07-09 01:00:00",
-                "o": 0.69335,
-                "h": 0.69338,
-                "l": 0.6925,
-                "c": 0.69313
-              },
-              {
-                "time": "2026-07-09 02:00:00",
-                "o": 0.69315,
-                "h": 0.69373,
-                "l": 0.69303,
-                "c": 0.69311
-              },
-              {
-                "time": "2026-07-09 03:00:00",
-                "o": 0.6931,
-                "h": 0.69373,
-                "l": 0.69278,
-                "c": 0.69344
-              },
-              {
-                "time": "2026-07-09 04:00:00",
-                "o": 0.69345,
-                "h": 0.69378,
-                "l": 0.69316,
-                "c": 0.69373
-              },
-              {
-                "time": "2026-07-09 05:00:00",
-                "o": 0.69374,
-                "h": 0.69398,
-                "l": 0.69342,
-                "c": 0.69381
-              },
-              {
-                "time": "2026-07-09 06:00:00",
-                "o": 0.69383,
-                "h": 0.6946,
-                "l": 0.69377,
-                "c": 0.69396
-              },
-              {
-                "time": "2026-07-09 07:00:00",
-                "o": 0.69395,
-                "h": 0.69407,
-                "l": 0.69335,
-                "c": 0.69378
-              },
-              {
-                "time": "2026-07-09 08:00:00",
-                "o": 0.69379,
-                "h": 0.69403,
-                "l": 0.69357,
-                "c": 0.69387
-              }
-            ],
-            "atr_14": 0.000772,
-            "trade_duration_hours": 20.3,
-            "max_favorable_pips": 8.2,
-            "max_adverse_pips": -9.5
-          },
-          "created_at": "2026-07-09 08:41:32"
-        }
-      ],
-      "reasoning": "The recent headlines indicate potential negative factors for the AUD/USD exchange rate. The telecoms outage in Australia could disrupt economic activity, and the labor dispute over a 28-hour workweek could impact productivity and economic growth. Additionally, the global context of cheaper package holidays to Australia might reduce demand for the AUD. While the headlines are not strongly confirming, the bearish trend and multiple potential negative factors suggest a short bias.",
-      "source": "llm",
-      "record": {
-        "trade_id": "f529be02c804463a8bb1f659321142c1",
-        "signal_id": "7e71ac9116b6442a80ad9fa96f343e49",
-        "instrument": "AUD_USD",
-        "direction": "short",
-        "source": "llm",
-        "signal": {
-          "confidence": 0.4,
-          "reasoning": "The recent headlines indicate potential negative factors for the AUD/USD exchange rate. The telecoms outage in Australia could disrupt economic activity, and the labor dispute over a 28-hour workweek could impact productivity and economic growth. Additionally, the global context of cheaper package holidays to Australia might reduce demand for the AUD. While the headlines are not strongly confirming, the bearish trend and multiple potential negative factors suggest a short bias.",
-          "key_factors": [
-            "Telecoms outage in Australia",
-            "Labor dispute over 28-hour workweek",
-            "Cheaper package holidays to Australia"
-          ],
-          "risk_factors": [
-            "Rapid resolution of telecoms outage",
-            "Positive outcome from labor negotiations",
-            "Increase in Australian tourism beyond expectations",
-            "Global economic factors overriding domestic issues"
-          ],
-          "prompt_version": "signal_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-        },
-        "challenge": {
-          "counter_argument": "The strongest argument against this trade is that the signal reasoning relies heavily on potential negative factors that may not materialize or have a significant impact on the AUD/USD exchange rate. The telecoms outage and labor dispute, while potentially disruptive, might be resolved quickly or have limited economic consequences. Moreover, the relationship between these domestic issues and the exchange rate is not straightforward, and the market may not react as expected.",
-          "alternative_interpretation": "An alternative interpretation is that the telecoms outage and labor dispute could lead to increased government spending or intervention to mitigate the effects, potentially supporting the AUD. Additionally, the cheaper package holidays could lead to increased tourism, which might boost the economy and, in turn, support the AUD. The bearish trend might also be overextended, setting up a potential reversal.",
-          "conviction_after_challenge": 0.4,
-          "recommendation": "reduce_size",
-          "prompt_version": "challenge_v1/v1",
-          "model": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-          "raw_response": "{\n\"counter_argument\": \"The strongest argument against this trade is that the signal reasoning relies heavily on potential negative factors that may not materialize or have a significant impact on the AUD/USD exchange rate. The telecoms outage and labor dispute, while potentially disruptive, might be resolved quickly or have limited economic consequences. Moreover, the relationship between these domestic issues and the exchange rate is not straightforward, and the market may not react as expected.\",\n  \"alternative_interpretation\": \"An alternative interpretation is that the telecoms outage and labor dispute could lead to increased government spending or intervention to mitigate the effects, potentially supporting the AUD. Additionally, the cheaper package holidays could lead to increased tourism, which might boost the economy and, in turn, support the AUD. The bearish trend might also be overextended, setting up a potential reversal.\",\n  \"conviction_after_challenge\": 0.4,\n  \"recommendation\": \"reduce_size\"\n}"
-        },
-        "headlines_used": [
-          "027b35fc4bcd40dfad70b0967c19fbdb",
-          "027b35fc4bcd40dfad70b0967c19fbdb",
-          "470274768b434d86a3bcdcd260a1dc44",
-          "470274768b434d86a3bcdcd260a1dc44",
-          "1dc9bddb69a84a2394507c0bccc3d691",
-          "644b026c1e194e5981cc5ebb11083af8",
-          "644b026c1e194e5981cc5ebb11083af8"
-        ],
-        "price_context": {
-          "current_price": 0.69267,
-          "daily_change_pct": -0.3367,
-          "trend": "bearish"
-        },
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.8092,
-          "bias_since": "2026-07-07T11:43:18.056173+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 165,
-          "rejection_reason": null,
-          "entry_price": 0.6926399999999999,
-          "stop_loss": 0.6941062499999999,
-          "take_profit": 0.6897074999999999
-        },
-        "metadata": null,
-        "entry": {
-          "price": 0.6926399999999999,
-          "time": "2026-07-08T12:22:57.858576+00:00",
-          "broker_deal_id": "00001544-0055-311e-0000-0000810214e5"
-        },
-        "exit": {
-          "price": 0.69377,
-          "time": "2026-07-09T07:00:31.706",
-          "pnl": -0.13,
-          "pnl_pips": -11.3,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-07-09T08:41:31.156302+00:00",
-        "market_price_at_detection": {
-          "bid": 0.69378,
-          "ask": 0.69384
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-07-08 23:00:00",
-            "o": 0.69301,
-            "h": 0.69366,
-            "l": 0.69292,
-            "c": 0.6936
-          },
-          {
-            "time": "2026-07-09 00:00:00",
-            "o": 0.69363,
-            "h": 0.69404,
-            "l": 0.69298,
-            "c": 0.69333
-          },
-          {
-            "time": "2026-07-09 01:00:00",
-            "o": 0.69335,
-            "h": 0.69338,
-            "l": 0.6925,
-            "c": 0.69313
-          },
-          {
-            "time": "2026-07-09 02:00:00",
-            "o": 0.69315,
-            "h": 0.69373,
-            "l": 0.69303,
-            "c": 0.69311
-          },
-          {
-            "time": "2026-07-09 03:00:00",
-            "o": 0.6931,
-            "h": 0.69373,
-            "l": 0.69278,
-            "c": 0.69344
-          },
-          {
-            "time": "2026-07-09 04:00:00",
-            "o": 0.69345,
-            "h": 0.69378,
-            "l": 0.69316,
-            "c": 0.69373
-          },
-          {
-            "time": "2026-07-09 05:00:00",
-            "o": 0.69374,
-            "h": 0.69398,
-            "l": 0.69342,
-            "c": 0.69381
-          },
-          {
-            "time": "2026-07-09 06:00:00",
-            "o": 0.69383,
-            "h": 0.6946,
-            "l": 0.69377,
-            "c": 0.69396
-          },
-          {
-            "time": "2026-07-09 07:00:00",
-            "o": 0.69395,
-            "h": 0.69407,
-            "l": 0.69335,
-            "c": 0.69378
-          },
-          {
-            "time": "2026-07-09 08:00:00",
-            "o": 0.69379,
-            "h": 0.69403,
-            "l": 0.69357,
-            "c": 0.69387
-          }
-        ],
-        "atr_14": 0.000772,
-        "trade_duration_hours": 20.3,
-        "max_favorable_pips": 8.2,
-        "max_adverse_pips": -9.5
-      },
-      "latest_snapshot": {
-        "current_price": 0.69357,
-        "unrealized_pl": -0.09,
-        "unrealized_pips": -9.3,
-        "distance_sl_pips": 5.4,
-        "distance_tp_pips": 38.6
       }
     }
   ]
