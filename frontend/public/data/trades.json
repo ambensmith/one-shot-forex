@@ -1,6 +1,208 @@
 {
   "trades": [
     {
+      "id": "7211179076cf45e3b3be86552456f59e",
+      "stream": "strategy:carry",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "entry_price": 0.71394,
+      "exit_price": null,
+      "stop_loss": 0.7147639285714286,
+      "take_profit": 0.7122921428571429,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-21T03:00:52.759362+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5cf4-c8e6-0469-1c770015549e",
+      "events": [
+        {
+          "id": 10796,
+          "trade_id": "7211179076cf45e3b3be86552456f59e",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.71394,
+            "stop_loss": 0.7147639285714286,
+            "take_profit": 0.7122921428571429,
+            "position_size": 164,
+            "broker_deal_id": "00000000-5cf4-c8e6-0469-1c770015549e"
+          },
+          "created_at": "2026-08-21 03:00:52"
+        },
+        {
+          "id": 10797,
+          "trade_id": "7211179076cf45e3b3be86552456f59e",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 164.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-21 03:00:53"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.048",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "7211179076cf45e3b3be86552456f59e",
+        "signal_id": "5da4785355c942d8a754d588c5527aa1",
+        "instrument": "AUD_USD",
+        "direction": "short",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.132,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.048",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.7166,
+          "bias_since": "2026-08-20T13:40:22.471508+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 164,
+          "rejection_reason": null,
+          "entry_price": 0.71394,
+          "stop_loss": 0.7147639285714286,
+          "take_profit": 0.7122921428571429
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 4.35,
+            "quote_rate": 5.25,
+            "differential": -0.9,
+            "vol_penalty": 0.048
+          },
+          "entry_price": 0.71394
+        },
+        "entry": {
+          "price": 0.71394,
+          "time": "2026-08-21T03:00:52.759362+00:00",
+          "broker_deal_id": "00000000-5cf4-c8e6-0469-1c770015549e"
+        }
+      }
+    },
+    {
+      "id": "745093784d764a3bb632682dfd3ea1e2",
+      "stream": "strategy:mean_reversion",
+      "instrument": "AUD_USD",
+      "direction": "short",
+      "entry_price": 0.71393,
+      "exit_price": null,
+      "stop_loss": 0.7147539285714285,
+      "take_profit": 0.7122821428571429,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-21T03:00:51.869912+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5cf4-c8d1-0469-1c770015549e",
+      "events": [
+        {
+          "id": 10795,
+          "trade_id": "745093784d764a3bb632682dfd3ea1e2",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.71393,
+            "stop_loss": 0.7147539285714285,
+            "take_profit": 0.7122821428571429,
+            "position_size": 164,
+            "broker_deal_id": "00000000-5cf4-c8d1-0469-1c770015549e"
+          },
+          "created_at": "2026-08-21 03:00:51"
+        },
+        {
+          "id": 10798,
+          "trade_id": "745093784d764a3bb632682dfd3ea1e2",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 164.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-21 03:00:53"
+        }
+      ],
+      "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.71355, bb_lower=0.71024, bb_mid=0.7119, rsi=76.83, pct_b=1.117",
+      "source": "strategy:mean_reversion",
+      "record": {
+        "trade_id": "745093784d764a3bb632682dfd3ea1e2",
+        "signal_id": "4c10b7bb8c684c45bec3c0d693235dab",
+        "instrument": "AUD_USD",
+        "direction": "short",
+        "source": "strategy:mean_reversion",
+        "signal": {
+          "confidence": 0.77,
+          "reasoning": "Bollinger Mean Reversion (Pojarliev 2008) \u2014 trades reversals at Bollinger Band extremes. Indicators: bb_upper=0.71355, bb_lower=0.71024, bb_mid=0.7119, rsi=76.83, pct_b=1.117",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bearish",
+          "strength": 0.7166,
+          "bias_since": "2026-08-20T13:40:22.471508+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 164,
+          "rejection_reason": null,
+          "entry_price": 0.71393,
+          "stop_loss": 0.7147539285714285,
+          "take_profit": 0.7122821428571429
+        },
+        "metadata": {
+          "parameters": {
+            "bb_period": 20,
+            "bb_std": 2.0,
+            "rsi_period": 14,
+            "rsi_oversold": 30,
+            "rsi_overbought": 70
+          },
+          "indicators": {
+            "bb_upper": 0.71355,
+            "bb_lower": 0.71024,
+            "bb_mid": 0.7119,
+            "rsi": 76.83,
+            "pct_b": 1.117
+          },
+          "entry_price": 0.71394
+        },
+        "entry": {
+          "price": 0.71393,
+          "time": "2026-08-21T03:00:51.869912+00:00",
+          "broker_deal_id": "00000000-5cf4-c8d1-0469-1c770015549e"
+        }
+      }
+    },
+    {
       "id": "7382ec3a947f4ddb8e9beb4c012e4787",
       "stream": "strategy:breakout",
       "instrument": "GBP_USD",
@@ -72689,1108 +72891,6 @@
         "unrealized_pips": 15.4,
         "distance_sl_pips": 22.8,
         "distance_tp_pips": -0.6
-      }
-    },
-    {
-      "id": "7141c8b82c6f4243822d4bf0c3ad879b",
-      "stream": "strategy:breakout",
-      "instrument": "USD_CAD",
-      "direction": "short",
-      "entry_price": 1.40659,
-      "exit_price": 1.4015900000000001,
-      "stop_loss": 1.4088,
-      "take_profit": 1.40218,
-      "position_size": 100.0,
-      "pnl": 0.21,
-      "pnl_pips": 50.0,
-      "status": "closed_tp",
-      "opened_at": "2026-07-14T21:54:52.137124+00:00",
-      "closed_at": "2026-07-16T13:39:36.543",
-      "broker_deal_id": "000154c4-000c-111e-0000-000081041b8d",
-      "events": [
-        {
-          "id": 8313,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.40659,
-            "stop_loss": 1.4087960714285714,
-            "take_profit": 1.4021778571428571,
-            "position_size": 114,
-            "broker_deal_id": "000154c4-000c-111e-0000-000081041b8d"
-          },
-          "created_at": "2026-07-14 21:54:52"
-        },
-        {
-          "id": 8314,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.4087960714285714,
-            "new_value": 1.4088,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-14 21:54:53"
-        },
-        {
-          "id": 8315,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.4021778571428571,
-            "new_value": 1.40218,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-14 21:54:53"
-        },
-        {
-          "id": 8316,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 114.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-14 21:54:53"
-        },
-        {
-          "id": 8317,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40597,
-            "unrealized_pl": 0.06,
-            "unrealized_pips": 6.2,
-            "distance_sl_pips": 28.3,
-            "distance_tp_pips": 37.9
-          },
-          "created_at": "2026-07-14 22:41:54"
-        },
-        {
-          "id": 8320,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40558,
-            "unrealized_pl": 0.1,
-            "unrealized_pips": 10.1,
-            "distance_sl_pips": 32.2,
-            "distance_tp_pips": 34.0
-          },
-          "created_at": "2026-07-14 23:31:17"
-        },
-        {
-          "id": 8323,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40513,
-            "unrealized_pl": 0.15,
-            "unrealized_pips": 14.6,
-            "distance_sl_pips": 36.7,
-            "distance_tp_pips": 29.5
-          },
-          "created_at": "2026-07-15 00:51:00"
-        },
-        {
-          "id": 8326,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40488,
-            "unrealized_pl": 0.17,
-            "unrealized_pips": 17.1,
-            "distance_sl_pips": 39.2,
-            "distance_tp_pips": 27.0
-          },
-          "created_at": "2026-07-15 03:49:23"
-        },
-        {
-          "id": 8329,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40541,
-            "unrealized_pl": 0.12,
-            "unrealized_pips": 11.8,
-            "distance_sl_pips": 33.9,
-            "distance_tp_pips": 32.3
-          },
-          "created_at": "2026-07-15 06:01:14"
-        },
-        {
-          "id": 8332,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40519,
-            "unrealized_pl": 0.14,
-            "unrealized_pips": 14.0,
-            "distance_sl_pips": 36.1,
-            "distance_tp_pips": 30.1
-          },
-          "created_at": "2026-07-15 08:14:30"
-        },
-        {
-          "id": 8335,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40622,
-            "unrealized_pl": 0.04,
-            "unrealized_pips": 3.7,
-            "distance_sl_pips": 25.8,
-            "distance_tp_pips": 40.4
-          },
-          "created_at": "2026-07-15 10:15:20"
-        },
-        {
-          "id": 8338,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40707,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -4.8,
-            "distance_sl_pips": 17.3,
-            "distance_tp_pips": 48.9
-          },
-          "created_at": "2026-07-15 11:48:01"
-        },
-        {
-          "id": 8343,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.4054,
-            "unrealized_pl": 0.12,
-            "unrealized_pips": 11.9,
-            "distance_sl_pips": 34.0,
-            "distance_tp_pips": 32.2
-          },
-          "created_at": "2026-07-15 12:58:47"
-        },
-        {
-          "id": 8364,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40547,
-            "unrealized_pl": 0.11,
-            "unrealized_pips": 11.2,
-            "distance_sl_pips": 33.3,
-            "distance_tp_pips": 32.9
-          },
-          "created_at": "2026-07-15 14:44:29"
-        },
-        {
-          "id": 8371,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40511,
-            "unrealized_pl": 0.15,
-            "unrealized_pips": 14.8,
-            "distance_sl_pips": 36.9,
-            "distance_tp_pips": 29.3
-          },
-          "created_at": "2026-07-15 16:08:18"
-        },
-        {
-          "id": 8379,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40377,
-            "unrealized_pl": 0.28,
-            "unrealized_pips": 28.2,
-            "distance_sl_pips": 50.3,
-            "distance_tp_pips": 15.9
-          },
-          "created_at": "2026-07-15 17:34:28"
-        },
-        {
-          "id": 8385,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40289,
-            "unrealized_pl": 0.37,
-            "unrealized_pips": 37.0,
-            "distance_sl_pips": 59.1,
-            "distance_tp_pips": 7.1
-          },
-          "created_at": "2026-07-15 18:40:55"
-        },
-        {
-          "id": 8392,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40422,
-            "unrealized_pl": 0.24,
-            "unrealized_pips": 23.7,
-            "distance_sl_pips": 45.8,
-            "distance_tp_pips": 20.4
-          },
-          "created_at": "2026-07-15 19:48:54"
-        },
-        {
-          "id": 8395,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.4043,
-            "unrealized_pl": 0.23,
-            "unrealized_pips": 22.9,
-            "distance_sl_pips": 45.0,
-            "distance_tp_pips": 21.2
-          },
-          "created_at": "2026-07-15 20:44:11"
-        },
-        {
-          "id": 8398,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40374,
-            "unrealized_pl": 0.29,
-            "unrealized_pips": 28.5,
-            "distance_sl_pips": 50.6,
-            "distance_tp_pips": 15.6
-          },
-          "created_at": "2026-07-15 21:38:09"
-        },
-        {
-          "id": 8401,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40402,
-            "unrealized_pl": 0.26,
-            "unrealized_pips": 25.7,
-            "distance_sl_pips": 47.8,
-            "distance_tp_pips": 18.4
-          },
-          "created_at": "2026-07-15 22:36:25"
-        },
-        {
-          "id": 8404,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.4039,
-            "unrealized_pl": 0.27,
-            "unrealized_pips": 26.9,
-            "distance_sl_pips": 49.0,
-            "distance_tp_pips": 17.2
-          },
-          "created_at": "2026-07-15 23:33:04"
-        },
-        {
-          "id": 8407,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40393,
-            "unrealized_pl": 0.27,
-            "unrealized_pips": 26.6,
-            "distance_sl_pips": 48.7,
-            "distance_tp_pips": 17.5
-          },
-          "created_at": "2026-07-16 00:58:20"
-        },
-        {
-          "id": 8410,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40478,
-            "unrealized_pl": 0.18,
-            "unrealized_pips": 18.1,
-            "distance_sl_pips": 40.2,
-            "distance_tp_pips": 26.0
-          },
-          "created_at": "2026-07-16 03:57:37"
-        },
-        {
-          "id": 8413,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40486,
-            "unrealized_pl": 0.17,
-            "unrealized_pips": 17.3,
-            "distance_sl_pips": 39.4,
-            "distance_tp_pips": 26.8
-          },
-          "created_at": "2026-07-16 06:11:25"
-        },
-        {
-          "id": 8416,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40459,
-            "unrealized_pl": 0.2,
-            "unrealized_pips": 20.0,
-            "distance_sl_pips": 42.1,
-            "distance_tp_pips": 24.1
-          },
-          "created_at": "2026-07-16 08:30:39"
-        },
-        {
-          "id": 8420,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40363,
-            "unrealized_pl": 0.3,
-            "unrealized_pips": 29.6,
-            "distance_sl_pips": 51.7,
-            "distance_tp_pips": 14.5
-          },
-          "created_at": "2026-07-16 10:27:00"
-        },
-        {
-          "id": 8426,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.40337,
-            "unrealized_pl": 0.32,
-            "unrealized_pips": 32.2,
-            "distance_sl_pips": 54.3,
-            "distance_tp_pips": 11.9
-          },
-          "created_at": "2026-07-16 11:57:26"
-        },
-        {
-          "id": 8435,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "closed_tp",
-          "data": {
-            "exit_price": 1.4015900000000001,
-            "pnl": 0.21,
-            "pnl_pips": 50.0,
-            "actual_close_time": "2026-07-16T13:39:36.543",
-            "detection_time": "2026-07-16T13:23:31.729196+00:00"
-          },
-          "created_at": "2026-07-16 13:23:31"
-        },
-        {
-          "id": 8437,
-          "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-07-16T13:23:44.936131+00:00",
-            "market_price_at_detection": {
-              "bid": 1.40144,
-              "ask": 1.40164
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-07-16 04:00:00",
-                "o": 1.40469,
-                "h": 1.40485,
-                "l": 1.40447,
-                "c": 1.40471
-              },
-              {
-                "time": "2026-07-16 05:00:00",
-                "o": 1.4047,
-                "h": 1.40509,
-                "l": 1.40453,
-                "c": 1.40502
-              },
-              {
-                "time": "2026-07-16 06:00:00",
-                "o": 1.40503,
-                "h": 1.40517,
-                "l": 1.40413,
-                "c": 1.40419
-              },
-              {
-                "time": "2026-07-16 07:00:00",
-                "o": 1.4042,
-                "h": 1.40469,
-                "l": 1.40405,
-                "c": 1.40466
-              },
-              {
-                "time": "2026-07-16 08:00:00",
-                "o": 1.40467,
-                "h": 1.40489,
-                "l": 1.40414,
-                "c": 1.4042
-              },
-              {
-                "time": "2026-07-16 09:00:00",
-                "o": 1.40421,
-                "h": 1.40481,
-                "l": 1.40409,
-                "c": 1.40411
-              },
-              {
-                "time": "2026-07-16 10:00:00",
-                "o": 1.4041,
-                "h": 1.40417,
-                "l": 1.40352,
-                "c": 1.40374
-              },
-              {
-                "time": "2026-07-16 11:00:00",
-                "o": 1.40376,
-                "h": 1.40383,
-                "l": 1.40306,
-                "c": 1.40327
-              },
-              {
-                "time": "2026-07-16 12:00:00",
-                "o": 1.40328,
-                "h": 1.403385,
-                "l": 1.40186,
-                "c": 1.40288
-              },
-              {
-                "time": "2026-07-16 13:00:00",
-                "o": 1.4029,
-                "h": 1.40315,
-                "l": 1.4018,
-                "c": 1.40181
-              }
-            ],
-            "atr_14": 0.000825,
-            "trade_duration_hours": 39.5,
-            "max_favorable_pips": 37.0,
-            "max_adverse_pips": -4.8
-          },
-          "created_at": "2026-07-16 13:23:45"
-        }
-      ],
-      "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.41748, asian_low=1.41287, asian_range=0.00461, buffer=0.001",
-      "source": "strategy:breakout",
-      "record": {
-        "trade_id": "7141c8b82c6f4243822d4bf0c3ad879b",
-        "signal_id": "8e9d63dad0cb4f918c8ce4fe3203d843",
-        "instrument": "USD_CAD",
-        "direction": "short",
-        "source": "strategy:breakout",
-        "signal": {
-          "confidence": 0.948,
-          "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.41748, asian_low=1.41287, asian_range=0.00461, buffer=0.001",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 0.8854,
-          "bias_since": "2026-07-13T21:52:04.554077+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 114,
-          "rejection_reason": null,
-          "entry_price": 1.40659,
-          "stop_loss": 1.4087960714285714,
-          "take_profit": 1.4021778571428571
-        },
-        "metadata": {
-          "parameters": {
-            "asian_start": "22:00",
-            "asian_end": "6:00",
-            "breakout_buffer_pips": 10
-          },
-          "indicators": {
-            "asian_high": 1.41748,
-            "asian_low": 1.41287,
-            "asian_range": 0.00461,
-            "buffer": 0.001
-          },
-          "entry_price": 1.4065599999999998
-        },
-        "entry": {
-          "price": 1.40659,
-          "time": "2026-07-14T21:54:52.137124+00:00",
-          "broker_deal_id": "000154c4-000c-111e-0000-000081041b8d"
-        },
-        "exit": {
-          "price": 1.4015900000000001,
-          "time": "2026-07-16T13:39:36.543",
-          "pnl": 0.21,
-          "pnl_pips": 50.0,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-07-16T13:23:44.936131+00:00",
-        "market_price_at_detection": {
-          "bid": 1.40144,
-          "ask": 1.40164
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-07-16 04:00:00",
-            "o": 1.40469,
-            "h": 1.40485,
-            "l": 1.40447,
-            "c": 1.40471
-          },
-          {
-            "time": "2026-07-16 05:00:00",
-            "o": 1.4047,
-            "h": 1.40509,
-            "l": 1.40453,
-            "c": 1.40502
-          },
-          {
-            "time": "2026-07-16 06:00:00",
-            "o": 1.40503,
-            "h": 1.40517,
-            "l": 1.40413,
-            "c": 1.40419
-          },
-          {
-            "time": "2026-07-16 07:00:00",
-            "o": 1.4042,
-            "h": 1.40469,
-            "l": 1.40405,
-            "c": 1.40466
-          },
-          {
-            "time": "2026-07-16 08:00:00",
-            "o": 1.40467,
-            "h": 1.40489,
-            "l": 1.40414,
-            "c": 1.4042
-          },
-          {
-            "time": "2026-07-16 09:00:00",
-            "o": 1.40421,
-            "h": 1.40481,
-            "l": 1.40409,
-            "c": 1.40411
-          },
-          {
-            "time": "2026-07-16 10:00:00",
-            "o": 1.4041,
-            "h": 1.40417,
-            "l": 1.40352,
-            "c": 1.40374
-          },
-          {
-            "time": "2026-07-16 11:00:00",
-            "o": 1.40376,
-            "h": 1.40383,
-            "l": 1.40306,
-            "c": 1.40327
-          },
-          {
-            "time": "2026-07-16 12:00:00",
-            "o": 1.40328,
-            "h": 1.403385,
-            "l": 1.40186,
-            "c": 1.40288
-          },
-          {
-            "time": "2026-07-16 13:00:00",
-            "o": 1.4029,
-            "h": 1.40315,
-            "l": 1.4018,
-            "c": 1.40181
-          }
-        ],
-        "atr_14": 0.000825,
-        "trade_duration_hours": 39.5,
-        "max_favorable_pips": 37.0,
-        "max_adverse_pips": -4.8
-      },
-      "latest_snapshot": {
-        "current_price": 1.40337,
-        "unrealized_pl": 0.32,
-        "unrealized_pips": 32.2,
-        "distance_sl_pips": 54.3,
-        "distance_tp_pips": 11.9
-      }
-    },
-    {
-      "id": "9e0510fef5b94e38ab879fcfc77da6d7",
-      "stream": "strategy:breakout",
-      "instrument": "EUR_USD",
-      "direction": "long",
-      "entry_price": 1.142695,
-      "exit_price": 1.142875,
-      "stop_loss": 1.14082,
-      "take_profit": 1.14645,
-      "position_size": 100.0,
-      "pnl": -0.17,
-      "pnl_pips": 1.8,
-      "status": "closed_reconciled",
-      "opened_at": "2026-07-14T17:09:30.121732+00:00",
-      "closed_at": "2026-07-15T13:06:50.382",
-      "broker_deal_id": "00005552-0055-311e-0000-00008210aea6",
-      "events": [
-        {
-          "id": 8292,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 1.142695,
-            "stop_loss": 1.1408157142857143,
-            "take_profit": 1.1464535714285715,
-            "position_size": 100,
-            "broker_deal_id": "00005552-0055-311e-0000-00008210aea6"
-          },
-          "created_at": "2026-07-14 17:09:30"
-        },
-        {
-          "id": 8293,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 1.1408157142857143,
-            "new_value": 1.14082,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-14 17:09:31"
-        },
-        {
-          "id": 8294,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 1.1464535714285715,
-            "new_value": 1.14645,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-14 17:09:31"
-        },
-        {
-          "id": 8297,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142755,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 0.6,
-            "distance_sl_pips": 19.4,
-            "distance_tp_pips": 37.0
-          },
-          "created_at": "2026-07-14 17:49:48"
-        },
-        {
-          "id": 8300,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142005,
-            "unrealized_pl": -0.07,
-            "unrealized_pips": -6.9,
-            "distance_sl_pips": 11.8,
-            "distance_tp_pips": 44.5
-          },
-          "created_at": "2026-07-14 18:50:19"
-        },
-        {
-          "id": 8303,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142145,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -5.5,
-            "distance_sl_pips": 13.3,
-            "distance_tp_pips": 43.1
-          },
-          "created_at": "2026-07-14 19:59:14"
-        },
-        {
-          "id": 8306,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142115,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -5.8,
-            "distance_sl_pips": 13.0,
-            "distance_tp_pips": 43.3
-          },
-          "created_at": "2026-07-14 20:57:37"
-        },
-        {
-          "id": 8311,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.14202,
-            "unrealized_pl": -0.07,
-            "unrealized_pips": -6.7,
-            "distance_sl_pips": 12.0,
-            "distance_tp_pips": 44.3
-          },
-          "created_at": "2026-07-14 21:50:38"
-        },
-        {
-          "id": 8318,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142105,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -5.9,
-            "distance_sl_pips": 12.8,
-            "distance_tp_pips": 43.5
-          },
-          "created_at": "2026-07-14 22:41:54"
-        },
-        {
-          "id": 8321,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142295,
-            "unrealized_pl": -0.04,
-            "unrealized_pips": -4.0,
-            "distance_sl_pips": 14.8,
-            "distance_tp_pips": 41.5
-          },
-          "created_at": "2026-07-14 23:31:17"
-        },
-        {
-          "id": 8324,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142985,
-            "unrealized_pl": 0.03,
-            "unrealized_pips": 2.9,
-            "distance_sl_pips": 21.6,
-            "distance_tp_pips": 34.7
-          },
-          "created_at": "2026-07-15 00:51:00"
-        },
-        {
-          "id": 8327,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.143565,
-            "unrealized_pl": 0.09,
-            "unrealized_pips": 8.7,
-            "distance_sl_pips": 27.4,
-            "distance_tp_pips": 28.9
-          },
-          "created_at": "2026-07-15 03:49:23"
-        },
-        {
-          "id": 8330,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.144155,
-            "unrealized_pl": 0.15,
-            "unrealized_pips": 14.6,
-            "distance_sl_pips": 33.4,
-            "distance_tp_pips": 22.9
-          },
-          "created_at": "2026-07-15 06:01:15"
-        },
-        {
-          "id": 8333,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.142295,
-            "unrealized_pl": -0.04,
-            "unrealized_pips": -4.0,
-            "distance_sl_pips": 14.8,
-            "distance_tp_pips": 41.5
-          },
-          "created_at": "2026-07-15 08:14:31"
-        },
-        {
-          "id": 8336,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.141455,
-            "unrealized_pl": -0.12,
-            "unrealized_pips": -12.4,
-            "distance_sl_pips": 6.4,
-            "distance_tp_pips": 49.9
-          },
-          "created_at": "2026-07-15 10:15:20"
-        },
-        {
-          "id": 8339,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 1.141435,
-            "unrealized_pl": -0.13,
-            "unrealized_pips": -12.6,
-            "distance_sl_pips": 6.2,
-            "distance_tp_pips": 50.1
-          },
-          "created_at": "2026-07-15 11:48:01"
-        },
-        {
-          "id": 8341,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 1.142875,
-            "pnl": -0.17,
-            "pnl_pips": 1.8,
-            "actual_close_time": "2026-07-15T13:06:50.382",
-            "detection_time": "2026-07-15T12:58:34.566462+00:00"
-          },
-          "created_at": "2026-07-15 12:58:34"
-        },
-        {
-          "id": 8342,
-          "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-07-15T12:58:45.696403+00:00",
-            "market_price_at_detection": {
-              "bid": 1.14299,
-              "ask": 1.14306
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-07-15 03:00:00",
-                "o": 1.144045,
-                "h": 1.144245,
-                "l": 1.143355,
-                "c": 1.143805
-              },
-              {
-                "time": "2026-07-15 04:00:00",
-                "o": 1.143815,
-                "h": 1.144085,
-                "l": 1.143665,
-                "c": 1.143715
-              },
-              {
-                "time": "2026-07-15 05:00:00",
-                "o": 1.143725,
-                "h": 1.144335,
-                "l": 1.143535,
-                "c": 1.144065
-              },
-              {
-                "time": "2026-07-15 06:00:00",
-                "o": 1.144075,
-                "h": 1.144385,
-                "l": 1.142815,
-                "c": 1.142885
-              },
-              {
-                "time": "2026-07-15 07:00:00",
-                "o": 1.142875,
-                "h": 1.143195,
-                "l": 1.142005,
-                "c": 1.142345
-              },
-              {
-                "time": "2026-07-15 08:00:00",
-                "o": 1.142355,
-                "h": 1.142765,
-                "l": 1.142115,
-                "c": 1.142445
-              },
-              {
-                "time": "2026-07-15 09:00:00",
-                "o": 1.142455,
-                "h": 1.142605,
-                "l": 1.141665,
-                "c": 1.141705
-              },
-              {
-                "time": "2026-07-15 10:00:00",
-                "o": 1.141715,
-                "h": 1.141835,
-                "l": 1.141085,
-                "c": 1.141585
-              },
-              {
-                "time": "2026-07-15 11:00:00",
-                "o": 1.141595,
-                "h": 1.141955,
-                "l": 1.141015,
-                "c": 1.141175
-              },
-              {
-                "time": "2026-07-15 12:00:00",
-                "o": 1.141195,
-                "h": 1.142835,
-                "l": 1.140615,
-                "c": 1.142625
-              }
-            ],
-            "atr_14": 0.000985,
-            "trade_duration_hours": 19.8,
-            "max_favorable_pips": 14.6,
-            "max_adverse_pips": -12.6
-          },
-          "created_at": "2026-07-15 12:58:46"
-        }
-      ],
-      "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.14092, asian_low=1.13784, asian_range=0.00309, buffer=0.001",
-      "source": "strategy:breakout",
-      "record": {
-        "trade_id": "9e0510fef5b94e38ab879fcfc77da6d7",
-        "signal_id": "5c37dedf91014cf49908ff5cf76ee180",
-        "instrument": "EUR_USD",
-        "direction": "long",
-        "source": "strategy:breakout",
-        "signal": {
-          "confidence": 0.663,
-          "reasoning": "London/NY Session Breakout (Breedon 2012) \u2014 trades breakouts from Asian range. Indicators: asian_high=1.14092, asian_low=1.13784, asian_range=0.00309, buffer=0.001",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 0.6112,
-          "bias_since": "2026-07-14T13:20:30.590682+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 1.142695,
-          "stop_loss": 1.1408157142857143,
-          "take_profit": 1.1464535714285715
-        },
-        "metadata": {
-          "parameters": {
-            "asian_start": "22:00",
-            "asian_end": "6:00",
-            "breakout_buffer_pips": 10
-          },
-          "indicators": {
-            "asian_high": 1.14092,
-            "asian_low": 1.13784,
-            "asian_range": 0.00309,
-            "buffer": 0.001
-          },
-          "entry_price": 1.142955
-        },
-        "entry": {
-          "price": 1.142695,
-          "time": "2026-07-14T17:09:30.121732+00:00",
-          "broker_deal_id": "00005552-0055-311e-0000-00008210aea6"
-        },
-        "exit": {
-          "price": 1.142875,
-          "time": "2026-07-15T13:06:50.382",
-          "pnl": -0.17,
-          "pnl_pips": 1.8,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-07-15T12:58:45.696403+00:00",
-        "market_price_at_detection": {
-          "bid": 1.14299,
-          "ask": 1.14306
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-07-15 03:00:00",
-            "o": 1.144045,
-            "h": 1.144245,
-            "l": 1.143355,
-            "c": 1.143805
-          },
-          {
-            "time": "2026-07-15 04:00:00",
-            "o": 1.143815,
-            "h": 1.144085,
-            "l": 1.143665,
-            "c": 1.143715
-          },
-          {
-            "time": "2026-07-15 05:00:00",
-            "o": 1.143725,
-            "h": 1.144335,
-            "l": 1.143535,
-            "c": 1.144065
-          },
-          {
-            "time": "2026-07-15 06:00:00",
-            "o": 1.144075,
-            "h": 1.144385,
-            "l": 1.142815,
-            "c": 1.142885
-          },
-          {
-            "time": "2026-07-15 07:00:00",
-            "o": 1.142875,
-            "h": 1.143195,
-            "l": 1.142005,
-            "c": 1.142345
-          },
-          {
-            "time": "2026-07-15 08:00:00",
-            "o": 1.142355,
-            "h": 1.142765,
-            "l": 1.142115,
-            "c": 1.142445
-          },
-          {
-            "time": "2026-07-15 09:00:00",
-            "o": 1.142455,
-            "h": 1.142605,
-            "l": 1.141665,
-            "c": 1.141705
-          },
-          {
-            "time": "2026-07-15 10:00:00",
-            "o": 1.141715,
-            "h": 1.141835,
-            "l": 1.141085,
-            "c": 1.141585
-          },
-          {
-            "time": "2026-07-15 11:00:00",
-            "o": 1.141595,
-            "h": 1.141955,
-            "l": 1.141015,
-            "c": 1.141175
-          },
-          {
-            "time": "2026-07-15 12:00:00",
-            "o": 1.141195,
-            "h": 1.142835,
-            "l": 1.140615,
-            "c": 1.142625
-          }
-        ],
-        "atr_14": 0.000985,
-        "trade_duration_hours": 19.8,
-        "max_favorable_pips": 14.6,
-        "max_adverse_pips": -12.6
-      },
-      "latest_snapshot": {
-        "current_price": 1.141435,
-        "unrealized_pl": -0.13,
-        "unrealized_pips": -12.6,
-        "distance_sl_pips": 6.2,
-        "distance_tp_pips": 50.1
       }
     }
   ]
