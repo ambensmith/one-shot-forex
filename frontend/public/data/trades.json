@@ -1,6 +1,296 @@
 {
   "trades": [
     {
+      "id": "19a2bd7799204e81bf2427407e941e56",
+      "stream": "strategy:momentum",
+      "instrument": "EUR_GBP",
+      "direction": "long",
+      "entry_price": 0.8576,
+      "exit_price": null,
+      "stop_loss": 0.8571087500000001,
+      "take_profit": 0.8585824999999999,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-27T02:47:45.966455+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5e80-5c67-0469-1c770015549e",
+      "events": [
+        {
+          "id": 11426,
+          "trade_id": "19a2bd7799204e81bf2427407e941e56",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.8576,
+            "stop_loss": 0.8571087500000001,
+            "take_profit": 0.8585824999999999,
+            "position_size": 100,
+            "broker_deal_id": "00000000-5e80-5c67-0469-1c770015549e"
+          },
+          "created_at": "2026-08-27 02:47:45"
+        }
+      ],
+      "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00355, short_return=0.00249, combined_signal=0.00312",
+      "source": "strategy:momentum",
+      "record": {
+        "trade_id": "19a2bd7799204e81bf2427407e941e56",
+        "signal_id": "e4a00a258c4d47d2bc3cd95c139e01c0",
+        "instrument": "EUR_GBP",
+        "direction": "long",
+        "source": "strategy:momentum",
+        "signal": {
+          "confidence": 0.062,
+          "reasoning": "Time Series Momentum (Moskowitz 2012) \u2014 trades in the direction of recent returns. Indicators: lookback_return=0.00355, short_return=0.00249, combined_signal=0.00312",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.8089,
+          "bias_since": "2026-08-26T21:33:46.892962+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 100,
+          "rejection_reason": null,
+          "entry_price": 0.8576,
+          "stop_loss": 0.8571087500000001,
+          "take_profit": 0.8585824999999999
+        },
+        "metadata": {
+          "parameters": {
+            "lookback_months": 12,
+            "rebalance_frequency": "weekly"
+          },
+          "indicators": {
+            "lookback_return": 0.00355,
+            "short_return": 0.00249,
+            "combined_signal": 0.00312
+          },
+          "entry_price": 0.85763
+        },
+        "entry": {
+          "price": 0.8576,
+          "time": "2026-08-27T02:47:45.966455+00:00",
+          "broker_deal_id": "00000000-5e80-5c67-0469-1c770015549e"
+        }
+      }
+    },
+    {
+      "id": "007ea52e23c24055b1c81973a5241b96",
+      "stream": "strategy:carry",
+      "instrument": "USD_JPY",
+      "direction": "long",
+      "entry_price": 159.315,
+      "exit_price": null,
+      "stop_loss": 159.184125,
+      "take_profit": 159.57675,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-27T02:47:45.034183+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5e80-5c53-0469-1c770015549e",
+      "events": [
+        {
+          "id": 11425,
+          "trade_id": "007ea52e23c24055b1c81973a5241b96",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 159.315,
+            "stop_loss": 159.184125,
+            "take_profit": 159.57675,
+            "position_size": 117,
+            "broker_deal_id": "00000000-5e80-5c53-0469-1c770015549e"
+          },
+          "created_at": "2026-08-27 02:47:45"
+        },
+        {
+          "id": 11427,
+          "trade_id": "007ea52e23c24055b1c81973a5241b96",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 117.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-27 02:47:47"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=0.1, differential=5.15, vol_penalty=0.024",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "007ea52e23c24055b1c81973a5241b96",
+        "signal_id": "55e64f1add8d43768c9d80cb91121b8d",
+        "instrument": "USD_JPY",
+        "direction": "long",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.976,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=0.1, differential=5.15, vol_penalty=0.024",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 1.0,
+          "bias_since": "2026-07-31T02:39:46.201141+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 117,
+          "rejection_reason": null,
+          "entry_price": 159.315,
+          "stop_loss": 159.184125,
+          "take_profit": 159.57675
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 5.25,
+            "quote_rate": 0.1,
+            "differential": 5.15,
+            "vol_penalty": 0.024
+          },
+          "entry_price": 159.323
+        },
+        "entry": {
+          "price": 159.315,
+          "time": "2026-08-27T02:47:45.034183+00:00",
+          "broker_deal_id": "00000000-5e80-5c53-0469-1c770015549e"
+        }
+      }
+    },
+    {
+      "id": "e0c6653f74b64538a89ca43c509b3e7f",
+      "stream": "strategy:carry",
+      "instrument": "USD_CHF",
+      "direction": "long",
+      "entry_price": 0.805455,
+      "exit_price": null,
+      "stop_loss": 0.8045207142857143,
+      "take_profit": 0.8073235714285716,
+      "position_size": 100.0,
+      "pnl": null,
+      "pnl_pips": null,
+      "status": "open",
+      "opened_at": "2026-08-27T02:47:44.096274+00:00",
+      "closed_at": null,
+      "broker_deal_id": "00000000-5e80-5c3f-0469-1c770015549e",
+      "events": [
+        {
+          "id": 11424,
+          "trade_id": "e0c6653f74b64538a89ca43c509b3e7f",
+          "event_type": "opened",
+          "data": {
+            "entry_price": 0.805455,
+            "stop_loss": 0.8045207142857143,
+            "take_profit": 0.8073235714285716,
+            "position_size": 117,
+            "broker_deal_id": "00000000-5e80-5c3f-0469-1c770015549e"
+          },
+          "created_at": "2026-08-27 02:47:44"
+        },
+        {
+          "id": 11428,
+          "trade_id": "e0c6653f74b64538a89ca43c509b3e7f",
+          "event_type": "size_adjusted",
+          "data": {
+            "old_value": 117.0,
+            "new_value": 100.0,
+            "source": "broker_sync"
+          },
+          "created_at": "2026-08-27 02:47:47"
+        }
+      ],
+      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.022",
+      "source": "strategy:carry",
+      "record": {
+        "trade_id": "e0c6653f74b64538a89ca43c509b3e7f",
+        "signal_id": "aee00fbdd4dc418197ffa9991b07edc5",
+        "instrument": "USD_CHF",
+        "direction": "long",
+        "source": "strategy:carry",
+        "signal": {
+          "confidence": 0.678,
+          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.022",
+          "key_factors": null,
+          "risk_factors": null,
+          "prompt_version": null,
+          "model": null
+        },
+        "challenge": null,
+        "headlines_used": null,
+        "price_context": null,
+        "bias_at_trade": {
+          "direction": "bullish",
+          "strength": 0.9355,
+          "bias_since": "2026-08-20T03:40:51.617077+00:00"
+        },
+        "risk_decision": {
+          "approved": true,
+          "position_size": 117,
+          "rejection_reason": null,
+          "entry_price": 0.805455,
+          "stop_loss": 0.8045207142857143,
+          "take_profit": 0.8073235714285716
+        },
+        "metadata": {
+          "parameters": {
+            "rate_data": "manual",
+            "min_differential": 0.5,
+            "rates": {
+              "USD": 5.25,
+              "EUR": 4.5,
+              "GBP": 5.25,
+              "JPY": 0.1,
+              "CHF": 1.75,
+              "AUD": 4.35,
+              "CAD": 5.0,
+              "NZD": 5.5
+            }
+          },
+          "indicators": {
+            "base_rate": 5.25,
+            "quote_rate": 1.75,
+            "differential": 3.5,
+            "vol_penalty": 0.022
+          },
+          "entry_price": 0.80545
+        },
+        "entry": {
+          "price": 0.805455,
+          "time": "2026-08-27T02:47:44.096274+00:00",
+          "broker_deal_id": "00000000-5e80-5c3f-0469-1c770015549e"
+        }
+      }
+    },
+    {
       "id": "8a1c89f485234cde99a0e878232188b3",
       "stream": "strategy:carry",
       "instrument": "EUR_GBP",
@@ -71677,730 +71967,6 @@
         "unrealized_pips": 9.4,
         "distance_sl_pips": 22.0,
         "distance_tp_pips": 15.7
-      }
-    },
-    {
-      "id": "5a83e14db42340b6bd76afc6d6506121",
-      "stream": "strategy:carry",
-      "instrument": "USD_CHF",
-      "direction": "long",
-      "entry_price": 0.81664,
-      "exit_price": 0.8146450000000001,
-      "stop_loss": 0.81519,
-      "take_profit": 0.81954,
-      "position_size": 100.0,
-      "pnl": -0.17,
-      "pnl_pips": -19.9,
-      "status": "closed_sl",
-      "opened_at": "2026-07-26T22:53:33.868912+00:00",
-      "closed_at": "2026-07-27T01:12:37.505",
-      "broker_deal_id": "000154c4-000c-819e-0000-000080e9001c",
-      "events": [
-        {
-          "id": 8948,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.81664,
-            "stop_loss": 0.8151876785714286,
-            "take_profit": 0.8195446428571429,
-            "position_size": 114,
-            "broker_deal_id": "000154c4-000c-819e-0000-000080e9001c"
-          },
-          "created_at": "2026-07-26 22:53:33"
-        },
-        {
-          "id": 8949,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.8151876785714286,
-            "new_value": 0.81519,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8950,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.8195446428571429,
-            "new_value": 0.81954,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8951,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 114.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8957,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.816545,
-            "unrealized_pl": -0.01,
-            "unrealized_pips": -1.0,
-            "distance_sl_pips": 13.5,
-            "distance_tp_pips": 30.0
-          },
-          "created_at": "2026-07-26 23:45:56"
-        },
-        {
-          "id": 8960,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "closed_sl",
-          "data": {
-            "exit_price": 0.8146450000000001,
-            "pnl": -0.17,
-            "pnl_pips": -19.9,
-            "actual_close_time": "2026-07-27T01:12:37.505",
-            "detection_time": "2026-07-27T01:19:55.626845+00:00"
-          },
-          "created_at": "2026-07-27 01:19:55"
-        },
-        {
-          "id": 8961,
-          "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-          "event_type": "close_context",
-          "data": {
-            "detection_time": "2026-07-27T01:19:58.603402+00:00",
-            "market_price_at_detection": {
-              "bid": 0.81458,
-              "ask": 0.81472
-            },
-            "last_10_candles": [
-              {
-                "time": "2026-07-24 16:00:00",
-                "o": 0.816785,
-                "h": 0.8174,
-                "l": 0.816505,
-                "c": 0.8174
-              },
-              {
-                "time": "2026-07-24 17:00:00",
-                "o": 0.81741,
-                "h": 0.81843,
-                "l": 0.817335,
-                "c": 0.81827
-              },
-              {
-                "time": "2026-07-24 18:00:00",
-                "o": 0.818255,
-                "h": 0.81854,
-                "l": 0.818185,
-                "c": 0.818215
-              },
-              {
-                "time": "2026-07-24 19:00:00",
-                "o": 0.81821,
-                "h": 0.818465,
-                "l": 0.818095,
-                "c": 0.818355
-              },
-              {
-                "time": "2026-07-24 20:00:00",
-                "o": 0.81835,
-                "h": 0.818575,
-                "l": 0.818075,
-                "c": 0.81812
-              },
-              {
-                "time": "2026-07-26 21:00:00",
-                "o": 0.81817,
-                "h": 0.81817,
-                "l": 0.815605,
-                "c": 0.81582
-              },
-              {
-                "time": "2026-07-26 22:00:00",
-                "o": 0.815835,
-                "h": 0.81695,
-                "l": 0.815315,
-                "c": 0.81684
-              },
-              {
-                "time": "2026-07-26 23:00:00",
-                "o": 0.816845,
-                "h": 0.816875,
-                "l": 0.816265,
-                "c": 0.816315
-              },
-              {
-                "time": "2026-07-27 00:00:00",
-                "o": 0.816325,
-                "h": 0.816325,
-                "l": 0.81408,
-                "c": 0.815075
-              },
-              {
-                "time": "2026-07-27 01:00:00",
-                "o": 0.815085,
-                "h": 0.815085,
-                "l": 0.81452,
-                "c": 0.81473
-              }
-            ],
-            "atr_14": 0.001048,
-            "trade_duration_hours": 2.4,
-            "max_favorable_pips": 0.0,
-            "max_adverse_pips": -1.0
-          },
-          "created_at": "2026-07-27 01:19:59"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.044",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "5a83e14db42340b6bd76afc6d6506121",
-        "signal_id": "0e8207c1ca5146cd883cd296bb3024be",
-        "instrument": "USD_CHF",
-        "direction": "long",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.656,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=5.25, quote_rate=1.75, differential=3.5, vol_penalty=0.044",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bullish",
-          "strength": 1.0,
-          "bias_since": "2026-07-03T00:00:52.626444+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 114,
-          "rejection_reason": null,
-          "entry_price": 0.81664,
-          "stop_loss": 0.8151876785714286,
-          "take_profit": 0.8195446428571429
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 5.25,
-            "quote_rate": 1.75,
-            "differential": 3.5,
-            "vol_penalty": 0.044
-          },
-          "entry_price": 0.8167
-        },
-        "entry": {
-          "price": 0.81664,
-          "time": "2026-07-26T22:53:33.868912+00:00",
-          "broker_deal_id": "000154c4-000c-819e-0000-000080e9001c"
-        },
-        "exit": {
-          "price": 0.8146450000000001,
-          "time": "2026-07-27T01:12:37.505",
-          "pnl": -0.17,
-          "pnl_pips": -19.9,
-          "close_reason": null
-        }
-      },
-      "close_context": {
-        "detection_time": "2026-07-27T01:19:58.603402+00:00",
-        "market_price_at_detection": {
-          "bid": 0.81458,
-          "ask": 0.81472
-        },
-        "last_10_candles": [
-          {
-            "time": "2026-07-24 16:00:00",
-            "o": 0.816785,
-            "h": 0.8174,
-            "l": 0.816505,
-            "c": 0.8174
-          },
-          {
-            "time": "2026-07-24 17:00:00",
-            "o": 0.81741,
-            "h": 0.81843,
-            "l": 0.817335,
-            "c": 0.81827
-          },
-          {
-            "time": "2026-07-24 18:00:00",
-            "o": 0.818255,
-            "h": 0.81854,
-            "l": 0.818185,
-            "c": 0.818215
-          },
-          {
-            "time": "2026-07-24 19:00:00",
-            "o": 0.81821,
-            "h": 0.818465,
-            "l": 0.818095,
-            "c": 0.818355
-          },
-          {
-            "time": "2026-07-24 20:00:00",
-            "o": 0.81835,
-            "h": 0.818575,
-            "l": 0.818075,
-            "c": 0.81812
-          },
-          {
-            "time": "2026-07-26 21:00:00",
-            "o": 0.81817,
-            "h": 0.81817,
-            "l": 0.815605,
-            "c": 0.81582
-          },
-          {
-            "time": "2026-07-26 22:00:00",
-            "o": 0.815835,
-            "h": 0.81695,
-            "l": 0.815315,
-            "c": 0.81684
-          },
-          {
-            "time": "2026-07-26 23:00:00",
-            "o": 0.816845,
-            "h": 0.816875,
-            "l": 0.816265,
-            "c": 0.816315
-          },
-          {
-            "time": "2026-07-27 00:00:00",
-            "o": 0.816325,
-            "h": 0.816325,
-            "l": 0.81408,
-            "c": 0.815075
-          },
-          {
-            "time": "2026-07-27 01:00:00",
-            "o": 0.815085,
-            "h": 0.815085,
-            "l": 0.81452,
-            "c": 0.81473
-          }
-        ],
-        "atr_14": 0.001048,
-        "trade_duration_hours": 2.4,
-        "max_favorable_pips": 0.0,
-        "max_adverse_pips": -1.0
-      },
-      "latest_snapshot": {
-        "current_price": 0.816545,
-        "unrealized_pl": -0.01,
-        "unrealized_pips": -1.0,
-        "distance_sl_pips": 13.5,
-        "distance_tp_pips": 30.0
-      }
-    },
-    {
-      "id": "d09ebec66161485c954f4ed79a455482",
-      "stream": "strategy:carry",
-      "instrument": "AUD_USD",
-      "direction": "short",
-      "entry_price": 0.6992499999999999,
-      "exit_price": 0.7000500000000001,
-      "stop_loss": 0.7005,
-      "take_profit": 0.69675,
-      "position_size": 100.0,
-      "pnl": -0.11,
-      "pnl_pips": -8.0,
-      "status": "closed_reconciled",
-      "opened_at": "2026-07-26T22:53:32.863839+00:00",
-      "closed_at": "2026-07-27T02:59:21.272",
-      "broker_deal_id": "00001544-0055-311e-0000-0000810b0048",
-      "events": [
-        {
-          "id": 8947,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.6992499999999999,
-            "stop_loss": 0.7004976785714285,
-            "take_profit": 0.6967546428571427,
-            "position_size": 163,
-            "broker_deal_id": "00001544-0055-311e-0000-0000810b0048"
-          },
-          "created_at": "2026-07-26 22:53:32"
-        },
-        {
-          "id": 8952,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.7004976785714285,
-            "new_value": 0.7005,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8953,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.6967546428571427,
-            "new_value": 0.69675,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8954,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "size_adjusted",
-          "data": {
-            "old_value": 163.0,
-            "new_value": 100.0,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8958,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69941,
-            "unrealized_pl": -0.02,
-            "unrealized_pips": -1.6,
-            "distance_sl_pips": 10.9,
-            "distance_tp_pips": 26.6
-          },
-          "created_at": "2026-07-26 23:45:57"
-        },
-        {
-          "id": 8962,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69983,
-            "unrealized_pl": -0.06,
-            "unrealized_pips": -5.8,
-            "distance_sl_pips": 6.7,
-            "distance_tp_pips": 30.8
-          },
-          "created_at": "2026-07-27 01:19:59"
-        },
-        {
-          "id": 8964,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.69967,
-            "unrealized_pl": -0.04,
-            "unrealized_pips": -4.2,
-            "distance_sl_pips": 8.3,
-            "distance_tp_pips": 29.2
-          },
-          "created_at": "2026-07-27 01:26:25"
-        },
-        {
-          "id": 8970,
-          "trade_id": "d09ebec66161485c954f4ed79a455482",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 0.7000500000000001,
-            "pnl": -0.11,
-            "pnl_pips": -8.0,
-            "actual_close_time": "2026-07-27T02:59:21.272",
-            "detection_time": "2026-07-27T02:23:19.566505+00:00"
-          },
-          "created_at": "2026-07-27 02:23:19"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.052",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "d09ebec66161485c954f4ed79a455482",
-        "signal_id": "03a6dc2791aa4f0cba0cfe3c0df61bb4",
-        "instrument": "AUD_USD",
-        "direction": "short",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.128,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.35, quote_rate=5.25, differential=-0.9, vol_penalty=0.052",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 1.0,
-          "bias_since": "2026-07-21T02:05:06.667987+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 163,
-          "rejection_reason": null,
-          "entry_price": 0.6992499999999999,
-          "stop_loss": 0.7004976785714285,
-          "take_profit": 0.6967546428571427
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 4.35,
-            "quote_rate": 5.25,
-            "differential": -0.9,
-            "vol_penalty": 0.052
-          },
-          "entry_price": 0.69918
-        },
-        "entry": {
-          "price": 0.6992499999999999,
-          "time": "2026-07-26T22:53:32.863839+00:00",
-          "broker_deal_id": "00001544-0055-311e-0000-0000810b0048"
-        },
-        "exit": {
-          "price": 0.7000500000000001,
-          "time": "2026-07-27T02:59:21.272",
-          "pnl": -0.11,
-          "pnl_pips": -8.0,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.69967,
-        "unrealized_pl": -0.04,
-        "unrealized_pips": -4.2,
-        "distance_sl_pips": 8.3,
-        "distance_tp_pips": 29.2
-      }
-    },
-    {
-      "id": "42e4e77961d54b039e2a8b18160d026f",
-      "stream": "strategy:carry",
-      "instrument": "EUR_GBP",
-      "direction": "short",
-      "entry_price": 0.85362,
-      "exit_price": 0.85438,
-      "stop_loss": 0.85451,
-      "take_profit": 0.85184,
-      "position_size": 100.0,
-      "pnl": -0.12,
-      "pnl_pips": -7.6,
-      "status": "closed_reconciled",
-      "opened_at": "2026-07-26T22:53:31.918309+00:00",
-      "closed_at": "2026-07-27T07:12:05.314",
-      "broker_deal_id": "00005552-001c-241e-0000-000080bc013f",
-      "events": [
-        {
-          "id": 8946,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "opened",
-          "data": {
-            "entry_price": 0.85362,
-            "stop_loss": 0.8545076785714286,
-            "take_profit": 0.8518446428571429,
-            "position_size": 100,
-            "broker_deal_id": "00005552-001c-241e-0000-000080bc013f"
-          },
-          "created_at": "2026-07-26 22:53:31"
-        },
-        {
-          "id": 8955,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "sl_updated",
-          "data": {
-            "old_value": 0.8545076785714286,
-            "new_value": 0.85451,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8956,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "tp_updated",
-          "data": {
-            "old_value": 0.8518446428571429,
-            "new_value": 0.85184,
-            "source": "broker_sync"
-          },
-          "created_at": "2026-07-26 22:53:34"
-        },
-        {
-          "id": 8959,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.8535,
-            "unrealized_pl": 0.01,
-            "unrealized_pips": 1.2,
-            "distance_sl_pips": 10.1,
-            "distance_tp_pips": 16.6
-          },
-          "created_at": "2026-07-26 23:45:57"
-        },
-        {
-          "id": 8963,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.85403,
-            "unrealized_pl": -0.04,
-            "unrealized_pips": -4.1,
-            "distance_sl_pips": 4.8,
-            "distance_tp_pips": 21.9
-          },
-          "created_at": "2026-07-27 01:20:00"
-        },
-        {
-          "id": 8965,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.85408,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -4.6,
-            "distance_sl_pips": 4.3,
-            "distance_tp_pips": 22.4
-          },
-          "created_at": "2026-07-27 01:26:26"
-        },
-        {
-          "id": 8972,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "snapshot",
-          "data": {
-            "current_price": 0.85412,
-            "unrealized_pl": -0.05,
-            "unrealized_pips": -5.0,
-            "distance_sl_pips": 3.9,
-            "distance_tp_pips": 22.8
-          },
-          "created_at": "2026-07-27 05:01:31"
-        },
-        {
-          "id": 8977,
-          "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-          "event_type": "closed_reconciled",
-          "data": {
-            "exit_price": 0.85438,
-            "pnl": -0.12,
-            "pnl_pips": -7.6,
-            "actual_close_time": "2026-07-27T07:12:05.314",
-            "detection_time": "2026-07-27T06:22:37.852152+00:00"
-          },
-          "created_at": "2026-07-27 06:22:37"
-        }
-      ],
-      "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.025",
-      "source": "strategy:carry",
-      "record": {
-        "trade_id": "42e4e77961d54b039e2a8b18160d026f",
-        "signal_id": "adc75c3eee9a4c40816411836564f9b1",
-        "instrument": "EUR_GBP",
-        "direction": "short",
-        "source": "strategy:carry",
-        "signal": {
-          "confidence": 0.125,
-          "reasoning": "Carry Trade (Menkhoff 2012) \u2014 long high-yield, short low-yield currencies. Indicators: base_rate=4.5, quote_rate=5.25, differential=-0.75, vol_penalty=0.025",
-          "key_factors": null,
-          "risk_factors": null,
-          "prompt_version": null,
-          "model": null
-        },
-        "challenge": null,
-        "headlines_used": null,
-        "price_context": null,
-        "bias_at_trade": {
-          "direction": "bearish",
-          "strength": 1.0,
-          "bias_since": "2026-07-22T08:17:37.326395+00:00"
-        },
-        "risk_decision": {
-          "approved": true,
-          "position_size": 100,
-          "rejection_reason": null,
-          "entry_price": 0.85362,
-          "stop_loss": 0.8545076785714286,
-          "take_profit": 0.8518446428571429
-        },
-        "metadata": {
-          "parameters": {
-            "rate_data": "manual",
-            "min_differential": 0.5,
-            "rates": {
-              "USD": 5.25,
-              "EUR": 4.5,
-              "GBP": 5.25,
-              "JPY": 0.1,
-              "CHF": 1.75,
-              "AUD": 4.35,
-              "CAD": 5.0,
-              "NZD": 5.5
-            }
-          },
-          "indicators": {
-            "base_rate": 4.5,
-            "quote_rate": 5.25,
-            "differential": -0.75,
-            "vol_penalty": 0.025
-          },
-          "entry_price": 0.85362
-        },
-        "entry": {
-          "price": 0.85362,
-          "time": "2026-07-26T22:53:31.918309+00:00",
-          "broker_deal_id": "00005552-001c-241e-0000-000080bc013f"
-        },
-        "exit": {
-          "price": 0.85438,
-          "time": "2026-07-27T07:12:05.314",
-          "pnl": -0.12,
-          "pnl_pips": -7.6,
-          "close_reason": null
-        }
-      },
-      "latest_snapshot": {
-        "current_price": 0.85412,
-        "unrealized_pl": -0.05,
-        "unrealized_pips": -5.0,
-        "distance_sl_pips": 3.9,
-        "distance_tp_pips": 22.8
       }
     }
   ]
